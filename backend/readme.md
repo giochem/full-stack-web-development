@@ -28,14 +28,14 @@ This backend provides essential features for a web application, focusing on hand
 - **API Pagination**: API responses include offset-based pagination for efficient data retrieval.
 - **Data Validation**: Input validation is handled using `express-validator` middleware.
 - **Completed Endpoints**:
-  - **Authentication**:
-  - **User Management**:
-  - **Product Management**:
-  - **Collection Management**:
-  - **Promotion Management**:
-  - **Cart Management**:
-  - **Order Management**:
-  - **Order Item Management**:
+  - **Authentication**
+  - **User Management**
+  - **Product Management**
+  - **Collection Management**
+  - **Promotion Management**
+  - **Cart Management**
+  - **Order Management**
+  - **Order Item Management**
 
 > Note : Each feature is designed to ensure that data is validated, API responses are paginated, and sessions are securely managed.
 
@@ -58,7 +58,7 @@ To get the backend running on your local machine, follow these steps:
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/yourusername/backend.git
+   git clone https://github.com/giochem/full-stack-web-development.git
    ```
 
 2. **Navigate into the project directory**:
