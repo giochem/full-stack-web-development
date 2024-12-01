@@ -14,6 +14,7 @@ apiRoute.get("", (req, res) => {
   res.json("Hi! this is backend");
 });
 apiRoute.use("/tmp", tmpRouter);
+
 apiRoute.use("/auth", authRouter);
 apiRoute.use("/users", userRouter);
 apiRoute.use("/products", productRouter);

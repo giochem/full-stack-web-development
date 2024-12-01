@@ -95,8 +95,9 @@ module.exports = {
         });
       }
       // remove image
-      fs.unlinkSync(`./src/uploads/${product[0].linkImage}`);
-
+      if (fs.existsSync(`./src/uploads/${product[0].linkImage}`)) {
+        fs.unlinkSync(`./src/uploads/${product[0].linkImage}`);
+      }
       await productService.deleteProduct(productID);
 
       res.status(200).json({
