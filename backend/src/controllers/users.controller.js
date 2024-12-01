@@ -36,8 +36,19 @@ module.exports = {
   },
   createUser: async (req, res, next) => {
     try {
-      const { username, email, password } = req.body;
-      const newUser = userService.createUser({ username, email, password });
+      const { username, email, password, role } = req.body;
+      const user = await userService.getUserByEmail(email);
+      if (user.length !== 0) {
+        return res
+          .status(400)
+          .json({ success: false, error: "duplicate email" });
+      }
+      const newUser = userService.createUser({
+        username,
+        email,
+        password,
+        role,
+      });
       res.status(200).json({
         success: true,
         data: newUser,
@@ -49,7 +60,7 @@ module.exports = {
 
   updateUser: async (req, res, next) => {
     try {
-      const { username, email, password } = req.body;
+      const { username, email, password, role } = req.body;
       const userID = req.params.userID;
 
       await userService.updateUser({
@@ -57,6 +68,7 @@ module.exports = {
         email,
         password,
         userID,
+        role,
       });
       return res.status(200).json({
         success: true,
