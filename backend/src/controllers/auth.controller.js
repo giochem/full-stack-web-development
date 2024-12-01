@@ -12,7 +12,7 @@ module.exports = {
 
     req.session.userID = user[0].userID;
     req.session.role = user[0].role;
-
+    console.log(req.sessionID);
     return res.status(200).json({ success: true, data: user });
   },
   register: async (req, res, next) => {
@@ -29,21 +29,22 @@ module.exports = {
         username,
         email,
         password,
-        role,
+        role: "client",
       });
 
       req.session.userID = newData[0].userID;
-      req.session.role = role;
+      req.session.role = newData[0].role;
 
       return res.status(201).json({
         success: true,
-        message: "Successfully register",
+        data: newData,
       });
     } catch (error) {
       console.log(error);
     }
   },
   check: async (req, res, next) => {
+    console.log(req.sessionID);
     return res.status(200).json({
       success: true,
       userID: req.session.userID,

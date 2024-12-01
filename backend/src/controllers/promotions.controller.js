@@ -73,7 +73,6 @@ module.exports = {
     }
   },
 
-
   deletePromotion: async (req, res, next) => {
     try {
       const promotionID = req.params.promotionID;

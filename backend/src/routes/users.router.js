@@ -9,7 +9,12 @@ const userValidation = require("../validations/users.validation");
 
 // mangement users: createUser, getUsers, getUser, updateUser, deleteUser
 router.post("/", userController.createUser);
-router.get("/", userValidation.getUsers, userController.getUsers);
+router.get(
+  "/",
+  authorizeRoles("admin"),
+  userValidation.getUsers,
+  userController.getUsers
+);
 router.get(
   "/:userID",
   authorizeRoles("admin", "client"),
