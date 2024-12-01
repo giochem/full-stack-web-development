@@ -30,21 +30,19 @@ module.exports = {
     const createAt = new Date().toISOString().slice(0, 19).replace("T", " ");
 
     const data = await pool(
-      `INSERT INTO Users (username, email, password, role, createAt) OUTPUT inserted.userID
+      `INSERT INTO Users (username, email, password, role, createAt) OUTPUT inserted.userID, inserted.role
       VALUES ('${username}','${email}','${password}','${role}','${createAt}');`
     );
 
     return data.recordset;
   },
   updateUser: async (user) => {
-    const { userID, username, email, password } = user;
+    const { userID, username, email, password, role } = user;
     const updateAt = new Date().toISOString().slice(0, 19).replace("T", " ");
 
-    const data = await pool(`UPDATE Users
-      SET username='${username}', email='${email}', password='${password}', updateAt='${updateAt}'
+    await pool(`UPDATE Users
+      SET username='${username}', email='${email}', password='${password}', role='${role}', updateAt='${updateAt}'
       WHERE userID=${userID};`);
-
-    return data.recordset;
   },
   deleteUser: async (user) => {
     const { userID } = user;
