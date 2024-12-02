@@ -1,71 +1,89 @@
 const { pool, config } = require("../configs/db");
 const sql = require("mssql");
+
 module.exports = {
   getPromotionsByOffsetBased: async (offset, limit) => {
-    const data = await pool(
-      `select * from Promotions ORDER BY PromotionID OFFSET ${offset} rows FETCH NEXT ${limit} ROWS ONLY;`
-    );
+    const conn = await sql.connect(config);
+    console.log("Connected to SQLServer...");
+    console.log("procedure getPromotionsByOffsetBased");
+    
+    const data = await conn
+      .request()
+      .input("offset", sql.Int, offset)
+      .input("limit", sql.Int, limit)
+      .query("SELECT * FROM Promotions ORDER BY promotionID OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY");
+    
     return data.recordset;
   },
+
   getPromotionByPromotionID: async (promotionID) => {
-    const data = await pool(
-      `SELECT * FROM Promotions WHERE PromotionID=${promotionID};`
-    );
+    const conn = await sql.connect(config);
+    console.log("Connected to SQLServer...");
+    console.log("procedure getPromotionByPromotionID");
+    
+    const data = await conn
+      .request()
+      .input("promotionID", sql.Int, promotionID)
+      .query("SELECT * FROM Promotions WHERE promotionID = @promotionID");
+    
     return data.recordset;
   },
+
   getPromotionByName: async (name) => {
-    const data = await pool(`SELECT * FROM Promotions WHERE name='${name}';`);
+    const conn = await sql.connect(config);
+    console.log("Connected to SQLServer...");
+    console.log("procedure getPromotionByName");
+    
+    const data = await conn
+      .request()
+      .input("name", sql.NVarChar(255), name)
+      .query("SELECT * FROM Promotions WHERE name = @name");
+    
     return data.recordset;
   },
+
   createPromotion: async (promotion) => {
     const { name, reduce, startTime, endTime } = promotion;
-    const data = await pool(
-      `INSERT INTO Promotions (name, reduce, startTime, endTime) 
-      VALUES ('${name}',${reduce}, '${startTime}','${endTime}');`
-    );
+    const conn = await sql.connect(config);
+    console.log("Connected to SQLServer...");
+    console.log("procedure createPromotion");
+    
+    const data = await conn
+      .request()
+      .input("name", sql.NVarChar(255), name)
+      .input("reduce", sql.TinyInt, reduce)
+      .input("startTime", sql.DateTime, startTime)
+      .input("endTime", sql.DateTime, endTime)
+      .query("INSERT INTO Promotions (name, reduce, startTime, endTime) VALUES (@name, @reduce, @startTime, @endTime); SELECT SCOPE_IDENTITY() AS promotionID;");
+    
     return data.recordset;
   },
+
   updatePromotion: async (promotion) => {
-    const { promotionID, name, reduce, startTime, endTime, productIDs } =
-      promotion;
-    await sql
-      .connect(config)
-      .then((conn) => {
-        console.log("Connected to SQLServer...");
-        console.log("procedure updatePromotion");
-        conn
-          .request()
-          .input("promotionID", sql.Int, promotionID)
-          .input("name", sql.NVarChar(255), name)
-          .input("reduce", sql.TinyInt, reduce)
-          .input("startTime", sql.DateTime, startTime)
-          .input("endTime", sql.DateTime, endTime)
-          .input("productIDs", sql.VarChar(255), productIDs)
-          .execute("updatePromotion")
-          .catch((err) => {
-            console.log("Database Execute Failed! Bad Config: ", err);
-          });
-      })
-      .catch((err) => {
-        console.log("Database Connection Failed! Bad Config: ", err);
-      });
+    const { promotionID, name, reduce, startTime, endTime, productIDs } = promotion;
+    const conn = await sql.connect(config);
+    console.log("Connected to SQLServer...");
+    console.log("procedure updatePromotion");
+    
+    await conn
+      .request()
+      .input("promotionID", sql.Int, promotionID)
+      .input("name", sql.NVarChar(255), name)
+      .input("reduce", sql.TinyInt, reduce)
+      .input("startTime", sql.DateTime, startTime)
+      .input("endTime", sql.DateTime, endTime)
+      .input("productIDs", sql.VarChar(255), productIDs)
+      .execute("updatePromotion");
   },
+
   deletePromotion: async (promotionID) => {
-    await sql
-      .connect(config)
-      .then((conn) => {
-        console.log("Connected to SQLServer...");
-        console.log("procedure deletePromotion");
-        conn
-          .request()
-          .input("promotionID", sql.Int, promotionID)
-          .execute("deletePromotion")
-          .catch((err) => {
-            console.log("Database Execute Failed! Bad Config: ", err);
-          });
-      })
-      .catch((err) => {
-        console.log("Database Connection Failed! Bad Config: ", err);
-      });
+    const conn = await sql.connect(config);
+    console.log("Connected to SQLServer...");
+    console.log("procedure deletePromotion");
+    
+    await conn
+      .request()
+      .input("promotionID", sql.Int, promotionID)
+      .execute("deletePromotion");
   },
 };

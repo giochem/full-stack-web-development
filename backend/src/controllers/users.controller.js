@@ -1,94 +1,66 @@
 const userService = require("../services/users.service");
-const { validationResult } = require("express-validator");
+const Response = require("../configs/response");
+const { Message, StatusCode } = require("../utils/constants");
 
 module.exports = {
   getUsers: async (req, res, next) => {
-    try {
-      // const errors = validationResult(req);
-      // if (!errors.isEmpty()) {
-      //   return res.status(400).json({
-      //     success: false,
-      //     errors: errors.array(),
-      //   });
-      // }
-      const { page, size } = req.query;
-      // offset-based
-      const offset = page * size;
-      const data = await userService.getUsersByOffsetBased(offset, size);
-      // keyset-based
-      // const data = await userService.getUsersByKeysetBased(lastID, limit);
-      return res.status(200).json({ success: true, data: data });
-    } catch (error) {
-      console.log(error);
-    }
+    const { page, size } = req.query;
+    // offset-based
+    const offset = page * size;
+    const data = await userService.getUsersByOffsetBased(offset, size);
+    // keyset-based
+    // const data = await userService.getUsersByKeysetBased(lastID, limit);
+    return Response.success(res, Message.SUCCESS_GET_USERS, data, StatusCode.OK);
   },
+
   getUser: async (req, res, next) => {
-    try {
-      const { userID } = req.params;
-      const data = await userService.getUser({ userID });
-      res.status(200).json({
-        success: true,
-        data: data,
-      });
-    } catch (error) {
-      console.log(error);
+    const { userID } = req.params;
+    const data = await userService.getUser({ userID });
+    if (!data || data.length === 0) {
+      return Response.error(res, Message.ERROR_USER_NOT_FOUND, null, StatusCode.NOT_FOUND);
     }
+    return Response.success(res, Message.SUCCESS_GET_USER, data, StatusCode.OK);
   },
+
   createUser: async (req, res, next) => {
-    try {
-      const { username, email, password, role } = req.body;
-      const user = await userService.getUserByEmail(email);
-      if (user.length !== 0) {
-        return res
-          .status(400)
-          .json({ success: false, error: "duplicate email" });
-      }
-      const newUser = userService.createUser({
-        username,
-        email,
-        password,
-        role,
-      });
-      res.status(200).json({
-        success: true,
-        data: newUser,
-      });
-    } catch (error) {
-      console.log(error);
+    const { username, email, password, role } = req.body;
+    const user = await userService.getUserByEmail(email);
+    if (user.length !== 0) {
+      return Response.error(res, Message.ERROR_EMAIL_EXISTS, null, StatusCode.CONFLICT);
     }
+    const newUser = await userService.createUser({
+      username,
+      email,
+      password,
+      role,
+    });
+    return Response.success(res, Message.SUCCESS_CREATE_USER, newUser, StatusCode.CREATED);
   },
 
   updateUser: async (req, res, next) => {
-    try {
-      const { username, email, password, role } = req.body;
-      const userID = req.params.userID;
-
-      await userService.updateUser({
-        username,
-        email,
-        password,
-        userID,
-        role,
-      });
-      return res.status(200).json({
-        success: true,
-        message: "successfully updated",
-      });
-    } catch (error) {
-      console.log(error);
+    const { username, email, password, role } = req.body;
+    const { userID } = req.params;
+    const user = await userService.getUser({ userID });
+    if (!user || user.length === 0) {
+      return Response.error(res, Message.ERROR_USER_NOT_FOUND, null, StatusCode.NOT_FOUND);
     }
+    await userService.updateUser({
+      username,
+      email,
+      password,
+      userID,
+      role,
+    });
+    return Response.success(res, Message.SUCCESS_UPDATE_USER, null, StatusCode.OK);
   },
 
   deleteUser: async (req, res, next) => {
-    try {
-      const userID = req.params.userID;
-      await userService.deleteUser({ userID });
-      res.status(200).json({
-        success: true,
-        message: "successfully deleted",
-      });
-    } catch (error) {
-      console.log(error);
+    const { userID } = req.params;
+    const user = await userService.getUser({ userID });
+    if (!user || user.length === 0) {
+      return Response.error(res, Message.ERROR_USER_NOT_FOUND, null, StatusCode.NOT_FOUND);
     }
+    await userService.deleteUser({ userID });
+    return Response.success(res, Message.SUCCESS_DELETE_USER, null, StatusCode.OK);
   },
 };
