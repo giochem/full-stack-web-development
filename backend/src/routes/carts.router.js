@@ -5,13 +5,6 @@ const { validate } = require("../middlewares/validate.middleware");
 const cartValidation = require("../validations/carts.validation");
 const cartController = require("../controllers/carts.controller");
 
-// router.post("/",
-//   authorizeRoles("client"),
-//   cartValidation.createCart,
-//   validate,
-//   cartController.createCart
-// );
-
 router.get(
   "/",
   authorizeRoles("admin", "client"),
@@ -19,28 +12,18 @@ router.get(
   validate,
   cartController.getCarts
 );
-
 router.get(
-  "/:cartID",
+  "/owner",
   authorizeRoles("admin", "client"),
-  cartValidation.getCart,
-  validate,
-  cartController.getCart
+  cartController.getOwnerCart
 );
 
 router.put(
-  "/:cartID",
-  authorizeRoles("client"),
+  "/",
+  authorizeRoles("client", "admin"),
   cartValidation.updateCart,
   validate,
   cartController.updateCart
 );
-
-// router.delete("/:cartID",
-//   authorizeRoles("client"),
-//   cartValidation.deleteCart,
-//   validate,
-//   cartController.deleteCart
-// );
 
 module.exports = router;

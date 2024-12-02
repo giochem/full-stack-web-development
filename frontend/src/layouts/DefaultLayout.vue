@@ -1,11 +1,12 @@
 <template>
-  <v-layout>
-    <HeaderDefault />
-    <router-view></router-view>
-    <FooterDefault />
-  </v-layout>
+  <HeaderDefault />
+  <router-view></router-view>
+  <FooterDefault />
 </template>
-<script setup>
+<script>
 import FooterDefault from "@/components/layouts/FooterDefault.vue";
 import HeaderDefault from "@/components/layouts/HeaderDefault.vue";
+export default {
+  components: { FooterDefault, HeaderDefault },
+};
 </script>

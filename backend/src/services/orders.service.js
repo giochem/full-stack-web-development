@@ -31,7 +31,7 @@ module.exports = {
     return data.recordset;
   },
 
-  createOrder: async (userID) => {
+  createOrderByUserID: async (userID) => {
     const conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
     console.log("procedure createOrder");

@@ -1,45 +1,97 @@
 <template>
-  <div class="container">
-    <div class="wrapper">
-      <div class="notify" ref="notify">Notify.</div>
-      <h1>Trang web quần áo thời trang 369</h1>
-      <div class="content">
-        <img src="@/assets/images/products/apparel1.jpg" alt="" />
-        <form action="">
-          <h3>{{ status }}</h3>
+  <div class="auth">
+    <div class="auth-container">
+      <div class="auth-content">
+        <!-- Left side - Brand Section -->
+        <div class="brand-section">
+          <div class="brand-content">
+            <h1>Thời trang 369</h1>
+            <p class="brand-description">
+              Khám phá xu hướng thời trang mới nhất cùng với 369 Fashion
+            </p>
+            <div class="brand-image">
+              <img
+                src="@/assets/images/products/apparel1.jpg"
+                alt="Fashion Banner"
+              />
+            </div>
+          </div>
+        </div>
 
-          <label for="email">Email</label
-          ><input v-model="form.email" name="email" type="email" />
-          <br />
-          <label for="password">Mật khẩu</label>
-          <input v-model="form.password" name="password" type="password" />
-          <br />
-          <div v-show="status === 'register'">
-            <label for="password2">Nhập lại Mật khẩu</label
-            ><input v-model="form.password2" name="password2" type="password" />
-          </div>
-          <br />
-          <div class="" v-if="status === 'login'">
-            <button @click.prevent="login">Đăng nhập</button
-            ><button @click.prevent="toggleStatus">Đăng ký</button>
-            <button @click.prevent="forgotPassword">Quên mật khẩu</button>
-          </div>
+        <!-- Right side - Auth Form -->
+        <div class="auth-form-container">
+          <form class="auth-form" @submit.prevent>
+            <h2>{{ status === "login" ? "Đăng nhập" : "Đăng ký" }}</h2>
 
-          <div v-else>
-            <button @click.prevent="register">Đăng ký</button
-            ><button @click.prevent="toggleStatus">Đăng nhập</button>
-            <button @click.prevent="forgotPassword">Quên mật khẩu</button>
-          </div>
-        </form>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input
+                id="email"
+                v-model="form.email"
+                type="email"
+                required
+                placeholder="Nhập email của bạn"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="password">Mật khẩu</label>
+              <input
+                id="password"
+                v-model="form.password"
+                type="password"
+                required
+                placeholder="Nhập mật khẩu"
+              />
+            </div>
+
+            <div v-if="status === 'register'" class="form-group">
+              <label for="password2">Xác nhận mật khẩu</label>
+              <input
+                id="password2"
+                v-model="form.password2"
+                type="password"
+                required
+                placeholder="Nhập lại mật khẩu"
+              />
+            </div>
+
+            <div class="form-actions">
+              <button
+                class="primary-btn"
+                @click="status === 'login' ? login() : register()"
+              >
+                {{ status === "login" ? "Đăng nhập" : "Đăng ký" }}
+              </button>
+
+              <div class="secondary-actions">
+                <button class="text-btn" @click="toggleStatus">
+                  {{
+                    status === "login"
+                      ? "Tạo tài khoản mới"
+                      : "Đã có tài khoản?"
+                  }}
+                </button>
+
+                <button class="text-btn" @click="forgotPassword">
+                  Quên mật khẩu?
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
 </template>
+
 <script setup>
-import { onMounted, ref, useTemplateRef } from "vue";
+import { ref } from "vue";
+import { getCurrentInstance } from "vue";
 import axios from "axios";
+
+const app = getCurrentInstance();
 const status = ref("login");
-const notify = useTemplateRef("notify");
 
 const form = ref({
   email: "",
@@ -47,17 +99,9 @@ const form = ref({
   password2: "",
 });
 
-onMounted(() => {
-  const token = window.sessionStorage.getItem("token");
-  if (token) {
-    console.log("not have token");
-  }
-});
-
 async function login() {
   const { email, password } = form.value;
 
-  // axios
   const options = {
     method: "POST",
     url: "http://localhost:5000/api/auth/login",
@@ -68,6 +112,9 @@ async function login() {
   await axios
     .request(options)
     .then((res) => {
+      window.sessionStorage.setItem("logined", "true");
+      app?.proxy.$notify("Đăng nhập thành công!", "success");
+
       if (res.data.data[0].role === "admin") {
         window.location.href = "admin";
       } else {
@@ -77,32 +124,20 @@ async function login() {
     .catch((err) => {
       const data = err.response?.data;
       if (data) {
-        notify.value.innerText = data.error || data.errors;
-        notify.value.style.display = "block";
-        setTimeout(() => {
-          notify.value.style.display = "none";
-        }, 3000);
+        app?.proxy.$notify(data.message, "error");
       } else {
-        console.log(err);
+        app?.proxy.$notify("Có lỗi xảy ra", "error");
       }
     });
 }
 async function register() {
   const { email, password, password2 } = form.value;
-  if (email || password || password2) {
-    notify.value.innerText = "Vui lòng nhập đủ thông tin";
-    notify.value.style.display = "block";
-    setTimeout(() => {
-      notify.value.style.display = "none";
-    }, 3000);
+  if (!email || !password || !password2) {
+    app?.proxy.$notify("Vui lòng nhập đủ thông tin", "warning");
     return;
   }
   if (password !== password2) {
-    notify.value.innerText = "Mật khẩu nhập lại không trùng mật khẩu ban đầu";
-    notify.value.style.display = "block";
-    setTimeout(() => {
-      notify.value.style.display = "none";
-    }, 3000);
+    app?.proxy.$notify("Mật khẩu nhập lại không trùng khớp", "error");
     return;
   }
 
@@ -113,10 +148,13 @@ async function register() {
     credentials: "include",
     withCredentials: true,
   };
-  // axios
+
   await axios
     .request(options)
     .then((res) => {
+      window.sessionStorage.setItem("logined", "true");
+      app?.proxy.$notify("Đăng ký thành công!", "success");
+
       if (res.data.data[0].role === "admin") {
         window.location.href = "admin";
       } else {
@@ -124,15 +162,11 @@ async function register() {
       }
     })
     .catch((err) => {
-      const data = err.response.data;
+      const data = err.response?.data;
       if (data) {
-        notify.value.innerText = data.error || data.errors;
-        notify.value.style.display = "block";
-        setTimeout(() => {
-          notify.value.style.display = "none";
-        }, 3000);
+        app?.proxy.$notify(data.error || data.errors, "error");
       } else {
-        console.log(err);
+        app?.proxy.$notify("Có lỗi xảy ra", "error");
       }
     });
 }
@@ -156,64 +190,192 @@ function toggleStatus() {
   status.value = status.value === "login" ? "register" : "login";
 }
 </script>
+
 <style scoped>
-/* notify */
-.notify {
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: #fde073;
-  text-align: center;
-  line-height: 2.5;
-  overflow: hclassden;
-  -webkit-box-shadow: 0 0 5px black;
-  -moz-box-shadow: 0 0 5px black;
-  box-shadow: 0 0 5px black;
-  display: none;
+.auth {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  background: var(--light-bg-color);
 }
-.wrapper {
-  padding: 1em;
-}
-.wrapper h1 {
-  text-align: center;
-  padding: 0 0 1em 0;
-}
-.content {
-  display: grid;
-  grid-template-columns: 40% 60%;
-}
-.content img {
-  border-radius: 10px;
-}
-form {
-  width: 550px;
+
+.auth-container {
+  width: 100%;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 2em;
-  border: 1em solid var(--dark-color);
-  border-radius: 10px;
+  padding: 2rem;
+}
+
+.auth-content {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.brand-section {
+  background: var(--secondary-color);
+  padding: 4rem 2rem;
+  color: white;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.brand-content {
+  max-width: 500px;
+  margin: 0 auto;
   text-align: center;
 }
-form h3 {
+
+.brand-content h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.brand-description {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.brand-image {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.brand-image img {
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.auth-form-container {
+  padding: 2rem;
+}
+
+.auth-form {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.auth-form h2 {
   text-align: center;
-  text-transform: uppercase;
-  padding: 0.5em;
+  margin-bottom: 2rem;
+  color: var(--secondary-dark-color);
+  font-size: 1.8rem;
 }
-form label {
-  float: left;
+
+.form-group {
+  margin-bottom: 1.5rem;
 }
-form input {
-  float: right;
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--secondary-dark-color);
 }
-form button {
-  width: 200px;
-  padding: 1em;
-  margin: 1em;
-  text-align: center;
-  justify-content: center;
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
 }
-form button:hover {
-  background-color: var(--primary-color);
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 2px rgba(121, 74, 250, 0.1);
+}
+
+.form-actions {
+  margin-top: 2rem;
+}
+
+.primary-btn {
+  width: 100%;
+  padding: 0.875rem;
+  background: var(--secondary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.primary-btn:hover {
+  background: var(--primary-color);
+  transform: translateY(-1px);
+}
+
+.secondary-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.text-btn {
+  background: none;
+  border: none;
+  color: var(--secondary-dark-color);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  padding: 0.5rem;
+}
+
+.text-btn:hover {
+  color: var(--secondary-color);
+}
+
+@media (max-width: 1024px) {
+  .auth-content {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .brand-section {
+    padding: 2rem;
+  }
+
+  .brand-content h1 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .auth-container {
+    padding: 1rem;
+  }
+
+  .auth-content {
+    border-radius: 12px;
+  }
+
+  .brand-section {
+    padding: 1.5rem;
+  }
+
+  .auth-form-container {
+    padding: 1.5rem;
+  }
+
+  .secondary-actions {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
 }
 </style>

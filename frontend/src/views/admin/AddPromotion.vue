@@ -1,51 +1,86 @@
 <template>
-  <div class="container">
-    <div class="wrapper">
-      <div class="notify" ref="notify">Notify.</div>
-      <div class="dashboard">
-        <div class="header">
-          <input type="text" placeholder="Search..." />
-          <img width="30px" src="@/assets/logo.svg" alt="" />
+  <div class="admin-page">
+    <header class="page-header">
+      <div class="header-content">
+        <div class="header-title">
+          <h1>Add Promotion</h1>
         </div>
-        <h3>Add Promotion</h3>
-        <form action="">
-          <div>
-            <label for="">Name</label>
-            <input v-model="promotion.name" type="text" />
-          </div>
-          <div>
-            <label for="">Reduce (%)</label>
-            <input v-model="promotion.reduce" type="number" min="0" max="100" />
-          </div>
-          <div>
-            <label for="">Start Time</label>
-            <input v-model="promotion.startTime" type="datetime-local" />
-          </div>
-          <div>
-            <label for="">End Time</label>
-            <input v-model="promotion.endTime" type="datetime-local" />
-          </div>
-          <div>
-            <label for="">Product IDs</label>
-            <input
-              v-model="promotion.productIDs"
-              type="text"
-              placeholder="1,2,3"
+      </div>
+    </header>
+
+    <div class="form-container">
+      <form class="admin-form" @submit.prevent="save">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input 
+            id="name"
+            v-model="promotion.name" 
+            type="text"
+            placeholder="Enter promotion name"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="reduce">Discount (%)</label>
+          <input 
+            id="reduce"
+            v-model="promotion.reduce" 
+            type="number"
+            min="0"
+            max="100"
+            placeholder="Enter discount percentage"
+          />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="startTime">Start Time</label>
+            <input 
+              id="startTime"
+              v-model="promotion.startTime" 
+              type="datetime-local"
             />
           </div>
-          <div class="functions">
-            <button @click.prevent="save">Save</button>
+
+          <div class="form-group">
+            <label for="endTime">End Time</label>
+            <input 
+              id="endTime"
+              v-model="promotion.endTime" 
+              type="datetime-local"
+            />
           </div>
-        </form>
-      </div>
+        </div>
+
+        <div class="form-group">
+          <label for="productIDs">Product IDs</label>
+          <input 
+            id="productIDs"
+            v-model="promotion.productIDs" 
+            type="text"
+            placeholder="Enter product IDs (comma-separated)"
+          />
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="primary-btn">
+            Add Promotion
+          </button>
+          <RouterLink to="/admin/manage-promotion" class="secondary-btn">
+            Cancel
+          </RouterLink>
+        </div>
+      </form>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, useTemplateRef } from "vue";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 import axios from "axios";
-const notify = useTemplateRef("notify");
+
+const router = useRouter();
 
 const promotion = ref({
   name: "",
@@ -56,76 +91,147 @@ const promotion = ref({
 });
 
 async function save() {
-  const { name, reduce, startTime, endTime, productIDs } = promotion.value;
-  const productIDArray = productIDs.split(",").map((id) => parseInt(id.trim()));
-
-  const options = {
-    method: "POST",
-    url: `http://localhost:5000/api/promotions`,
-    withCredentials: true,
-    data: {
-      name,
-      reduce: parseInt(reduce),
-      startTime: startTime.replace("T", " "),
-      endTime: endTime.replace("T", " "),
-      productIDs: productIDArray,
-    },
-  };
-
   try {
-    await axios.request(options);
-    window.location.href = "/admin/manage-promotion";
-  } catch (err) {
-    notify.value.innerText = err.response.data.error;
-    notify.value.style.display = "block";
-    setTimeout(() => {
-      notify.value.style.display = "none";
-    }, 3000);
+    const productIDArray = promotion.value.productIDs
+      .split(",")
+      .map(id => parseInt(id.trim()));
+
+    const data = {
+      ...promotion.value,
+      productIDs: productIDArray,
+      reduce: parseInt(promotion.value.reduce),
+      startTime: promotion.value.startTime.replace("T", " "),
+      endTime: promotion.value.endTime.replace("T", " "),
+    };
+
+    await axios.post(
+      "http://localhost:5000/api/promotions",
+      data,
+      { withCredentials: true }
+    );
+    
+    router.push("/admin/manage-promotion");
+  } catch (error) {
+    console.error("Error adding promotion:", error);
   }
 }
 </script>
 
 <style scoped>
-.notify {
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: #fde073;
-  text-align: center;
-  line-height: 2.5;
-  overflow: hidden;
-  -webkit-box-shadow: 0 0 5px black;
-  -moz-box-shadow: 0 0 5px black;
-  box-shadow: 0 0 5px black;
-  display: none;
+/* Use the same styles as EditProduct.vue */
+.admin-page {
+  padding: 1.5rem;
 }
-.wrapper {
-  margin-left: 20em;
-  padding: 1em;
-  height: 100vh;
-  background-color: var(--light-bg-color);
+
+.page-header {
+  margin-bottom: 2rem;
 }
-.header {
+
+.header-content {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 1em;
+  justify-content: center;
+  align-items: center;
 }
-form {
-  width: 550px;
+
+.header-title {
+  text-align: center;
+}
+
+.header-title h1 {
+  font-size: 1.5rem;
+  color: var(--secondary-dark-color);
+  margin: 0;
+}
+
+.form-container {
+  max-width: 600px;
   margin: 0 auto;
-  padding: 2em;
-  border: 1em solid var(--dark-color);
-  border-radius: 10px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: var(--secondary-dark-color);
+}
+
+.form-group input {
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.primary-btn,
+.secondary-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  text-decoration: none;
   text-align: center;
 }
-form div {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5em;
+
+.primary-btn {
+  background: var(--primary-color);
+  color: white;
 }
-form .functions button {
-  background-color: var(--secondary-color);
+
+.primary-btn:hover {
+  background: var(--secondary-color);
+}
+
+.secondary-btn {
+  background: white;
+  border: 1px solid var(--border-color);
+  color: var(--secondary-dark-color);
+}
+
+.secondary-btn:hover {
+  background: var(--light-bg-color);
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
 }
 </style>

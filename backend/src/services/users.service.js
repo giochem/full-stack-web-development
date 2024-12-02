@@ -89,7 +89,6 @@ module.exports = {
 
   updateUser: async (user) => {
     const { userID, username, email, password, role } = user;
-    const { userID, username, email, password, role } = user;
     const updateAt = new Date().toISOString().slice(0, 19).replace("T", " ");
 
     const conn = await sql.connect(config);

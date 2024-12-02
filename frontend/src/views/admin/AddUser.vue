@@ -1,48 +1,76 @@
 <template>
-  <div class="container">
-    <div class="wrapper">
-      <div class="notify" ref="notify">Notify.</div>
-      <div class="dashboard">
-        <div class="header">
-          <input type="text" placeholder="Search..." /><img
-            width="30px"
-            src="@/assets/logo.svg"
-            alt=""
+  <div class="admin-page">
+    <header class="page-header">
+      <div class="header-content">
+        <div class="header-title">
+          <h1>Add User</h1>
+        </div>
+      </div>
+    </header>
+
+    <div class="form-container">
+      <form class="admin-form" @submit.prevent="save">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input 
+            id="email"
+            v-model="user.email" 
+            type="email"
+            placeholder="Enter email address"
           />
         </div>
-        <h3>Add User</h3>
-        <form action="">
-          <div>
-            <label for="">Email</label
-            ><input v-model="user.email" type="text" />
-          </div>
-          <div>
-            <label for="">Username</label>
-            <input v-model="user.username" type="text" />
-          </div>
-          <div>
-            <label for="">Password</label>
-            <input v-model="user.password" type="text" />
-          </div>
-          <div>
-            <label for="">Role</label>
-            <select v-model="user.role">
-              <option value="client">client</option>
-              <option value="admin">admin</option>
-            </select>
-          </div>
-          <div class="functions">
-            <button @click.prevent="save">Save</button>
-          </div>
-        </form>
-      </div>
+
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input 
+            id="username"
+            v-model="user.username" 
+            type="text"
+            placeholder="Enter username"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input 
+            id="password"
+            v-model="user.password" 
+            type="password"
+            placeholder="Enter password"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="role">Role</label>
+          <select 
+            id="role"
+            v-model="user.role"
+            class="form-select"
+          >
+            <option value="client">Client</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="primary-btn">
+            Add User
+          </button>
+          <RouterLink to="/admin/manage-user" class="secondary-btn">
+            Cancel
+          </RouterLink>
+        </div>
+      </form>
     </div>
   </div>
 </template>
+
 <script setup>
-import { onMounted, ref, useTemplateRef } from "vue";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 import axios from "axios";
-const notify = useTemplateRef("notify");
+
+const router = useRouter();
 
 const user = ref({
   email: "",
@@ -50,78 +78,133 @@ const user = ref({
   password: "",
   role: "client",
 });
-onMounted(async () => {});
+
 async function save() {
-  const { email, username, password, role } = user.value;
-  // axios
-  const options = {
-    method: "POST",
-    url: `http://localhost:5000/api/users`,
-    withCredentials: true,
-    data: {
-      email,
-      username,
-      password,
-      role,
-    },
-  };
-  await axios
-    .request(options)
-    .then((res) => {
-      window.location.href = "/admin/manage-user";
-    })
-    .catch((err) => {
-      notify.value.innerText = err.response.data.error;
-      notify.value.style.display = "block";
-      setTimeout(() => {
-        notify.value.style.display = "none";
-      }, 3000);
-    });
+  try {
+    await axios.post(
+      "http://localhost:5000/api/users",
+      user.value,
+      { withCredentials: true }
+    );
+    router.push("/admin/manage-user");
+  } catch (error) {
+    console.error("Error adding user:", error);
+  }
 }
 </script>
+
 <style scoped>
-/* notify */
-.notify {
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: #fde073;
-  text-align: center;
-  line-height: 2.5;
-  overflow: hclassden;
-  -webkit-box-shadow: 0 0 5px black;
-  -moz-box-shadow: 0 0 5px black;
-  box-shadow: 0 0 5px black;
-  display: none;
-}
-.wrapper {
-  margin-left: 20em;
-  padding: 1em;
-  height: 100vh;
-  background-color: var(--light-bg-color);
-}
-.header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1em;
-}
-form {
-  width: 550px;
-  margin: 0 auto;
-  padding: 2em;
-  border: 1em solid var(--dark-color);
-  border-radius: 10px;
-  text-align: center;
-}
-form div {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5em;
+/* Use the same styles as other admin forms */
+.admin-page {
+  padding: 1.5rem;
 }
 
-form .functions button {
-  background-color: var(--secondary-color);
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.header-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.header-title {
+  text-align: center;
+}
+
+.header-title h1 {
+  font-size: 1.5rem;
+  color: var(--secondary-dark-color);
+  margin: 0;
+}
+
+.form-container {
+  max-width: 600px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: var(--secondary-dark-color);
+}
+
+.form-group input,
+.form-select {
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.form-select {
+  background-color: white;
+  cursor: pointer;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.primary-btn,
+.secondary-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  text-decoration: none;
+  text-align: center;
+}
+
+.primary-btn {
+  background: var(--primary-color);
+  color: white;
+}
+
+.primary-btn:hover {
+  background: var(--secondary-color);
+}
+
+.secondary-btn {
+  background: white;
+  border: 1px solid var(--border-color);
+  color: var(--secondary-dark-color);
+}
+
+.secondary-btn:hover {
+  background: var(--light-bg-color);
+}
+
+@media (max-width: 768px) {
+  .form-actions {
+    flex-direction: column;
+  }
 }
 </style>
