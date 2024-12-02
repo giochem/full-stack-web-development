@@ -14,10 +14,19 @@ module.exports = {
       StatusCode.OK
     );
   },
-
-  getOrder: async (req, res, next) => {
+  getOwnerOrders: async (req, res, next) => {
+    const { userID } = req.session;
+    const data = await orderService.getOrdersByUserID(userID);
+    return Response.success(
+      res,
+      Message.SUCCESS_GET_ORDERS,
+      data,
+      StatusCode.OK
+    );
+  },
+  getOrderItem: async (req, res, next) => {
     const { orderID } = req.params;
-    const data = await orderService.getOrderByOrderID(orderID);
+    const data = await orderService.getOrderItemByOrderID(orderID);
     if (!data || data.length === 0) {
       return Response.error(
         res,

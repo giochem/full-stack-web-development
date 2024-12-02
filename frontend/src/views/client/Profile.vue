@@ -33,17 +33,28 @@
         <div class="profile-section">
           <h2>Order History</h2>
           <div class="orders-list" v-if="orders.length > 0">
-            <div v-for="order in orders" :key="order.orderID" class="order-card">
+            <div
+              v-for="order in orders"
+              :key="order.orderID"
+              class="order-card"
+            >
               <div class="order-header">
                 <span class="order-id">Order #{{ order.orderID }}</span>
-                <span :class="['order-status', order.status]">{{ order.status }}</span>
+                <span :class="['order-status', order.status]">{{
+                  order.status
+                }}</span>
               </div>
               <div class="order-details">
                 <div class="order-info">
                   <p class="order-date">{{ formatDate(order.createdAt) }}</p>
-                  <p class="order-total">{{ formatPrice(order.totalAmount) }} đ</p>
+                  <p class="order-total">
+                    {{ formatPrice(order.totalAmount) }} đ
+                  </p>
                 </div>
-                <button @click="viewOrderDetails(order.orderID)" class="view-btn">
+                <button
+                  @click="viewOrderDetails(order.orderID)"
+                  class="view-btn"
+                >
                   View Details
                 </button>
               </div>
@@ -61,12 +72,12 @@
         <div class="modal-content">
           <form @submit.prevent="updateProfile" class="edit-form">
             <h2>Edit Profile</h2>
-            
+
             <div class="form-group">
               <label for="username">Username</label>
-              <input 
+              <input
                 id="username"
-                v-model="editForm.username" 
+                v-model="editForm.username"
                 type="text"
                 placeholder="Enter username"
               />
@@ -74,9 +85,9 @@
 
             <div class="form-group">
               <label for="email">Email</label>
-              <input 
+              <input
                 id="email"
-                v-model="editForm.email" 
+                v-model="editForm.email"
                 type="email"
                 placeholder="Enter email"
               />
@@ -84,9 +95,9 @@
 
             <div class="form-group">
               <label for="password">New Password (optional)</label>
-              <input 
+              <input
                 id="password"
-                v-model="editForm.password" 
+                v-model="editForm.password"
                 type="password"
                 placeholder="Enter new password"
               />
@@ -94,9 +105,9 @@
 
             <div class="form-actions">
               <button type="submit" class="save-btn">Save Changes</button>
-              <button 
-                type="button" 
-                @click="showEditForm = false" 
+              <button
+                type="button"
+                @click="showEditForm = false"
                 class="cancel-btn"
               >
                 Cancel
@@ -110,30 +121,33 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import axios from 'axios';
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import axios from "axios";
 
 const router = useRouter();
 const user = ref({});
 const orders = ref([]);
 const showEditForm = ref(false);
+const showOrderDetails = ref(false);
+const selectedOrder = ref(null);
 const editForm = ref({
-  username: '',
-  email: '',
-  password: ''
+  userID: null,
+  username: "",
+  email: "",
+  password: "",
 });
 
 function formatDate(dateString) {
-  return new Date(dateString).toLocaleDateString('vi-VN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+  return new Date(dateString).toLocaleDateString("vi-VN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 }
 
 function formatPrice(price) {
-  return price.toLocaleString('vi-VN');
+  return price.toLocaleString("vi-VN");
 }
 
 function viewOrderDetails(orderID) {
@@ -142,28 +156,28 @@ function viewOrderDetails(orderID) {
 
 async function fetchUserProfile() {
   try {
-    const response = await axios.get('http://localhost:5000/api/users/profile', {
-      withCredentials: true
+    const response = await axios.get("http://localhost:5000/api/auth/profile", {
+      withCredentials: true,
     });
-    user.value = response.data.data;
+    user.value = response.data.data[0];
     editForm.value = {
       username: user.value.username,
       email: user.value.email,
-      password: ''
+      password: "",
     };
   } catch (error) {
-    console.error('Error fetching profile:', error);
+    console.error("Error fetching profile:", error);
   }
 }
 
 async function fetchOrders() {
   try {
-    const response = await axios.get('http://localhost:5000/api/orders/user', {
-      withCredentials: true
+    const response = await axios.get("http://localhost:5000/api/orders/owner", {
+      withCredentials: true,
     });
     orders.value = response.data.data;
   } catch (error) {
-    console.error('Error fetching orders:', error);
+    console.error("Error fetching orders:", error);
   }
 }
 
@@ -172,15 +186,20 @@ async function updateProfile() {
     const data = { ...editForm.value };
     if (!data.password) delete data.password;
 
-    await axios.put('http://localhost:5000/api/users/profile', data, {
-      withCredentials: true
+    await axios.put("http://localhost:5000/api/users/profile", data, {
+      withCredentials: true,
     });
-    
+
     await fetchUserProfile();
     showEditForm.value = false;
   } catch (error) {
-    console.error('Error updating profile:', error);
+    console.error("Error updating profile:", error);
   }
+}
+
+function closeOrderDetails() {
+  showOrderDetails.value = false;
+  selectedOrder.value = null;
 }
 
 onMounted(() => {
@@ -371,6 +390,175 @@ onMounted(() => {
   max-width: 500px;
 }
 
+.modal-content.order-details-modal {
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: var(--secondary-dark-color);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--light-text-color);
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.3s;
+}
+
+.close-btn:hover {
+  color: var(--secondary-dark-color);
+}
+
+.detail-section {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.detail-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.status-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.status-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-weight: 500;
+}
+
+.status-badge.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.processing {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-badge.completed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.date-info {
+  color: var(--light-text-color);
+}
+
+.order-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.order-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  background: var(--light-bg-color);
+  border-radius: 8px;
+}
+
+.item-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-details h4 {
+  margin: 0 0 0.5rem 0;
+  color: var(--secondary-dark-color);
+}
+
+.item-meta {
+  color: var(--light-text-color);
+  font-size: 0.9rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.item-price {
+  color: var(--primary-color);
+  font-weight: 500;
+  margin: 0;
+}
+
+.item-total {
+  font-weight: 500;
+  color: var(--primary-color);
+}
+
+.shipping-info p {
+  margin: 0.5rem 0;
+  color: var(--secondary-dark-color);
+}
+
+.shipping-info strong {
+  color: var(--light-text-color);
+  margin-right: 0.5rem;
+}
+
+.summary {
+  background: var(--light-bg-color);
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  color: var(--light-text-color);
+}
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  font-weight: 500;
+  color: var(--secondary-dark-color);
+  font-size: 1.1rem;
+}
+
 .edit-form {
   display: flex;
   flex-direction: column;
@@ -449,4 +637,4 @@ onMounted(() => {
     flex-direction: column;
   }
 }
-</style> 
+</style>

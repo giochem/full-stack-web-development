@@ -10,7 +10,7 @@ module.exports = {
       .withMessage("size in query is required and >= 1"),
   ],
 
-  getOrder: [
+  getOrderItem: [
     param("orderID")
       .notEmpty()
       .withMessage("orderID is required")

@@ -252,17 +252,59 @@ onMounted(() => {
 
 .product-price {
   font-size: 1.5em;
-  color: #2c3e50;
+  color: var(--secondary-dark-color);
   font-weight: bold;
 }
 
 .product-description {
   line-height: 1.6;
-  color: #666;
+  color: var(--light-text-color);
+}
+
+.product-options {
+  margin: 20px 0;
+}
+
+.product-options h3 {
+  margin-bottom: 10px;
+  font-size: 1.1em;
+  color: var(--secondary-dark-color);
+}
+
+.option-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.color-option,
+.size-option {
+  padding: 8px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.color-option.active,
+.size-option.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.color-option:hover,
+.size-option:hover {
+  border-color: var(--primary-color);
+}
+
+.stock-info {
+  color: var(--light-text-color);
+  font-size: 0.9em;
 }
 
 .product-actions {
-  margin-top: 20px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -271,13 +313,11 @@ onMounted(() => {
 .quantity-selector {
   display: inline-flex;
   align-items: center;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--border-color);
   border-radius: 8px;
-  overflow: hidden;
   height: 44px;
   background: white;
   width: fit-content;
-  align-self: flex-start;
 }
 
 .quantity-btn {
@@ -288,28 +328,19 @@ onMounted(() => {
   justify-content: center;
   background: transparent;
   border: none;
-  box-shadow: none;
-  color: #333;
+  color: var(--secondary-dark-color);
   font-size: 1.5em;
   cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 0;
+  transition: background 0.2s ease;
 }
 
 .quantity-btn:hover:not(:disabled) {
-  background: #f5f5f5;
+  background: var(--light-bg-color);
 }
 
 .quantity-btn:disabled {
-  color: #ccc;
+  color: var(--border-color);
   cursor: not-allowed;
-}
-
-.quantity-btn .minus,
-.quantity-btn .plus {
-  display: block;
-  line-height: 0;
-  font-weight: bold;
 }
 
 .quantity-input {
@@ -317,12 +348,11 @@ onMounted(() => {
   height: 100%;
   text-align: center;
   border: none;
-  border-left: 2px solid #e0e0e0;
-  border-right: 2px solid #e0e0e0;
+  border-left: 2px solid var(--border-color);
+  border-right: 2px solid var(--border-color);
   font-size: 1em;
-  font-weight: 500;
-  color: #333;
-  /* -moz-appearance: textfield; */
+  color: var(--secondary-dark-color);
+  -moz-appearance: textfield;
 }
 
 .quantity-input::-webkit-outer-spin-button,
@@ -331,13 +361,7 @@ onMounted(() => {
   margin: 0;
 }
 
-.quantity-input:focus {
-  outline: none;
-  background: #f8f8f8;
-}
-
 .add-to-cart-btn {
-  position: relative;
   width: 100%;
   padding: 15px;
   background: var(--primary-color);
@@ -347,7 +371,7 @@ onMounted(() => {
   cursor: pointer;
   font-size: 1.1em;
   font-weight: 500;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .add-to-cart-btn:disabled {
@@ -357,10 +381,6 @@ onMounted(() => {
 
 .add-to-cart-btn:hover:not(:disabled) {
   background: var(--secondary-color);
-}
-
-.add-to-cart-btn:active:not(:disabled) {
-  transform: scale(0.98);
 }
 
 .tooltip {
@@ -394,87 +414,16 @@ onMounted(() => {
   font-size: 1.25rem;
 }
 
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.tooltip.show {
-  animation: slideIn 0.3s ease forwards;
-}
-
 .loading {
   text-align: center;
   padding: 40px;
   font-size: 1.2em;
-  color: #666;
+  color: var(--light-text-color);
 }
 
 @media (max-width: 768px) {
   .product-container {
     grid-template-columns: 1fr;
   }
-
-  .quantity-selector {
-    height: 40px;
-  }
-
-  .quantity-btn {
-    width: 40px;
-  }
-
-  .quantity-input {
-    width: 40px;
-  }
-}
-
-.product-options {
-  margin: 20px 0;
-}
-
-.product-options h3 {
-  margin-bottom: 10px;
-  font-size: 1.1em;
-  color: #333;
-}
-
-.option-buttons {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.color-option,
-.size-option {
-  padding: 8px 16px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.color-option.active,
-.size-option.active {
-  background: #42b983;
-  color: white;
-  border-color: #42b983;
-}
-
-.color-option:hover,
-.size-option:hover {
-  border-color: #42b983;
-}
-
-.stock-info {
-  color: #666;
-  font-size: 0.9em;
-  margin: 10px 0;
 }
 </style>

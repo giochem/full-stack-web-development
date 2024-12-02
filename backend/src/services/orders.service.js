@@ -17,18 +17,30 @@ module.exports = {
 
     return data.recordset;
   },
-
-  getOrderByOrderID: async (orderID) => {
+  getOrdersByUserID: async (userID) => {
     const conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
-    console.log("procedure getOrderByOrderID");
+    console.log("procedure getOrdersByUserID");
+
+    const data = await conn
+      .request()
+      .input("userID", sql.Int, userID)
+      .execute("getOrdersByUserID");
+
+    return data.recordset;
+  },
+
+  getOrderItemByOrderID: async (orderID) => {
+    const conn = await sql.connect(config);
+    console.log("Connected to SQLServer...");
+    console.log("procedure getOrderItemByOrderID");
 
     const data = await conn
       .request()
       .input("orderID", sql.Int, orderID)
-      .query("SELECT * FROM Orders WHERE orderID = @orderID");
+      .execute("getOrderItemByOrderID");
 
-    return data.recordset;
+    return data.recordsets;
   },
 
   createOrderByUserID: async (userID) => {

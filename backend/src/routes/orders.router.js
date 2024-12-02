@@ -21,13 +21,18 @@ router.get(
   validate,
   orderController.getOrders
 );
+router.get(
+  "/owner",
+  authorizeRoles("admin", "client"),
+  orderController.getOwnerOrders
+);
 
 router.get(
   "/:orderID",
   authorizeRoles("admin", "client"),
-  orderValidation.getOrder,
+  orderValidation.getOrderItem,
   validate,
-  orderController.getOrder
+  orderController.getOrderItem
 );
 
 router.put(
