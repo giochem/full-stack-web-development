@@ -8,9 +8,9 @@ const orderController = require("../controllers/orders.controller");
 
 router.post(
   "/",
-  authorizeRoles("client"),
-  orderValidation.createOrder,
-  validate,
+  authorizeRoles("client", "admin"),
+  // orderValidation.createOrder,
+  // validate,
   orderController.createOrder
 );
 
@@ -21,28 +21,26 @@ router.get(
   validate,
   orderController.getOrders
 );
+router.get(
+  "/owner",
+  authorizeRoles("admin", "client"),
+  orderController.getOwnerOrders
+);
 
 router.get(
   "/:orderID",
   authorizeRoles("admin", "client"),
-  orderValidation.getOrder,
+  orderValidation.getOrderItem,
   validate,
-  orderController.getOrder
+  orderController.getOrderItem
 );
 
 router.put(
   "/:orderID",
-  authorizeRoles("admin"),
+  authorizeRoles("admin", "client"),
   orderValidation.updateOrder,
   validate,
   orderController.updateOrder
 );
-
-// router.delete("/:orderID",
-//   authorizeRoles("admin"),
-//   orderValidation.deleteOrder,
-//   validate,
-//   orderController.deleteOrder
-// );
 
 module.exports = router;

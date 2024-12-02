@@ -6,13 +6,15 @@ module.exports = {
     const conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
     console.log("procedure getCartsByOffsetBased");
-    
+
     const data = await conn
       .request()
       .input("offset", sql.Int, offset)
       .input("limit", sql.Int, limit)
-      .query("SELECT * FROM CartItem ORDER BY userID OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY");
-    
+      .query(
+        "SELECT * FROM CartItem ORDER BY userID OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY"
+      );
+
     return data.recordset;
   },
 
@@ -20,12 +22,12 @@ module.exports = {
     const conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
     console.log("procedure getCartByUserID");
-    
+
     const data = await conn
       .request()
       .input("userID", sql.Int, userID)
-      .query("SELECT * FROM CartItem WHERE userID = @userID");
-    
+      .execute("getCartByUserID");
+
     return data.recordset;
   },
 
@@ -34,7 +36,7 @@ module.exports = {
     const conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
     console.log("procedure updateCart");
-    
+
     await conn
       .request()
       .input("userID", sql.Int, userID)

@@ -10,12 +10,12 @@ module.exports = {
       .withMessage("size in query is required and >= 1"),
   ],
 
-  getOrder: [
+  getOrderItem: [
     param("orderID")
       .notEmpty()
       .withMessage("orderID is required")
       .isInt()
-      .withMessage("orderID must be an integer")
+      .withMessage("orderID must be an integer"),
   ],
 
   createOrder: [
@@ -26,7 +26,7 @@ module.exports = {
       .withMessage("userID must be an integer"),
     body("status")
       .optional()
-      .isIn(["pending", "processing", "completed", "cancelled"])
+      .isIn(["processing", "completed", "cancelled"])
       .withMessage("Invalid status value"),
   ],
 
@@ -38,7 +38,7 @@ module.exports = {
       .withMessage("orderID must be an integer"),
     body("status")
       .optional()
-      .isIn(["pending", "processing", "completed", "cancelled"])
+      .isIn(["processing", "completed", "cancelled"])
       .withMessage("Invalid status value"),
   ],
 
@@ -47,6 +47,6 @@ module.exports = {
       .notEmpty()
       .withMessage("orderID is required")
       .isInt()
-      .withMessage("orderID must be an integer")
+      .withMessage("orderID must be an integer"),
   ],
-}; 
+};

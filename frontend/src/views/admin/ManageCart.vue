@@ -1,167 +1,269 @@
 <template>
-  <div class="container">
-    <div class="wrapper">
-      <div class="dashboard">
-        <div class="header">
-          <input type="text" placeholder="Search..." />
-          <img width="30px" src="@/assets/logo.svg" alt="" />
-        </div>
-        <h3>Manage Carts</h3>
-        <div class="content">
-          <table>
-            <thead>
-              <tr>
-                <th>STT</th>
-                <th>User ID</th>
-                <th>Product ID</th>
-                <th>Quantity</th>
-                <th>Functions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(cart, index) in carts" :key="cart.cartID">
-                <td>{{ index + 1 }}</td>
-                <td>{{ cart.userID }}</td>
-                <td>{{ cart.productID }}</td>
-                <td>{{ cart.quantity }}</td>
-                <td>
-                  <p @click="remove(cart.cartID)">Delete</p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="pagination">
-            <ul>
-              <li @click.prevent="changePage(newPage[0] - 1)"><~~</li>
-              <li @click.prevent="changePage(newPage[0])">{{ newPage[0] }}</li>
-              <li @click.prevent="changePage(newPage[1])">{{ newPage[1] }}</li>
-              <li @click.prevent="changePage(newPage[2])">{{ newPage[2] }}</li>
-              <li @click.prevent="changePage(newPage[2] + 1)">~~></li>
-            </ul>
+  <div class="admin-page">
+    <header class="page-header">
+      <div class="header-content">
+        <h1>Manage Carts</h1>
+        <div class="header-actions">
+          <div class="search-box">
+            <i class="ri-search-line"></i>
+            <input type="text" placeholder="Search carts..." />
           </div>
         </div>
       </div>
+    </header>
+
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(cart, index) in carts" :key="cart.cartID">
+            <td>{{ index + 1 }}</td>
+            <td>{{ cart.userID }}</td>
+            <td>{{ cart.productID }}</td>
+            <td>{{ formatPrice(cart.price) }} đ</td>
+            <td>
+              <span class="quantity-badge">
+                {{ cart.quantity }}
+              </span>
+            </td>
+            <td>{{ formatPrice(cart.price * cart.quantity) }} đ</td>
+            <td>
+              <div class="action-buttons">
+                <button 
+                  @click="remove(cart.cartID)"
+                  class="delete-btn"
+                >
+                  <i class="ri-delete-bin-line"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <button 
+        class="page-btn"
+        @click="changePage(currentPage - 1)"
+        :disabled="currentPage <= 0"
+      >
+        <i class="ri-arrow-left-s-line"></i>
+      </button>
+      
+      <button 
+        v-for="page in displayedPages"
+        :key="page"
+        @click="changePage(page)"
+        :class="['page-btn', { active: currentPage === page }]"
+      >
+        {{ page + 1 }}
+      </button>
+      
+      <button 
+        class="page-btn"
+        @click="changePage(currentPage + 1)"
+        :disabled="!hasMorePages"
+      >
+        <i class="ri-arrow-right-s-line"></i>
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
-const currentPage = ref(0);
-const newPage = ref([1, 2, 3]);
 const carts = ref([]);
+const currentPage = ref(0);
+const itemsPerPage = 10;
+const totalPages = ref(1);
 
-onMounted(async () => {
-  const options = {
-    method: "GET",
-    url: "http://localhost:5000/api/carts?page=0&size=10",
-    withCredentials: true,
-  };
-
-  try {
-    const res = await axios.request(options);
-    carts.value = res.data.data;
-  } catch (err) {
-    console.log(err);
+const displayedPages = computed(() => {
+  const pages = [];
+  const start = Math.max(0, currentPage.value - 1);
+  const end = Math.min(totalPages.value - 1, start + 2);
+  
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
   }
+  return pages;
 });
 
-async function changePage(newValue) {
-  if (newValue < 0 || newValue === currentPage.value) {
-    return;
-  }
-  currentPage.value = newValue;
-  newPage.value = [newValue, newValue + 1, newValue + 2];
+const hasMorePages = computed(() => {
+  return currentPage.value < totalPages.value - 1;
+});
 
-  const options = {
-    method: "GET",
-    url: `http://localhost:5000/api/carts?page=${newValue}&size=10`,
-    withCredentials: true,
-  };
+function formatPrice(price) {
+  return price.toLocaleString("vi-VN");
+}
 
+async function fetchCarts(page = 0) {
   try {
-    const res = await axios.request(options);
-    carts.value = res.data.data;
-  } catch (err) {
-    console.log(err);
+    const response = await axios.get(
+      `http://localhost:5000/api/carts?page=${page}&size=${itemsPerPage}`,
+      { withCredentials: true }
+    );
+    carts.value = response.data.data;
+    totalPages.value = Math.ceil(response.data.total / itemsPerPage);
+  } catch (error) {
+    console.error("Error fetching carts:", error);
   }
+}
+
+async function changePage(newPage) {
+  if (newPage < 0 || newPage >= totalPages.value) return;
+  currentPage.value = newPage;
+  await fetchCarts(newPage);
 }
 
 async function remove(cartID) {
   if (!confirm("Are you sure you want to delete this cart item?")) return;
-
-  const options = {
-    method: "DELETE",
-    url: `http://localhost:5000/api/carts/${cartID}`,
-    withCredentials: true,
-  };
-
+  
   try {
-    await axios.request(options);
-    router.go();
-  } catch (err) {
-    console.log(err);
+    await axios.delete(`http://localhost:5000/api/carts/${cartID}`, {
+      withCredentials: true,
+    });
+    await fetchCarts(currentPage.value);
+  } catch (error) {
+    console.error("Error deleting cart item:", error);
   }
 }
+
+onMounted(() => {
+  fetchCarts();
+});
 </script>
 
 <style scoped>
-.wrapper {
-  margin-left: 20em;
-  padding: 1em;
-  height: 100vh;
-  background-color: var(--light-bg-color);
+.admin-page {
+  padding: 1.5rem;
 }
-.header {
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.header-content {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 1em;
+  align-items: center;
 }
-.dashboard .functions {
+
+.header-actions {
   display: flex;
-  justify-content: space-between;
-  padding: 1em;
-  background-color: var(--light-bg-color);
+  gap: 1rem;
 }
-.dashboard .functions button {
-  background-color: var(--secondary-color);
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  width: 200px;
+}
+
+.table-container {
+  background: white;
   border-radius: 8px;
-  color: var(--white-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
-.dashboard table {
-  border-collapse: collapse;
+
+.data-table {
   width: 100%;
+  border-collapse: collapse;
 }
-.dashboard .content .pagination ul {
-  display: flex;
-  justify-content: space-evenly;
-  padding: 2em 15em;
-  margin: 0 5em;
-}
-.dashboard .content .pagination ul li {
-  cursor: pointer;
-  border: 1px solid var(--primary-color);
-  padding: 6px;
-  border-radius: 10px;
-}
-th,
-td {
-  padding: 0.25rem;
+
+.data-table th,
+.data-table td {
+  padding: 1rem;
   text-align: left;
-  border: 1px solid #ccc;
+  border-bottom: 1px solid var(--border-color);
 }
-tbody tr:nth-child(odd) {
-  background: #eee;
+
+.data-table th {
+  background: var(--light-bg-color);
+  font-weight: 600;
 }
-tbody td:last-child {
+
+.quantity-badge {
+  padding: 0.25rem 0.5rem;
+  background: var(--light-bg-color);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: var(--secondary-dark-color);
+}
+
+.action-buttons {
   display: flex;
-  justify-content: space-evenly;
+  gap: 0.5rem;
 }
-tbody td p {
+
+.delete-btn {
+  padding: 0.5rem;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s;
+  color: #dc3545;
+  background: rgba(220, 53, 69, 0.1);
+}
+
+.delete-btn:hover {
+  background: rgba(220, 53, 69, 0.2);
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+.page-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color);
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: var(--light-bg-color);
+  border-color: var(--primary-color);
+}
+
+.page-btn.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>

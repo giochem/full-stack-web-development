@@ -11,48 +11,22 @@ module.exports = {
   ],
 
   getCart: [
-    param("cartID")
-      .notEmpty()
-      .withMessage("cartID is required")
-      .isInt()
-      .withMessage("cartID must be an integer"),
-  ],
-
-  createCart: [
-    body("userID")
+    param("userID")
       .notEmpty()
       .withMessage("userID is required")
       .isInt()
       .withMessage("userID must be an integer"),
+  ],
+
+  updateCart: [
     body("productID")
       .notEmpty()
       .withMessage("productID is required")
       .isInt()
       .withMessage("productID must be an integer"),
     body("quantity")
-      .notEmpty()
-      .withMessage("Quantity is required")
-      .isInt({ min: 1 })
-      .withMessage("Quantity must be at least 1"),
-  ],
-
-  updateCart: [
-    param("cartID")
-      .notEmpty()
-      .withMessage("cartID is required")
-      .isInt()
-      .withMessage("cartID must be an integer"),
-    body("quantity")
       .optional()
       .isInt({ min: 1 })
       .withMessage("Quantity must be at least 1"),
   ],
-
-  deleteCart: [
-    param("cartID")
-      .notEmpty()
-      .withMessage("cartID is required")
-      .isInt()
-      .withMessage("cartID must be an integer"),
-  ],
-}; 
+};

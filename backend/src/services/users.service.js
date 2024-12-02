@@ -64,6 +64,18 @@ module.exports = {
 
     return data.recordset;
   },
+  getUserByUserID: async (userID) => {
+    const conn = await sql.connect(config);
+    console.log("Connected to SQLServer...");
+    console.log("procedure getUserByUserID");
+
+    const data = await conn
+      .request()
+      .input("userID", sql.Int, userID)
+      .query("SELECT * FROM Users WHERE userID = @userID");
+
+    return data.recordset;
+  },
 
   createUser: async (user) => {
     const { username, email, password, role } = user;
@@ -88,7 +100,6 @@ module.exports = {
   },
 
   updateUser: async (user) => {
-    const { userID, username, email, password, role } = user;
     const { userID, username, email, password, role } = user;
     const updateAt = new Date().toISOString().slice(0, 19).replace("T", " ");
 

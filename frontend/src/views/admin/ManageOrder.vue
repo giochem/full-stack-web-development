@@ -1,209 +1,308 @@
 <template>
-  <div class="container">
-    <div class="wrapper">
-      <div class="dashboard">
-        <div class="header">
-          <input type="text" placeholder="Search..." />
-          <img width="30px" src="@/assets/logo.svg" alt="" />
-        </div>
-        <h3>Manage Orders</h3>
-        <div class="content">
-          <table>
-            <thead>
-              <tr>
-                <th>STT</th>
-                <th>User ID</th>
-                <th>Status</th>
-                <th>Created At</th>
-                <th>Functions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(order, index) in orders" :key="order.orderID">
-                <td>{{ index + 1 }}</td>
-                <td>{{ order.userID }}</td>
-                <td>
-                  <span
-                    :class="{
-                      pending: order.status === 'pending',
-                      processing: order.status === 'processing',
-                      completed: order.status === 'completed',
-                      cancelled: order.status === 'cancelled',
-                    }"
-                  >
-                    {{ order.status }}
-                  </span>
-                </td>
-                <td>{{ new Date(order.createdAt).toLocaleString() }}</td>
-                <td>
-                  <p>
-                    <router-link :to="`/admin/edit-order/${order.orderID}`"
-                      >Edit</router-link
-                    >
-                  </p>
-                  <p @click="remove(order.orderID)">Delete</p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="pagination">
-            <ul>
-              <li @click.prevent="changePage(newPage[0] - 1)"><~~</li>
-              <li @click.prevent="changePage(newPage[0])">{{ newPage[0] }}</li>
-              <li @click.prevent="changePage(newPage[1])">{{ newPage[1] }}</li>
-              <li @click.prevent="changePage(newPage[2])">{{ newPage[2] }}</li>
-              <li @click.prevent="changePage(newPage[2] + 1)">~~></li>
-            </ul>
+  <div class="admin-page">
+    <header class="page-header">
+      <div class="header-content">
+        <h1>Manage Orders</h1>
+        <div class="header-actions">
+          <div class="search-box">
+            <i class="ri-search-line"></i>
+            <input type="text" placeholder="Search orders..." />
           </div>
         </div>
       </div>
+    </header>
+
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(order, index) in orders" :key="order.orderID">
+            <td>{{ index + 1 }}</td>
+            <td>{{ order.userID }}</td>
+            <td>{{ formatPrice(order.totalAmount) }} đ</td>
+            <td>
+              <span :class="['status-badge', order.status]">
+                {{ order.status }}
+              </span>
+            </td>
+            <td>{{ formatDate(order.createdAt) }}</td>
+            <td>
+              <div class="action-buttons">
+                <RouterLink 
+                  :to="`/admin/edit-order/${order.orderID}`"
+                  class="edit-btn"
+                >
+                  <i class="ri-edit-line"></i>
+                </RouterLink>
+                <button 
+                  @click="remove(order.orderID)"
+                  class="delete-btn"
+                >
+                  <i class="ri-delete-bin-line"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <button 
+        class="page-btn"
+        @click="changePage(currentPage - 1)"
+        :disabled="currentPage <= 0"
+      >
+        <i class="ri-arrow-left-s-line"></i>
+      </button>
+      
+      <button 
+        v-for="page in displayedPages"
+        :key="page"
+        @click="changePage(page)"
+        :class="['page-btn', { active: currentPage === page }]"
+      >
+        {{ page + 1 }}
+      </button>
+      
+      <button 
+        class="page-btn"
+        @click="changePage(currentPage + 1)"
+        :disabled="!hasMorePages"
+      >
+        <i class="ri-arrow-right-s-line"></i>
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
-const currentPage = ref(0);
-const newPage = ref([1, 2, 3]);
 const orders = ref([]);
+const currentPage = ref(0);
+const itemsPerPage = 10;
+const totalPages = ref(1);
 
-onMounted(async () => {
-  const options = {
-    method: "GET",
-    url: "http://localhost:5000/api/orders?page=0&size=10",
-    withCredentials: true,
-  };
-
-  try {
-    const res = await axios.request(options);
-    orders.value = res.data.data;
-  } catch (err) {
-    console.log(err);
+const displayedPages = computed(() => {
+  const pages = [];
+  const start = Math.max(0, currentPage.value - 1);
+  const end = Math.min(totalPages.value - 1, start + 2);
+  
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
   }
+  return pages;
 });
 
-async function changePage(newValue) {
-  if (newValue < 0 || newValue === currentPage.value) {
-    return;
-  }
-  currentPage.value = newValue;
-  newPage.value = [newValue, newValue + 1, newValue + 2];
+const hasMorePages = computed(() => {
+  return currentPage.value < totalPages.value - 1;
+});
 
-  const options = {
-    method: "GET",
-    url: `http://localhost:5000/api/orders?page=${newValue}&size=10`,
-    withCredentials: true,
-  };
+function formatPrice(price) {
+  return price.toLocaleString("vi-VN");
+}
 
+function formatDate(dateString) {
+  return new Date(dateString).toLocaleString("vi-VN");
+}
+
+async function fetchOrders(page = 0) {
   try {
-    const res = await axios.request(options);
-    orders.value = res.data.data;
-  } catch (err) {
-    console.log(err);
+    const response = await axios.get(
+      `http://localhost:5000/api/orders?page=${page}&size=${itemsPerPage}`,
+      { withCredentials: true }
+    );
+    orders.value = response.data.data;
+    totalPages.value = Math.ceil(response.data.total / itemsPerPage);
+  } catch (error) {
+    console.error("Error fetching orders:", error);
   }
+}
+
+async function changePage(newPage) {
+  if (newPage < 0 || newPage >= totalPages.value) return;
+  currentPage.value = newPage;
+  await fetchOrders(newPage);
 }
 
 async function remove(orderID) {
   if (!confirm("Are you sure you want to delete this order?")) return;
-
-  const options = {
-    method: "DELETE",
-    url: `http://localhost:5000/api/orders/${orderID}`,
-    withCredentials: true,
-  };
-
+  
   try {
-    await axios.request(options);
-    router.go();
-  } catch (err) {
-    console.log(err);
+    await axios.delete(`http://localhost:5000/api/orders/${orderID}`, {
+      withCredentials: true,
+    });
+    await fetchOrders(currentPage.value);
+  } catch (error) {
+    console.error("Error deleting order:", error);
   }
 }
+
+onMounted(() => {
+  fetchOrders();
+});
 </script>
 
 <style scoped>
-.wrapper {
-  margin-left: 20em;
-  padding: 1em;
-  height: 100vh;
-  background-color: var(--light-bg-color);
-}
-.header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1em;
-}
-.dashboard .functions {
-  display: flex;
-  justify-content: space-between;
-  padding: 1em;
-  background-color: var(--light-bg-color);
-}
-.dashboard .functions button {
-  background-color: var(--secondary-color);
-  border-radius: 8px;
-  color: var(--white-color);
-}
-.dashboard table {
-  border-collapse: collapse;
-  width: 100%;
-}
-.dashboard .content .pagination ul {
-  display: flex;
-  justify-content: space-evenly;
-  padding: 2em 15em;
-  margin: 0 5em;
-}
-.dashboard .content .pagination ul li {
-  cursor: pointer;
-  border: 1px solid var(--primary-color);
-  padding: 6px;
-  border-radius: 10px;
-}
-th,
-td {
-  padding: 0.25rem;
-  text-align: left;
-  border: 1px solid #ccc;
-}
-tbody tr:nth-child(odd) {
-  background: #eee;
-}
-tbody td:last-child {
-  display: flex;
-  justify-content: space-evenly;
-}
-tbody td p {
-  cursor: pointer;
+.admin-page {
+  padding: 1.5rem;
 }
 
-/* Status styles */
-.pending {
-  background-color: #ffd700;
-  padding: 4px 8px;
-  border-radius: 4px;
-  color: #000;
+.page-header {
+  margin-bottom: 2rem;
 }
-.processing {
-  background-color: #87ceeb;
-  padding: 4px 8px;
-  border-radius: 4px;
-  color: #000;
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-.completed {
-  background-color: #90ee90;
-  padding: 4px 8px;
-  border-radius: 4px;
-  color: #000;
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
 }
-.cancelled {
-  background-color: #ff6b6b;
-  padding: 4px 8px;
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: white;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  color: #fff;
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  width: 200px;
+}
+
+.table-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.data-table th {
+  background: var(--light-bg-color);
+  font-weight: 600;
+}
+
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.status-badge.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.processing {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-badge.completed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.edit-btn,
+.delete-btn {
+  padding: 0.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.edit-btn {
+  color: var(--secondary-color);
+  background: rgba(121, 74, 250, 0.1);
+}
+
+.delete-btn {
+  color: #dc3545;
+  background: rgba(220, 53, 69, 0.1);
+}
+
+.edit-btn:hover {
+  background: rgba(121, 74, 250, 0.2);
+}
+
+.delete-btn:hover {
+  background: rgba(220, 53, 69, 0.2);
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+.page-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color);
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: var(--light-bg-color);
+  border-color: var(--primary-color);
+}
+
+.page-btn.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>

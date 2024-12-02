@@ -3,7 +3,7 @@ import DefaultLayout from "../layouts/DefaultLayout.vue";
 import ClientHome from "../views/client/Home.vue";
 // admin
 import AdminLayout from "../layouts/AdminLayout.vue";
-import Dashboard from "@/views/admin/Dashboard.vue";
+//import Dashboard from "@/views/admin/Dashboard.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,9 +24,29 @@ const router = createRouter({
           component: ClientHome,
         },
         {
+          path: "/product/:productID",
+          name: "product",
+          component: () => import("../views/client/Product.vue"),
+        },
+        {
           path: "/cart",
           name: "cart",
-          component: () => import("../views/admin/Dashboard.vue"),
+          component: () => import("../views/client/Cart.vue"),
+        },
+        {
+          path: "/checkout",
+          name: "checkout",
+          component: () => import("../views/client/Checkout.vue"),
+        },
+        {
+          path: "/order-success",
+          name: "order-success",
+          component: () => import("../views/client/OrderSuccess.vue"),
+        },
+        {
+          path: "/profile",
+          name: "profile",
+          component: () => import("../views/client/Profile.vue"),
         },
       ],
     },
