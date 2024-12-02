@@ -1,7 +1,7 @@
 const express = require("express");
 const sessions = require("express-session");
 const cookieParser = require("cookie-parser");
-
+const Response = require("./configs/response");
 const cors = require("cors");
 const app = express();
 
@@ -25,5 +25,16 @@ app.use(
 app.use("/uploads", express.static(__dirname + "/uploads"));
 app.use("/api", require("./routes/index.router"));
 
-module.exports = app;
+app.use((err, req, res, next) => {
+  const message =
+    process.env.NODE_ENV === "production"
+      ? "Internal Server Error"
+      : err.message;
+  return Response.serverError(
+    res,
+    message,
+    err
+  );
+});
 
+module.exports = app;

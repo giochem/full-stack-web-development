@@ -23,8 +23,7 @@ const pool = async (query) => {
     })
     .catch((err) =>
       console.log("Database Connection Failed! Bad Config: ", err)
-    )
-    .finally("Finished query SQLServer....");
+    );
 };
 
 module.exports = { pool, config };
