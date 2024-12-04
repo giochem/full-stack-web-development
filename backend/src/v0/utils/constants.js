@@ -94,7 +94,13 @@ const StatusCode = {
   SERVICE_UNAVAILABLE: 503,
 };
 
+const Path = {
+  UPLOAD_DIR: "./src/v0/uploads",
+  STATIC_DIR: "/v0/uploads",
+};
+
 module.exports = {
   Message,
   StatusCode,
+  Path,
 };

@@ -9,45 +9,53 @@
     </header>
 
     <div class="form-container">
-      <form class="admin-form" @submit.prevent="save">
+      <form class="admin-form" @submit.prevent="handleSave">
         <div class="form-group">
           <label for="name">Name</label>
-          <input 
+          <input
             id="name"
-            v-model="product.name" 
+            v-model="product.name"
             type="text"
             placeholder="Enter product name"
+            :disabled="productStore.loading"
+            required
           />
         </div>
 
         <div class="form-group">
           <label for="description">Description</label>
-          <textarea 
+          <textarea
             id="description"
-            v-model="product.description" 
+            v-model="product.description"
             rows="3"
             placeholder="Enter product description"
+            :disabled="productStore.loading"
+            required
           ></textarea>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="color">Colors</label>
-            <input 
+            <input
               id="color"
-              v-model="product.color" 
+              v-model="product.color"
               type="text"
               placeholder="e.g. Red-Blue-Green"
+              :disabled="productStore.loading"
+              required
             />
           </div>
 
           <div class="form-group">
             <label for="size">Sizes</label>
-            <input 
+            <input
               id="size"
-              v-model="product.size" 
+              v-model="product.size"
               type="text"
               placeholder="e.g. S-M-L-XL"
+              :disabled="productStore.loading"
+              required
             />
           </div>
         </div>
@@ -55,23 +63,27 @@
         <div class="form-row">
           <div class="form-group">
             <label for="price">Price</label>
-            <input 
+            <input
               id="price"
-              v-model="product.price" 
+              v-model.number="product.price"
               type="number"
               min="0"
               placeholder="Enter price"
+              :disabled="productStore.loading"
+              required
             />
           </div>
 
           <div class="form-group">
             <label for="quantity">Quantity</label>
-            <input 
+            <input
               id="quantity"
-              v-model="product.quantity" 
+              v-model.number="product.quantity"
               type="number"
               min="0"
               placeholder="Enter quantity"
+              :disabled="productStore.loading"
+              required
             />
           </div>
         </div>
@@ -79,11 +91,12 @@
         <div class="form-group">
           <label for="image">Product Image</label>
           <div class="image-upload">
-            <input 
+            <input
               id="image"
               type="file"
               @change="uploadImage"
               accept="image/*"
+              :disabled="productStore.loading"
             />
             <img
               ref="previewImage"
@@ -95,10 +108,18 @@
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="primary-btn">
+          <button
+            type="submit"
+            class="primary-btn"
+            :disabled="productStore.loading"
+          >
             Add Product
           </button>
-          <RouterLink to="/admin/manage-product" class="secondary-btn">
+          <RouterLink
+            to="/admin/manage-product"
+            class="secondary-btn"
+            :class="{ disabled: productStore.loading }"
+          >
             Cancel
           </RouterLink>
         </div>
@@ -108,11 +129,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, getCurrentInstance } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import { useProductStore } from "@/stores/product";
 
+const app = getCurrentInstance();
 const router = useRouter();
+const productStore = useProductStore();
 const previewImage = ref(null);
 const newImage = ref(null);
 
@@ -129,7 +152,7 @@ const imagePreviewUrl = computed(() => {
   if (previewImage.value?.src) {
     return previewImage.value.src;
   }
-  return 'https://via.placeholder.com/200';
+  return "https://via.placeholder.com/200";
 });
 
 function uploadImage(e) {
@@ -140,37 +163,41 @@ function uploadImage(e) {
   }
 }
 
-async function save() {
-  try {
-    const formData = new FormData();
-    formData.append("name", product.value.name);
-    formData.append("description", product.value.description);
-    formData.append("color", product.value.color);
-    formData.append("size", product.value.size);
-    formData.append("price", product.value.price);
-    formData.append("quantity", product.value.quantity);
-    if (newImage.value) {
-      formData.append("file", newImage.value);
-    }
-
-    await axios.post(
-      "http://localhost:5000/api/products",
-      formData,
-      {
-        withCredentials: true,
-        headers: { "Content-Type": "multipart/form-data" },
-      }
+async function handleSave() {
+  if (
+    !product.value.name ||
+    !product.value.description ||
+    product.value.price <= 0 ||
+    product.value.quantity < 0
+  ) {
+    app?.proxy.$notify(
+      "Please fill in all required fields correctly",
+      "warning"
     );
+    return;
+  }
 
+  const formData = new FormData();
+  formData.append("name", product.value.name);
+  formData.append("description", product.value.description);
+  formData.append("color", product.value.color);
+  formData.append("size", product.value.size);
+  formData.append("price", product.value.price);
+  formData.append("quantity", product.value.quantity);
+  if (newImage.value) {
+    formData.append("file", newImage.value);
+  }
+  const result = await productStore.createProduct(formData);
+  if (result.success) {
+    app?.proxy.$notify(result.message, "success");
     router.push("/admin/manage-product");
-  } catch (error) {
-    console.error("Error adding product:", error);
+  } else {
+    app?.proxy.$notify(result.message, "error");
   }
 }
 </script>
 
 <style scoped>
-/* Use the same styles as EditProduct.vue */
 .admin-page {
   padding: 1.5rem;
 }
@@ -242,6 +269,12 @@ async function save() {
   border-color: var(--primary-color);
 }
 
+.form-group input:disabled,
+.form-group textarea:disabled {
+  background-color: var(--light-bg-color);
+  cursor: not-allowed;
+}
+
 .image-upload {
   display: flex;
   flex-direction: column;
@@ -279,8 +312,13 @@ async function save() {
   color: white;
 }
 
-.primary-btn:hover {
+.primary-btn:hover:not(:disabled) {
   background: var(--secondary-color);
+}
+
+.primary-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .secondary-btn {
@@ -289,8 +327,14 @@ async function save() {
   color: var(--secondary-dark-color);
 }
 
-.secondary-btn:hover {
+.secondary-btn:hover:not(.disabled) {
   background: var(--light-bg-color);
+}
+
+.secondary-btn.disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 @media (max-width: 768px) {

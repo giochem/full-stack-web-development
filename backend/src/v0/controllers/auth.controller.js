@@ -4,74 +4,113 @@ const { Message, StatusCode } = require("../utils/constants");
 
 module.exports = {
   login: async (req, res, next) => {
-    const { email, password } = req.body;
-    const user = await userService.getUserByEmail(email);
+    try {
+      const { email, password } = req.body;
+      const user = await userService.getUserByEmail(email);
 
-    if (user.length === 0 || user[0].password !== password) {
-      return Response.error(
-        res,
-        Message.ERROR_INVALID_CREDENTIALS,
-        null,
-        StatusCode.UNAUTHORIZED
-      );
+      if (user.length === 0 || user[0].password !== password) {
+        return Response.error(
+          res,
+          Message.ERROR_INVALID_CREDENTIALS,
+          null,
+          StatusCode.UNAUTHORIZED
+        );
+      }
+      req.session.userID = user[0].userID;
+      req.session.role = user[0].role;
+      return Response.success(res, Message.SUCCESS_LOGIN, user, StatusCode.OK);
+    } catch (error) {
+      console.error("Error in login controller:", error);
+      return Response.serverError(res, Message.ERROR_DB_QUERY, error);
     }
-    req.session.userID = user[0].userID;
-    req.session.role = user[0].role;
-    return Response.success(res, Message.SUCCESS_LOGIN, user, StatusCode.OK);
   },
+
   getProfile: async (req, res, next) => {
-    const user = await userService.getUserByUserID(req.session.userID);
-    return Response.success(res, Message.SUCCESS_LOGIN, user, StatusCode.OK);
+    try {
+      const user = await userService.getUserByUserID(req.session.userID);
+      if (!user || user.length === 0) {
+        return Response.error(
+          res,
+          Message.ERROR_USER_NOT_FOUND,
+          null,
+          StatusCode.NOT_FOUND
+        );
+      }
+      return Response.success(res, Message.SUCCESS_LOGIN, user, StatusCode.OK);
+    } catch (error) {
+      console.error("Error in getProfile controller:", error);
+      return Response.serverError(res, Message.ERROR_DB_QUERY, error);
+    }
   },
 
   register: async (req, res, next) => {
-    const { username, email, password } = req.body;
-    const user = await userService.getUserByEmail(email);
+    try {
+      const { username, email, password } = req.body;
+      const user = await userService.getUserByEmail(email);
 
-    if (user.length !== 0) {
-      return Response.error(
+      if (user.length !== 0) {
+        return Response.error(
+          res,
+          Message.ERROR_EMAIL_EXISTS,
+          null,
+          StatusCode.CONFLICT
+        );
+      }
+
+      const newData = await userService.createUser({
+        username,
+        email,
+        password,
+        role: "client",
+      });
+
+      req.session.userID = newData[0].userID;
+      req.session.role = newData[0].role;
+
+      return Response.success(
         res,
-        Message.ERROR_EMAIL_EXISTS,
-        null,
-        StatusCode.CONFLICT
+        Message.SUCCESS_REGISTER,
+        newData,
+        StatusCode.CREATED
       );
+    } catch (error) {
+      console.error("Error in register controller:", error);
+      return Response.serverError(res, Message.ERROR_DB_QUERY, error);
     }
-
-    const newData = await userService.createUser({
-      username,
-      email,
-      password,
-      role: "client",
-    });
-
-    req.session.userID = newData[0].userID;
-    req.session.role = newData[0].role;
-
-    return Response.success(
-      res,
-      Message.SUCCESS_REGISTER,
-      newData,
-      StatusCode.CREATED
-    );
   },
 
   check: async (req, res, next) => {
-    if (!req.session.userID) {
-      return Response.error(
+    try {
+      if (!req.session.userID) {
+        return Response.error(
+          res,
+          Message.ERROR_UNAUTHORIZED,
+          null,
+          StatusCode.UNAUTHORIZED
+        );
+      }
+      return Response.success(
         res,
-        Message.ERROR_UNAUTHORIZED,
-        null,
-        StatusCode.UNAUTHORIZED
+        Message.SUCCESS_LOGIN,
+        {
+          userID: req.session.userID,
+          role: req.session.role,
+        },
+        StatusCode.OK
       );
+    } catch (error) {
+      console.error("Error in check controller:", error);
+      return Response.serverError(res, Message.ERROR_DB_QUERY, error);
     }
-    return Response.success(
-      res,
-      Message.SUCCESS_LOGIN,
-      {
-        userID: req.session.userID,
-        role: req.session.role,
-      },
-      StatusCode.OK
-    );
+  },
+
+  logout: async (req, res, next) => {
+    try {
+      req.session.destroy();
+      return Response.success(res, Message.SUCCESS_LOGOUT, null, StatusCode.OK);
+    } catch (error) {
+      console.error("Error in logout controller:", error);
+      return Response.serverError(res, Message.ERROR_DB_QUERY, error);
+    }
   },
 };

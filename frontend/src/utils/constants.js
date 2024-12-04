@@ -49,6 +49,18 @@ export const API_ENDPOINTS = {
       url: (id) => `/products/${id}`,
       method: "GET",
     },
+    CREATE: {
+      url: "/products",
+      method: "POST",
+    },
+    UPDATE: {
+      url: (id) => `/products/${id}`,
+      method: "PUT",
+    },
+    DELETE: {
+      url: (id) => `/products/${id}`,
+      method: "DELETE",
+    },
   },
   CART: {
     LIST: {
@@ -78,7 +90,7 @@ export const API_ENDPOINTS = {
 
 // App Constants
 export const APP_CONSTANTS = {
-  NOTIFICATION_DURATION: 3000,
+  API_URL: "http://localhost:5000",
   API_BASE_URL: "http://localhost:5000/api",
   API_TIMEOUT: 5000,
   STORAGE_KEYS: {
@@ -91,5 +103,13 @@ export const APP_CONSTANTS = {
   },
   ORDER: {
     SHIPPING_FEE: 0,
+  },
+  PAGINATION: {
+    DEFAULT_PAGE: 0,
+    DEFAULT_SIZE: 10,
+  },
+  UPLOAD: {
+    DEFAULT_IMAGE: "https://via.placeholder.com/200",
+    UPLOAD_URL: "http://localhost:5000/uploads/v0/",
   },
 };

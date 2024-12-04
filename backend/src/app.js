@@ -2,6 +2,7 @@ const express = require("express");
 const sessions = require("express-session");
 const cookieParser = require("cookie-parser");
 const Response = require("./v0/configs/response");
+const { Path } = require("./v0/utils/constants");
 
 const cors = require("cors");
 const app = express();
@@ -23,7 +24,7 @@ app.use(
 );
 
 //router
-app.use("/uploads", express.static(__dirname + "/uploads"));
+app.use("/uploads/v0", express.static(__dirname + Path.STATIC_DIR));
 app.use("/api", require("./v0/routes/index.router"));
 
 app.use((err, req, res, next) => {
