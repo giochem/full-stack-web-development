@@ -17,7 +17,7 @@ module.exports = {
       .notEmpty()
       .withMessage("userID is required")
       .isInt()
-      .withMessage("userID must be an integer")
+      .withMessage("userID must be an integer"),
   ],
 
   // Validate create user
@@ -80,6 +80,11 @@ module.exports = {
       .notEmpty()
       .withMessage("userID is required")
       .isInt()
-      .withMessage("userID must be an integer")
+      .withMessage("userID must be an integer"),
+  ],
+
+  // Validate search users
+  searchUsers: [
+    query("searchText").notEmpty().withMessage("searchText is required"),
   ],
 };

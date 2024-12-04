@@ -19,15 +19,22 @@ module.exports = {
   ],
 
   createOrder: [
-    body("userID")
+    body("fullName")
       .notEmpty()
-      .withMessage("userID is required")
-      .isInt()
-      .withMessage("userID must be an integer"),
-    body("status")
-      .optional()
-      .isIn(["processing", "completed", "cancelled"])
-      .withMessage("Invalid status value"),
+      .withMessage("fullName is required")
+      .isString()
+      .withMessage("fullName must be a string"),
+    body("phone")
+      .notEmpty()
+      .withMessage("phone is required")
+      .matches(/^[0-9]+$/)
+      .withMessage("phone must be a valid number"),
+    body("address")
+      .notEmpty()
+      .withMessage("address is required")
+      .isString()
+      .withMessage("address must be a string"),
+    body("note").optional().isString().withMessage("note must be a string"),
   ],
 
   updateOrder: [

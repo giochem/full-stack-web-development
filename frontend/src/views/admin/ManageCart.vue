@@ -17,32 +17,29 @@
         <thead>
           <tr>
             <th>ID</th>
-            <th>User</th>
-            <th>Product</th>
-            <th>Price</th>
+            <th>User ID</th>
+            <th>Product ID</th>
             <th>Quantity</th>
-            <th>Total</th>
+            <th>Created At</th>
+            <th>Updated At</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(cart, index) in carts" :key="cart.cartID">
+          <tr v-for="(cart, index) in carts" :key="index">
             <td>{{ index + 1 }}</td>
             <td>{{ cart.userID }}</td>
             <td>{{ cart.productID }}</td>
-            <td>{{ formatPrice(cart.price) }} đ</td>
             <td>
               <span class="quantity-badge">
                 {{ cart.quantity }}
               </span>
             </td>
-            <td>{{ formatPrice(cart.price * cart.quantity) }} đ</td>
+            <td>{{ formatDate(cart.createAt) }}</td>
+            <td>{{ cart.updateAt ? formatDate(cart.updateAt) : '-' }}</td>
             <td>
               <div class="action-buttons">
-                <button 
-                  @click="remove(cart.cartID)"
-                  class="delete-btn"
-                >
+                <button @click="remove(cart.productID, cart.userID)" class="delete-btn">
                   <i class="ri-delete-bin-line"></i>
                 </button>
               </div>
@@ -53,15 +50,15 @@
     </div>
 
     <div class="pagination">
-      <button 
+      <button
         class="page-btn"
         @click="changePage(currentPage - 1)"
         :disabled="currentPage <= 0"
       >
         <i class="ri-arrow-left-s-line"></i>
       </button>
-      
-      <button 
+
+      <button
         v-for="page in displayedPages"
         :key="page"
         @click="changePage(page)"
@@ -69,8 +66,8 @@
       >
         {{ page + 1 }}
       </button>
-      
-      <button 
+
+      <button
         class="page-btn"
         @click="changePage(currentPage + 1)"
         :disabled="!hasMorePages"
@@ -96,7 +93,7 @@ const displayedPages = computed(() => {
   const pages = [];
   const start = Math.max(0, currentPage.value - 1);
   const end = Math.min(totalPages.value - 1, start + 2);
-  
+
   for (let i = start; i <= end; i++) {
     pages.push(i);
   }
@@ -107,8 +104,14 @@ const hasMorePages = computed(() => {
   return currentPage.value < totalPages.value - 1;
 });
 
-function formatPrice(price) {
-  return price.toLocaleString("vi-VN");
+function formatDate(dateString) {
+  return new Date(dateString).toLocaleString('vi-VN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
 }
 
 async function fetchCarts(page = 0) {
@@ -130,11 +133,11 @@ async function changePage(newPage) {
   await fetchCarts(newPage);
 }
 
-async function remove(cartID) {
+async function remove(productID, userID) {
   if (!confirm("Are you sure you want to delete this cart item?")) return;
-  
+
   try {
-    await axios.delete(`http://localhost:5000/api/carts/${cartID}`, {
+    await axios.delete(`http://localhost:5000/api/carts/${productID}/${userID}`, {
       withCredentials: true,
     });
     await fetchCarts(currentPage.value);
@@ -189,6 +192,7 @@ onMounted(() => {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  margin-bottom: 2rem;
 }
 
 .data-table {
@@ -251,9 +255,8 @@ onMounted(() => {
   transition: all 0.3s;
 }
 
-.page-btn:hover:not(:disabled) {
+.page-btn:hover {
   background: var(--light-bg-color);
-  border-color: var(--primary-color);
 }
 
 .page-btn.active {

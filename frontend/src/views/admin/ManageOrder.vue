@@ -37,16 +37,13 @@
             <td>{{ formatDate(order.createdAt) }}</td>
             <td>
               <div class="action-buttons">
-                <RouterLink 
+                <RouterLink
                   :to="`/admin/edit-order/${order.orderID}`"
                   class="edit-btn"
                 >
                   <i class="ri-edit-line"></i>
                 </RouterLink>
-                <button 
-                  @click="remove(order.orderID)"
-                  class="delete-btn"
-                >
+                <button @click="remove(order.orderID)" class="delete-btn">
                   <i class="ri-delete-bin-line"></i>
                 </button>
               </div>
@@ -57,15 +54,15 @@
     </div>
 
     <div class="pagination">
-      <button 
+      <button
         class="page-btn"
         @click="changePage(currentPage - 1)"
         :disabled="currentPage <= 0"
       >
         <i class="ri-arrow-left-s-line"></i>
       </button>
-      
-      <button 
+
+      <button
         v-for="page in displayedPages"
         :key="page"
         @click="changePage(page)"
@@ -73,8 +70,8 @@
       >
         {{ page + 1 }}
       </button>
-      
-      <button 
+
+      <button
         class="page-btn"
         @click="changePage(currentPage + 1)"
         :disabled="!hasMorePages"
@@ -100,7 +97,7 @@ const displayedPages = computed(() => {
   const pages = [];
   const start = Math.max(0, currentPage.value - 1);
   const end = Math.min(totalPages.value - 1, start + 2);
-  
+
   for (let i = start; i <= end; i++) {
     pages.push(i);
   }
@@ -122,9 +119,10 @@ function formatDate(dateString) {
 async function fetchOrders(page = 0) {
   try {
     const response = await axios.get(
-      `http://localhost:5000/api/orders?page=${page}&size=${itemsPerPage}`,
+      `http://localhost:5000/api/orders/owner`,
       { withCredentials: true }
     );
+    console.log(response.data.data);
     orders.value = response.data.data;
     totalPages.value = Math.ceil(response.data.total / itemsPerPage);
   } catch (error) {
@@ -140,7 +138,7 @@ async function changePage(newPage) {
 
 async function remove(orderID) {
   if (!confirm("Are you sure you want to delete this order?")) return;
-  
+
   try {
     await axios.delete(`http://localhost:5000/api/orders/${orderID}`, {
       withCredentials: true,

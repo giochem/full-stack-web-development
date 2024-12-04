@@ -111,14 +111,20 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, getCurrentInstance } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import { useCartStore } from "@/stores/cart";
+import { useOrderStore } from "@/stores/order";
+import { APP_CONSTANTS } from "@/utils/constants";
 
+const app = getCurrentInstance();
 const router = useRouter();
+const cartStore = useCartStore();
+const orderStore = useOrderStore();
+
 const cartItems = ref([]);
 const isProcessing = ref(false);
-const shippingFee = 30000;
+const shippingFee = APP_CONSTANTS.ORDER.SHIPPING_FEE;
 
 const shippingInfo = ref({
   fullName: "",
@@ -144,44 +150,36 @@ function formatPrice(price) {
 
 async function fetchCartItems() {
   try {
-    const response = await axios.get("http://localhost:5000/api/carts/owner", {
-      withCredentials: true,
-    });
-    cartItems.value = response.data.data;
+    const response = await cartStore.fetchCartItems();
+    if (response.success) {
+      cartItems.value = response.data;
+    } else {
+      app?.proxy.$notify("Error fetching cart items", "error");
+    }
   } catch (error) {
-    console.error("Error fetching cart items:", error);
+    app?.proxy.$notify("Error fetching cart items", "error");
   }
 }
 
 async function placeOrder() {
-  //   if (!validateForm()) return;
+  if (!validateForm()) return;
 
   try {
     isProcessing.value = true;
-
     const orderData = {
-      shippingInfo: shippingInfo.value,
-      items: cartItems.value.map((item) => ({
-        productID: item.productID,
-        quantity: item.quantity,
-        price: item.price,
-      })),
-      totalAmount: total.value,
+      ...shippingInfo.value,
+      total: total.value,
+      items: cartItems.value,
     };
 
-    const response = await axios.post(
-      "http://localhost:5000/api/orders",
-      { orderData },
-      {
-        withCredentials: true,
-      }
-    );
-
-    if (response.data.success) {
+    const result = await orderStore.createOrder(orderData);
+    if (result.success) {
       router.push("/order-success");
+    } else {
+      app?.proxy.$notify(result.error, "error");
     }
   } catch (error) {
-    console.error("Error placing order:", error);
+    app?.proxy.$notify("Error placing order", "error");
   } finally {
     isProcessing.value = false;
   }
@@ -189,15 +187,15 @@ async function placeOrder() {
 
 function validateForm() {
   if (!shippingInfo.value.fullName.trim()) {
-    alert("Please enter your full name");
+    app?.proxy.$notify("Please enter your full name", "warning");
     return false;
   }
   if (!shippingInfo.value.phone.trim()) {
-    alert("Please enter your phone number");
+    app?.proxy.$notify("Please enter your phone number", "warning");
     return false;
   }
   if (!shippingInfo.value.address.trim()) {
-    alert("Please enter your delivery address");
+    app?.proxy.$notify("Please enter your delivery address", "warning");
     return false;
   }
   return true;

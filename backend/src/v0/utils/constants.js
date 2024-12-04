@@ -1,6 +1,7 @@
 const Message = {
   // User related messages
   SUCCESS_GET_USERS: "Successfully retrieved users",
+  SUCCESS_SEARCH_USERS: "Successfully searched users",
   SUCCESS_GET_USER: "Successfully retrieved user",
   SUCCESS_CREATE_USER: "Successfully created user",
   SUCCESS_UPDATE_USER: "Successfully updated user",
@@ -60,6 +61,14 @@ const Message = {
   ERROR_PROMOTION_NAME_EXISTS: "Promotion name already exists",
   ERROR_PROMOTION_EXPIRED: "Promotion has expired",
   ERROR_PROMOTION_NOT_STARTED: "Promotion has not started yet",
+
+  // Database related messages
+  ERROR_DB_CONNECTION: "Database connection error",
+  ERROR_DB_QUERY: "Database query error",
+
+  // General errors
+  ERROR_UNKNOWN: "An unknown error occurred",
+  ERROR_VALIDATION: "Validation error",
 };
 
 const StatusCode = {

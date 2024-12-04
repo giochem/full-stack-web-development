@@ -4,13 +4,21 @@
       <section class="products-section">
         <h2>Sản phẩm nổi bật</h2>
         
-        <div v-if="products.length === 0" class="no-products">
+        <div v-if="loading" class="loading">
+          <p>Đang tải sản phẩm...</p>
+        </div>
+        
+        <div v-else-if="productStore.error" class="error">
+          <p>{{ productStore.error }}</p>
+        </div>
+        
+        <div v-else-if="productStore.products.length === 0" class="no-products">
           <p>Cửa hàng hiện đang không có sản phẩm.</p>
         </div>
         
         <div v-else class="products-grid">
           <div 
-            v-for="product in products" 
+            v-for="product in productStore.products" 
             :key="product.productID"
             class="product-card"
             @click="navigateTo(`/product/${product.productID}`)"
@@ -34,20 +42,17 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
-import axios from "axios";
+import { onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
+import { useProductStore } from "@/stores/product";
 
 const router = useRouter();
-const products = ref([]);
+const productStore = useProductStore();
+
+const loading = computed(() => productStore.loading);
 
 onMounted(async () => {
-  try {
-    const response = await axios.get("http://localhost:5000/api/products?page=0&size=10");
-    products.value = response.data.data;
-  } catch (err) {
-    console.log(err);
-  }
+  await productStore.fetchProducts();
 });
 
 function navigateTo(path) {
@@ -154,5 +159,15 @@ function navigateTo(path) {
   .products-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 2rem;
+  color: var(--light-text-color);
+}
+
+.error {
+  color: var(--error-color);
 }
 </style>
