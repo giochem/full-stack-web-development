@@ -84,7 +84,6 @@ export const useProductStore = defineStore("product", {
         this.loading = false;
       }
     },
-
     async createProduct(productData) {
       try {
         this.loading = true;
