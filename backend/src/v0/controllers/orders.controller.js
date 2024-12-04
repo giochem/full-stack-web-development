@@ -44,7 +44,14 @@ module.exports = {
   },
 
   createOrder: async (req, res, next) => {
-    await orderService.createOrderByUserID(req.session.userID);
+    const { fullName, phone, address, note } = req.body;
+    await orderService.createOrder({
+      userID: req.session.userID,
+      fullName,
+      phone,
+      address,
+      note,
+    });
     return Response.success(
       res,
       Message.SUCCESS_CREATE_ORDER,

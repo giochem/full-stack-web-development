@@ -3,20 +3,22 @@
     <header class="page-header">
       <div class="header-content">
         <div class="header-title">
-          <h1>Add User</h1>
+          <h1>Add New User</h1>
         </div>
       </div>
     </header>
 
     <div class="form-container">
-      <form class="admin-form" @submit.prevent="save">
+      <form class="admin-form" @submit.prevent="handleSave">
         <div class="form-group">
           <label for="email">Email</label>
           <input 
             id="email"
-            v-model="user.email" 
+            v-model="form.email" 
             type="email"
-            placeholder="Enter email address"
+            placeholder="Enter email"
+            :disabled="userStore.loading"
+            required
           />
         </div>
 
@@ -24,9 +26,11 @@
           <label for="username">Username</label>
           <input 
             id="username"
-            v-model="user.username" 
+            v-model="form.username" 
             type="text"
             placeholder="Enter username"
+            :disabled="userStore.loading"
+            required
           />
         </div>
 
@@ -34,9 +38,11 @@
           <label for="password">Password</label>
           <input 
             id="password"
-            v-model="user.password" 
+            v-model="form.password" 
             type="password"
             placeholder="Enter password"
+            :disabled="userStore.loading"
+            required
           />
         </div>
 
@@ -44,8 +50,9 @@
           <label for="role">Role</label>
           <select 
             id="role"
-            v-model="user.role"
+            v-model="form.role"
             class="form-select"
+            :disabled="userStore.loading"
           >
             <option value="client">Client</option>
             <option value="admin">Admin</option>
@@ -53,10 +60,18 @@
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="primary-btn">
+          <button 
+            type="submit" 
+            class="primary-btn"
+            :disabled="userStore.loading"
+          >
             Add User
           </button>
-          <RouterLink to="/admin/manage-user" class="secondary-btn">
+          <RouterLink 
+            to="/admin/manage-user" 
+            class="secondary-btn"
+            :class="{ disabled: userStore.loading }"
+          >
             Cancel
           </RouterLink>
         </div>
@@ -66,35 +81,38 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, getCurrentInstance } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import { useUserStore } from "@/stores/user";
 
+const app = getCurrentInstance();
 const router = useRouter();
+const userStore = useUserStore();
 
-const user = ref({
+const form = ref({
   email: "",
   username: "",
   password: "",
   role: "client",
 });
 
-async function save() {
-  try {
-    await axios.post(
-      "http://localhost:5000/api/users",
-      user.value,
-      { withCredentials: true }
-    );
+async function handleSave() {
+  if (!form.value.email || !form.value.username || !form.value.password) {
+    app?.proxy.$notify("Please fill in all required fields", "warning");
+    return;
+  }
+
+  const result = await userStore.createUser(form.value);
+  if (result.success) {
+    app?.proxy.$notify(result.message, "success");
     router.push("/admin/manage-user");
-  } catch (error) {
-    console.error("Error adding user:", error);
+  } else {
+    app?.proxy.$notify(result.message, "error");
   }
 }
 </script>
 
 <style scoped>
-/* Use the same styles as other admin forms */
 .admin-page {
   padding: 1.5rem;
 }
@@ -160,6 +178,12 @@ async function save() {
   border-color: var(--primary-color);
 }
 
+.form-group input:disabled,
+.form-select:disabled {
+  background-color: var(--light-bg-color);
+  cursor: not-allowed;
+}
+
 .form-select {
   background-color: white;
   cursor: pointer;
@@ -188,8 +212,13 @@ async function save() {
   color: white;
 }
 
-.primary-btn:hover {
+.primary-btn:hover:not(:disabled) {
   background: var(--secondary-color);
+}
+
+.primary-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .secondary-btn {
@@ -198,8 +227,14 @@ async function save() {
   color: var(--secondary-dark-color);
 }
 
-.secondary-btn:hover {
+.secondary-btn:hover:not(.disabled) {
   background: var(--light-bg-color);
+}
+
+.secondary-btn.disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 @media (max-width: 768px) {

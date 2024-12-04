@@ -15,6 +15,8 @@ module.exports = {
         "SELECT * FROM Users ORDER BY userID OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY"
       );
 
+    await conn.close();
+    console.log("Connection closed.");
     return data.recordset;
   },
 
@@ -35,20 +37,8 @@ module.exports = {
         "SELECT TOP (@limit) * FROM Users WHERE userID > @lastID ORDER BY userID"
       );
 
-    return data.recordset;
-  },
-
-  getUser: async (user) => {
-    const { userID } = user;
-    const conn = await sql.connect(config);
-    console.log("Connected to SQLServer...");
-    console.log("procedure getUser");
-
-    const data = await conn
-      .request()
-      .input("userID", sql.Int, userID)
-      .query("SELECT * FROM Users WHERE userID = @userID");
-
+    await conn.close();
+    console.log("Connection closed.");
     return data.recordset;
   },
 
@@ -62,8 +52,11 @@ module.exports = {
       .input("email", sql.NVarChar(255), email)
       .query("SELECT * FROM Users WHERE email = @email");
 
+    await conn.close();
+    console.log("Connection closed.");
     return data.recordset;
   },
+
   getUserByUserID: async (userID) => {
     const conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
@@ -74,6 +67,8 @@ module.exports = {
       .input("userID", sql.Int, userID)
       .query("SELECT * FROM Users WHERE userID = @userID");
 
+    await conn.close();
+    console.log("Connection closed.");
     return data.recordset;
   },
 
@@ -96,6 +91,8 @@ module.exports = {
         "INSERT INTO Users (username, email, password, role, createAt) OUTPUT inserted.userID, inserted.role VALUES (@username, @email, @password, @role, @createAt)"
       );
 
+    await conn.close();
+    console.log("Connection closed.");
     return data.recordset;
   },
 
@@ -118,19 +115,22 @@ module.exports = {
       .query(
         "UPDATE Users SET username = @username, email = @email, password = @password, role = @role, updateAt = @updateAt WHERE userID = @userID"
       );
-  },
 
-  deleteUser: async (user) => {
-    const { userID } = user;
+    await conn.close();
+    console.log("Connection closed.");
+  },
+  searchUsers: async (searchText) => {
     const conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
-    console.log("procedure deleteUser");
+    console.log("procedure searchUsers");
 
     const data = await conn
       .request()
-      .input("userID", sql.Int, userID)
-      .query("DELETE FROM Users WHERE userID = @userID");
+      .input("searchText", sql.NVarChar(255), searchText)
+      .execute("searchUsers");
 
+    await conn.close();
+    console.log("Connection closed.");
     return data.recordset;
   },
 };

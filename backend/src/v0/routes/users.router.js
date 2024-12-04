@@ -8,7 +8,6 @@ const userController = require("../controllers/users.controller");
 const { validate } = require("../middlewares/validate.middleware");
 const userValidation = require("../validations/users.validation");
 
-// mangement users: createUser, getUsers, getUser, updateUser, deleteUser
 router.post(
   "/",
   authorizeRoles("admin"),
@@ -23,6 +22,15 @@ router.get(
   validate,
   userController.getUsers
 );
+
+router.get(
+  "/search",
+  authorizeRoles("admin"),
+  userValidation.searchUsers,
+  validate,
+  userController.searchUsers
+);
+
 router.get(
   "/:userID",
   authorizeRoles("admin", "client"),
@@ -32,17 +40,10 @@ router.get(
 );
 router.put(
   "/:userID",
-  authorizeRoles("admin", "client"),
+  authorizeRoles("admin"),
   userValidation.updateUser,
   validate,
   userController.updateUser
-);
-router.delete(
-  "/:userID",
-  authorizeRoles("admin", "client"),
-  userValidation.deleteUser,
-  validate,
-  userController.deleteUser
 );
 
 module.exports = router;

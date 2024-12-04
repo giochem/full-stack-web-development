@@ -41,7 +41,7 @@
                   </button>
                 </div>
 
-                <button @click="removeItem(item.cartID)" class="remove-btn">
+                <button @click="removeItem(item)" class="remove-btn">
                   <i class="ri-delete-bin-line"></i>
                 </button>
               </div>
@@ -86,11 +86,13 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import { useCartStore } from "@/stores/cart";
+import { APP_CONSTANTS } from "@/utils/constants";
 
 const router = useRouter();
+const cartStore = useCartStore();
 const cartItems = ref([]);
-const shippingFee = 30000; // Fixed shipping fee
+const shippingFee = APP_CONSTANTS.ORDER.SHIPPING_FEE;
 
 const subtotal = computed(() => {
   return cartItems.value.reduce(
@@ -108,14 +110,9 @@ function formatPrice(price) {
 }
 
 async function fetchCartItems() {
-  try {
-    const response = await axios.get("http://localhost:5000/api/carts/owner", {
-      withCredentials: true,
-    });
-    console.log(response.data.data);
-    cartItems.value = response.data.data;
-  } catch (error) {
-    console.error("Error fetching cart items:", error);
+  const result = await cartStore.fetchCartItems();
+  if (result.success) {
+    cartItems.value = result.data;
   }
 }
 
@@ -123,41 +120,20 @@ async function updateQuantity(item, change) {
   const newQuantity = item.quantity + change;
   if (newQuantity < 1) return;
 
-  try {
-    await axios.put(
-      `http://localhost:5000/api/carts`,
-      {
-        productID: item.productID,
-        quantity: newQuantity,
-      },
-      { withCredentials: true }
-    );
+  const result = await cartStore.addToCart(item.productID, newQuantity);
+  if (result.success) {
     await fetchCartItems();
-  } catch (error) {
-    console.error("Error updating quantity:", error);
   }
 }
 
-async function removeItem(cartID) {
-  try {
-    await axios.put(
-      `http://localhost:5000/api/carts`,
-      {
-        productID: item.productID,
-        quantity: 0,
-      },
-      {
-        withCredentials: true,
-      }
-    );
+async function removeItem(item) {
+  const result = await cartStore.addToCart(item.productID, 0);
+  if (result.success) {
     await fetchCartItems();
-  } catch (error) {
-    console.error("Error removing item:", error);
   }
 }
 
 function checkout() {
-  // Implement checkout logic
   router.push("/checkout");
 }
 

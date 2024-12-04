@@ -12,15 +12,15 @@
           <div class="info-grid">
             <div class="info-item">
               <label>Username</label>
-              <p>{{ user.username }}</p>
+              <p>{{ authStore.user?.username }}</p>
             </div>
             <div class="info-item">
               <label>Email</label>
-              <p>{{ user.email }}</p>
+              <p>{{ authStore.user?.email }}</p>
             </div>
             <div class="info-item">
               <label>Role</label>
-              <p>{{ user.role }}</p>
+              <p>{{ authStore.user?.role }}</p>
             </div>
           </div>
           <button @click="showEditForm = true" class="edit-btn">
@@ -32,9 +32,9 @@
         <!-- Order History Section -->
         <div class="profile-section">
           <h2>Order History</h2>
-          <div class="orders-list" v-if="orders.length > 0">
+          <div class="orders-list" v-if="orderStore.orders.length > 0">
             <div
-              v-for="order in orders"
+              v-for="order in orderStore.orders"
               :key="order.orderID"
               class="order-card"
             >
@@ -46,7 +46,7 @@
               </div>
               <div class="order-details">
                 <div class="order-info">
-                  <p class="order-date">{{ formatDate(order.createdAt) }}</p>
+                  <p class="order-date">{{ formatDate(order.createAt) }}</p>
                   <p class="order-total">
                     {{ formatPrice(order.totalAmount) }} đ
                   </p>
@@ -70,14 +70,14 @@
       <!-- Edit Profile Modal -->
       <div v-if="showEditForm" class="modal-overlay">
         <div class="modal-content">
-          <form @submit.prevent="updateProfile" class="edit-form">
+          <form @submit.prevent="handleUpdateProfile" class="edit-form">
             <h2>Edit Profile</h2>
 
             <div class="form-group">
               <label for="username">Username</label>
               <input
                 id="username"
-                v-model="editForm.username"
+                v-model="form.username"
                 type="text"
                 placeholder="Enter username"
               />
@@ -87,7 +87,7 @@
               <label for="email">Email</label>
               <input
                 id="email"
-                v-model="editForm.email"
+                v-model="form.email"
                 type="email"
                 placeholder="Enter email"
               />
@@ -97,7 +97,7 @@
               <label for="password">New Password (optional)</label>
               <input
                 id="password"
-                v-model="editForm.password"
+                v-model="form.password"
                 type="password"
                 placeholder="Enter new password"
               />
@@ -121,18 +121,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, getCurrentInstance, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import { useAuthStore } from "@/stores/auth";
+import { useOrderStore } from "@/stores/order";
 
+const app = getCurrentInstance();
 const router = useRouter();
-const user = ref({});
-const orders = ref([]);
+const authStore = useAuthStore();
+const orderStore = useOrderStore();
+
 const showEditForm = ref(false);
-const showOrderDetails = ref(false);
-const selectedOrder = ref(null);
-const editForm = ref({
-  userID: null,
+const form = ref({
   username: "",
   email: "",
   password: "",
@@ -151,60 +151,43 @@ function formatPrice(price) {
 }
 
 function viewOrderDetails(orderID) {
-  router.push(`/order/${orderID}`);
+  router.push(`/orders/${orderID}`);
 }
 
-async function fetchUserProfile() {
-  try {
-    const response = await axios.get("http://localhost:5000/api/auth/profile", {
-      withCredentials: true,
-    });
-    user.value = response.data.data[0];
-    editForm.value = {
-      username: user.value.username,
-      email: user.value.email,
+async function handleUpdateProfile() {
+  const { username, email, password } = form.value;
+
+  if (!username || !email) {
+    app?.proxy.$notify("Please enter required fields", "warning");
+    return;
+  }
+
+  const data = { username, email };
+  if (password) data.password = password;
+
+  const result = await authStore.updateProfile(data);
+  if (result.success) {
+    app?.proxy.$notify("Profile updated successfully", "success");
+    showEditForm.value = false;
+  } else {
+    app?.proxy.$notify(result.error, "error");
+  }
+}
+
+onMounted(async () => {
+  const profileResult = await authStore.fetchProfile();
+  if (profileResult.success) {
+    form.value = {
+      username: authStore.user.username,
+      email: authStore.user.email,
       password: "",
     };
-  } catch (error) {
-    console.error("Error fetching profile:", error);
   }
-}
 
-async function fetchOrders() {
-  try {
-    const response = await axios.get("http://localhost:5000/api/orders/owner", {
-      withCredentials: true,
-    });
-    orders.value = response.data.data;
-  } catch (error) {
-    console.error("Error fetching orders:", error);
+  const ordersResult = await orderStore.fetchOwnerOrders();
+  if (!ordersResult.success) {
+    app?.proxy.$notify(ordersResult.error, "error");
   }
-}
-
-async function updateProfile() {
-  try {
-    const data = { ...editForm.value };
-    if (!data.password) delete data.password;
-
-    await axios.put("http://localhost:5000/api/users/profile", data, {
-      withCredentials: true,
-    });
-
-    await fetchUserProfile();
-    showEditForm.value = false;
-  } catch (error) {
-    console.error("Error updating profile:", error);
-  }
-}
-
-function closeOrderDetails() {
-  showOrderDetails.value = false;
-  selectedOrder.value = null;
-}
-
-onMounted(() => {
-  fetchUserProfile();
-  fetchOrders();
 });
 </script>
 

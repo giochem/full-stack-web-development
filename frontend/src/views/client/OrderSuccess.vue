@@ -13,16 +13,8 @@
 
         <div class="order-info">
           <div class="info-row">
-            <span class="label">Order Number:</span>
-            <span class="value">#{{ orderNumber }}</span>
-          </div>
-          <div class="info-row">
             <span class="label">Order Date:</span>
             <span class="value">{{ formatDate(new Date()) }}</span>
-          </div>
-          <div class="info-row">
-            <span class="label">Total Amount:</span>
-            <span class="value">{{ formatPrice(orderTotal) }} đ</span>
           </div>
         </div>
 
@@ -49,12 +41,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
-
-const route = useRoute();
-const orderNumber = ref(Math.floor(100000 + Math.random() * 900000));
-const orderTotal = ref(0);
+import { onMounted, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
+import { useOrderStore } from "@/stores/order";
+import { storeToRefs } from "pinia";
+const { successOrder } = storeToRefs(useOrderStore());
+const router = useRouter();
+const orderStore = useOrderStore();
 
 function formatDate(date) {
   return date.toLocaleDateString("vi-VN", {
@@ -66,15 +59,14 @@ function formatDate(date) {
   });
 }
 
-function formatPrice(price) {
-  return price.toLocaleString("vi-VN");
-}
-
 onMounted(() => {
-  // You can get the order details from route params or state
-  //   if (route.params.total) {
-  //     orderTotal.value = route.params.total;
-  //   }
+  if (!successOrder.value) {
+    router.push("/");
+  }
+});
+
+onUnmounted(() => {
+  orderStore.clearSuccessOrder();
 });
 </script>
 

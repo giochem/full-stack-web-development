@@ -86,11 +86,13 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { getCurrentInstance } from "vue";
-import axios from "axios";
+import { ref, getCurrentInstance } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
 
 const app = getCurrentInstance();
+const router = useRouter();
+const authStore = useAuthStore();
 const status = ref("login");
 
 const form = ref({
@@ -101,91 +103,48 @@ const form = ref({
 
 async function login() {
   const { email, password } = form.value;
+  const result = await authStore.login(email, password);
 
-  const options = {
-    method: "POST",
-    url: "http://localhost:5000/api/auth/login",
-    data: { email, password },
-    credentials: "include",
-    withCredentials: true,
-  };
-  await axios
-    .request(options)
-    .then((res) => {
-      window.sessionStorage.setItem("logined", "true");
-      app?.proxy.$notify("Đăng nhập thành công!", "success");
-
-      if (res.data.data[0].role === "admin") {
-        window.location.href = "admin";
-      } else {
-        window.location.href = "/";
-      }
-    })
-    .catch((err) => {
-      const data = err.response?.data;
-      if (data) {
-        app?.proxy.$notify(data.message, "error");
-      } else {
-        app?.proxy.$notify("Có lỗi xảy ra", "error");
-      }
-    });
+  if (result.success) {
+    if (result.user.role === "admin") {
+      router.push("/admin");
+    } else {
+      router.push("/");
+    }
+  } else {
+    app?.proxy.$notify(result.message, "error");
+  }
 }
+
 async function register() {
   const { email, password, password2 } = form.value;
+
   if (!email || !password || !password2) {
     app?.proxy.$notify("Vui lòng nhập đủ thông tin", "warning");
     return;
   }
+
   if (password !== password2) {
     app?.proxy.$notify("Mật khẩu nhập lại không trùng khớp", "error");
     return;
   }
 
-  const options = {
-    method: "POST",
-    url: "http://localhost:5000/api/auth/register",
-    data: { email, password },
-    credentials: "include",
-    withCredentials: true,
-  };
-
-  await axios
-    .request(options)
-    .then((res) => {
-      window.sessionStorage.setItem("logined", "true");
-      app?.proxy.$notify("Đăng ký thành công!", "success");
-
-      if (res.data.data[0].role === "admin") {
-        window.location.href = "admin";
-      } else {
-        window.location.href = "/";
-      }
-    })
-    .catch((err) => {
-      const data = err.response?.data;
-      if (data) {
-        app?.proxy.$notify(data.error || data.errors, "error");
-      } else {
-        app?.proxy.$notify("Có lỗi xảy ra", "error");
-      }
-    });
+  const result = await authStore.register(email, password);
+  if (result.success) {
+    if (result.user.role === "admin") {
+      router.push("/admin");
+    } else {
+      router.push("/");
+    }
+  } else {
+    app?.proxy.$notify(result.message, "error");
+  }
 }
-async function forgotPassword() {
-  const options = {
-    method: "GET",
-    url: "http://localhost:5000/api/auth/check",
-    withCredentials: true,
-  };
-  // axios
-  await axios
-    .request(options)
-    .then((res) => {
-      console.log(res.data);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+
+function forgotPassword() {
+  console.log("Coming soon: Forgot password functionality");
 }
+
 function toggleStatus() {
   status.value = status.value === "login" ? "register" : "login";
 }

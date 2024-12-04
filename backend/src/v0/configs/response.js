@@ -19,17 +19,17 @@ class Response {
     return res.status(status).json(response);
   }
 
-  // static unauthorized(res, message = "Unauthorized") {
-  //   return this.error(res, message, null, 401);
-  // }
+  static unauthorized(res, message = "Unauthorized") {
+    return this.error(res, message, null, 401);
+  }
 
-  // static forbidden(res, message = "Forbidden") {
-  //   return this.error(res, message, null, 403);
-  // }
+  static forbidden(res, message = "Forbidden") {
+    return this.error(res, message, null, 403);
+  }
 
-  // static notFound(res, message = "Not Found") {
-  //   return this.error(res, message, null, 404);
-  // }
+  static notFound(res, message = "Not Found") {
+    return this.error(res, message, null, 404);
+  }
 
   static serverError(res, message = "Internal Server Error", error = null) {
     const response = new Response(false, message);

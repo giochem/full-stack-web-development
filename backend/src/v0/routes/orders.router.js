@@ -9,8 +9,8 @@ const orderController = require("../controllers/orders.controller");
 router.post(
   "/",
   authorizeRoles("client", "admin"),
-  // orderValidation.createOrder,
-  // validate,
+  orderValidation.createOrder,
+  validate,
   orderController.createOrder
 );
 

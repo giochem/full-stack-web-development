@@ -15,7 +15,6 @@ module.exports = {
         StatusCode.UNAUTHORIZED
       );
     }
-
     req.session.userID = user[0].userID;
     req.session.role = user[0].role;
     return Response.success(res, Message.SUCCESS_LOGIN, user, StatusCode.OK);

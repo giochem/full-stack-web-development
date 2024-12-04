@@ -9,43 +9,47 @@
     </header>
 
     <div class="form-container">
-      <form class="admin-form" @submit.prevent="save">
+      <form class="admin-form" @submit.prevent="handleSave">
         <div class="form-group">
           <label for="email">Email</label>
-          <input 
+          <input
             id="email"
-            v-model="user.email" 
+            v-model="form.email"
             type="email"
             placeholder="Enter email"
+            :disabled="userStore.loading"
           />
         </div>
 
         <div class="form-group">
           <label for="username">Username</label>
-          <input 
+          <input
             id="username"
-            v-model="user.username" 
+            v-model="form.username"
             type="text"
             placeholder="Enter username"
+            :disabled="userStore.loading"
           />
         </div>
 
         <div class="form-group">
           <label for="password">Password</label>
-          <input 
+          <input
             id="password"
-            v-model="user.password" 
+            v-model="form.password"
             type="password"
             placeholder="Enter password"
+            :disabled="userStore.loading"
           />
         </div>
 
         <div class="form-group">
           <label for="role">Role</label>
-          <select 
+          <select
             id="role"
-            v-model="user.role"
+            v-model="form.role"
             class="form-select"
+            :disabled="userStore.loading"
           >
             <option value="client">Client</option>
             <option value="admin">Admin</option>
@@ -53,10 +57,18 @@
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="primary-btn">
+          <button
+            type="submit"
+            class="primary-btn"
+            :disabled="userStore.loading"
+          >
             Save Changes
           </button>
-          <RouterLink to="/admin/manage-user" class="secondary-btn">
+          <RouterLink
+            to="/admin/manage-user"
+            class="secondary-btn"
+            :class="{ disabled: userStore.loading }"
+          >
             Cancel
           </RouterLink>
         </div>
@@ -66,25 +78,28 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { ref, getCurrentInstance, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useUserStore } from "@/stores/user";
 import axios from "axios";
 
+const app = getCurrentInstance();
 const route = useRoute();
 const router = useRouter();
+const userStore = useUserStore();
 
-const user = ref({
+const form = ref({
   email: "",
   username: "",
   password: "",
   role: "client",
 });
 
-async function save() {
+async function handleSave() {
   try {
     await axios.put(
       `http://localhost:5000/api/users/${route.params.userID}`,
-      user.value,
+      form.value,
       { withCredentials: true }
     );
     router.push("/admin/manage-user");
@@ -94,14 +109,17 @@ async function save() {
 }
 
 onMounted(async () => {
-  try {
-    const response = await axios.get(
-      `http://localhost:5000/api/users/${route.params.userID}`,
-      { withCredentials: true }
-    );
-    user.value = response.data.data[0];
-  } catch (error) {
-    console.error("Error fetching user:", error);
+  const result = await userStore.getUserByUserID(route.params.userID);
+  if (result.success) {
+    form.value = {
+      email: result.data.email,
+      username: result.data.username,
+      password: "",
+      role: result.data.role,
+    };
+  } else {
+    app?.proxy.$notify(result.message, "error");
+    router.push("/admin/manage-user");
   }
 });
 </script>
@@ -172,6 +190,12 @@ onMounted(async () => {
   border-color: var(--primary-color);
 }
 
+.form-group input:disabled,
+.form-select:disabled {
+  background-color: var(--light-bg-color);
+  cursor: not-allowed;
+}
+
 .form-select {
   background-color: white;
   cursor: pointer;
@@ -200,8 +224,13 @@ onMounted(async () => {
   color: white;
 }
 
-.primary-btn:hover {
+.primary-btn:hover:not(:disabled) {
   background: var(--secondary-color);
+}
+
+.primary-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .secondary-btn {
@@ -210,8 +239,14 @@ onMounted(async () => {
   color: var(--secondary-dark-color);
 }
 
-.secondary-btn:hover {
+.secondary-btn:hover:not(.disabled) {
   background: var(--light-bg-color);
+}
+
+.secondary-btn.disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 @media (max-width: 768px) {

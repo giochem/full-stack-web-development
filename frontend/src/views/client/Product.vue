@@ -94,34 +94,36 @@
 <script setup>
 import { ref, onMounted, computed, getCurrentInstance } from "vue";
 import { useRoute } from "vue-router";
-import axios from "axios";
+import { useProductStore } from "@/stores/product";
 import { useCartStore } from "@/stores/cart";
 
 const app = getCurrentInstance();
 const route = useRoute();
-const product = ref(null);
+const productStore = useProductStore();
+const cartStore = useCartStore();
+
 const quantity = ref(1);
 const selectedColor = ref("");
 const selectedSize = ref("");
-const cartStore = useCartStore();
 const showTooltip = ref(false);
 const isAddingToCart = ref(false);
 
-const fetchProduct = async () => {
-  try {
-    const productID = route.params.productID;
-    const response = await axios.get(
-      `http://localhost:5000/api/products/${productID}`
-    );
-    product.value = response.data.data[0];
+// Computed properties
+const product = computed(() => productStore.currentProduct);
+const loading = computed(() => productStore.loading);
 
-    // Set default selections
-    if (product.value) {
-      selectedColor.value = product.value.color.split("-")[0];
-      selectedSize.value = product.value.size.split("-")[0];
-    }
-  } catch (error) {
-    console.error("Error fetching product:", error);
+const productImage = computed(() => {
+  return product.value?.linkImage || "https://via.placeholder.com/400";
+});
+
+// Methods
+const fetchProduct = async () => {
+  const productID = route.params.productID;
+  const result = await productStore.fetchProductById(productID);
+
+  if (result.success && product.value) {
+    selectedColor.value = product.value.color.split("-")[0];
+    selectedSize.value = product.value.size.split("-")[0];
   }
 };
 
@@ -134,7 +136,6 @@ const getSizeOptions = () => {
 };
 
 const validateQuantity = () => {
-  // Convert to number and ensure it's within bounds
   let val = parseInt(quantity.value) || 1;
   val = Math.max(1, Math.min(val, product.value?.quantity || 1));
   quantity.value = val;
@@ -154,7 +155,6 @@ const increaseQuantity = () => {
 
 const addToCart = async () => {
   try {
-    // Check if user is logged in
     const isLoggedIn = window.sessionStorage.getItem("logined") === "true";
 
     if (!isLoggedIn) {
@@ -162,57 +162,36 @@ const addToCart = async () => {
       return;
     }
 
-    // Check if color and size are selected
     if (!selectedColor.value || !selectedSize.value) {
       app?.proxy.$notify("Please select color and size", "warning");
       return;
     }
 
     isAddingToCart.value = true;
-
-    const response = await axios.put(
-      "http://localhost:5000/api/carts/",
-      {
-        productID: product.value.productID,
-        quantity: quantity.value,
-      },
-      {
-        withCredentials: true,
-      }
+    const result = await cartStore.addToCart(
+      product.value.productID,
+      quantity.value
     );
 
-    if (response.data.success) {
-      // Show tooltip
+    if (result.success) {
       showTooltip.value = true;
       setTimeout(() => {
         showTooltip.value = false;
       }, 2000);
-
-      // Update cart count
-      await cartStore.updateCartCount();
-
-      // Reload product data
       await fetchProduct();
+    } else {
+      app?.proxy.$notify(result.error, "error");
     }
   } catch (error) {
-    console.error("Error adding to cart:", error);
-    const errorMessage =
-      error.response?.data?.message || "Error adding to cart";
-    app?.proxy.$notify(errorMessage, "error");
+    app?.proxy.$notify("Error adding to cart", "error");
   } finally {
     isAddingToCart.value = false;
   }
 };
 
-// Add price formatter function
 const formatPrice = (price) => {
   return price.toLocaleString("vi-VN");
 };
-
-// Add computed property for product image
-const productImage = computed(() => {
-  return product.value?.linkImage || "https://via.placeholder.com/400";
-});
 
 onMounted(() => {
   fetchProduct();
@@ -352,7 +331,6 @@ onMounted(() => {
   border-right: 2px solid var(--border-color);
   font-size: 1em;
   color: var(--secondary-dark-color);
-  -moz-appearance: textfield;
 }
 
 .quantity-input::-webkit-outer-spin-button,

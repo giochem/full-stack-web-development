@@ -6,7 +6,21 @@
         <div class="header-actions">
           <div class="search-box">
             <i class="ri-search-line"></i>
-            <input type="text" placeholder="Search users..." />
+            <input 
+              type="text" 
+              v-model="searchQuery" 
+              placeholder="Search users..."
+              @keyup.enter="handleSearch"
+              :disabled="userStore.loading"
+            />
+            <button 
+              v-if="searchQuery" 
+              @click="clearSearch" 
+              class="clear-search"
+              :disabled="userStore.loading"
+            >
+              <i class="ri-close-line"></i>
+            </button>
           </div>
           <RouterLink to="/admin/add-user" class="add-button">
             <i class="ri-add-line"></i>
@@ -30,8 +44,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(user, index) in users" :key="user.userID">
-            <td>{{ index + 1 }}</td>
+          <tr v-for="(user, index) in userStore.users" :key="user.userID">
+            <td>{{ currentPage * itemsPerPage + index + 1 }}</td>
             <td>{{ user.username }}</td>
             <td>{{ user.email }}</td>
             <td>
@@ -55,12 +69,6 @@
                 >
                   <i class="ri-edit-line"></i>
                 </RouterLink>
-                <button 
-                  @click="remove(user.userID)"
-                  class="delete-btn"
-                >
-                  <i class="ri-delete-bin-line"></i>
-                </button>
               </div>
             </td>
           </tr>
@@ -68,11 +76,11 @@
       </table>
     </div>
 
-    <div class="pagination">
+    <div class="pagination" v-if="!searchQuery">
       <button 
         class="page-btn"
         @click="changePage(currentPage - 1)"
-        :disabled="currentPage <= 0"
+        :disabled="currentPage <= 0 || userStore.loading"
       >
         <i class="ri-arrow-left-s-line"></i>
       </button>
@@ -82,6 +90,7 @@
         :key="page"
         @click="changePage(page)"
         :class="['page-btn', { active: currentPage === page }]"
+        :disabled="userStore.loading"
       >
         {{ page + 1 }}
       </button>
@@ -89,7 +98,7 @@
       <button 
         class="page-btn"
         @click="changePage(currentPage + 1)"
-        :disabled="!hasMorePages"
+        :disabled="!userStore.hasNextPage || userStore.loading"
       >
         <i class="ri-arrow-right-s-line"></i>
       </button>
@@ -98,66 +107,70 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from "vue";
-import axios from "axios";
+import { onMounted, ref, computed, getCurrentInstance } from "vue";
 import { useRouter } from "vue-router";
+import { useUserStore } from "@/stores/user";
 
+const app = getCurrentInstance();
 const router = useRouter();
-const users = ref([]);
+const userStore = useUserStore();
+
 const currentPage = ref(0);
 const itemsPerPage = 10;
-const totalPages = ref(1);
+const searchQuery = ref("");
 
 const displayedPages = computed(() => {
   const pages = [];
   const start = Math.max(0, currentPage.value - 1);
-  const end = Math.min(totalPages.value - 1, start + 2);
+  // Show 3 pages at a time
+  const end = start + 2;
   
   for (let i = start; i <= end; i++) {
-    pages.push(i);
+    // Only add the page if we're on it or there might be more pages
+    if (i <= currentPage.value || userStore.hasNextPage) {
+      pages.push(i);
+    }
   }
   return pages;
 });
 
-const hasMorePages = computed(() => {
-  return currentPage.value < totalPages.value - 1;
-});
+async function handleSearch() {
+  if (searchQuery.value.length > 0) {
+    currentPage.value = 0;
+    const result = await userStore.searchUsers(searchQuery.value);
+    if (!result.success) {
+      app?.proxy.$notify(result.message, "error");
+    }
+  } else {
+    await clearSearch();
+  }
+}
 
-async function fetchUsers(page = 0) {
-  try {
-    const response = await axios.get(
-      `http://localhost:5000/api/users?page=${page}&size=${itemsPerPage}`,
-      { withCredentials: true }
-    );
-    users.value = response.data.data;
-    totalPages.value = Math.ceil(response.data.total / itemsPerPage);
-  } catch (error) {
-    console.error('Error fetching users:', error);
+async function clearSearch() {
+  searchQuery.value = "";
+  userStore.clearSearch();
+  currentPage.value = 0;
+  const result = await userStore.fetchUsers(0, itemsPerPage);
+  if (!result.success) {
+    app?.proxy.$notify(result.message, "error");
   }
 }
 
 async function changePage(newPage) {
-  if (newPage < 0 || newPage >= totalPages.value) return;
-  currentPage.value = newPage;
-  await fetchUsers(newPage);
-}
-
-async function remove(userID) {
-  if (!confirm('Are you sure you want to delete this user?')) return;
+  if (newPage < 0 || (newPage > currentPage.value && !userStore.hasNextPage)) return;
   
-  try {
-    await axios.delete(
-      `http://localhost:5000/api/users/${userID}`,
-      { withCredentials: true }
-    );
-    await fetchUsers(currentPage.value);
-  } catch (error) {
-    console.error('Error deleting user:', error);
+  currentPage.value = newPage;
+  const result = await userStore.fetchUsers(newPage, itemsPerPage);
+  if (!result.success) {
+    app?.proxy.$notify(result.message, "error");
   }
 }
 
-onMounted(() => {
-  fetchUsers();
+onMounted(async () => {
+  const result = await userStore.fetchUsers(0, itemsPerPage);
+  if (!result.success) {
+    app?.proxy.$notify(result.message, "error");
+  }
 });
 </script>
 
@@ -182,6 +195,7 @@ onMounted(() => {
 }
 
 .search-box {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -195,6 +209,34 @@ onMounted(() => {
   border: none;
   outline: none;
   width: 200px;
+  padding-right: 24px; /* Space for clear button */
+}
+
+.search-box input:disabled {
+  background: transparent;
+  cursor: not-allowed;
+}
+
+.clear-search {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--light-text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clear-search:hover:not(:disabled) {
+  color: var(--secondary-dark-color);
+}
+
+.clear-search:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .add-button {
@@ -258,31 +300,18 @@ onMounted(() => {
   gap: 0.5rem;
 }
 
-.edit-btn,
-.delete-btn {
+.edit-btn {
   padding: 0.5rem;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s;
-}
-
-.edit-btn {
   color: var(--secondary-color);
   background: rgba(121, 74, 250, 0.1);
 }
 
-.delete-btn {
-  color: #dc3545;
-  background: rgba(220, 53, 69, 0.1);
-}
-
 .edit-btn:hover {
   background: rgba(121, 74, 250, 0.2);
-}
-
-.delete-btn:hover {
-  background: rgba(220, 53, 69, 0.2);
 }
 
 .pagination {
@@ -315,5 +344,11 @@ onMounted(() => {
 .page-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .form-actions {
+    flex-direction: column;
+  }
 }
 </style>
