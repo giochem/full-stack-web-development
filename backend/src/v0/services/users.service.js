@@ -115,7 +115,7 @@ module.exports = {
       .input("email", sql.NVarChar(255), email)
       .input("password", sql.NVarChar(255), password)
       .input("role", sql.NVarChar(50), role)
-      .query("updateUser");
+      .execute("updateUser");
 
     await conn.close();
     console.log("Connection closed.");
