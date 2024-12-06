@@ -8,13 +8,6 @@ const userController = require("../controllers/users.controller");
 const { validate } = require("../middlewares/validate.middleware");
 const userValidation = require("../validations/users.validation");
 
-router.post(
-  "/",
-  authorizeRoles("admin"),
-  userValidation.createUser,
-  validate,
-  userController.createUser
-);
 router.get(
   "/",
   authorizeRoles("admin"),
@@ -24,19 +17,18 @@ router.get(
 );
 
 router.get(
-  "/search",
-  authorizeRoles("admin"),
-  userValidation.searchUsers,
-  validate,
-  userController.searchUsers
-);
-
-router.get(
   "/:userID",
   authorizeRoles("admin", "client"),
   userValidation.getUser,
   validate,
   userController.getUser
+);
+router.post(
+  "/",
+  authorizeRoles("admin"),
+  userValidation.createUser,
+  validate,
+  userController.createUser
 );
 router.put(
   "/:userID",

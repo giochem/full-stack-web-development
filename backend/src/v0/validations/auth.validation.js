@@ -5,8 +5,8 @@ module.exports = {
     body("username")
       .notEmpty()
       .withMessage("Username is required")
-      .isLength({ min: 3, max: 50 })
-      .withMessage("Username must be between 3 and 50 characters"),
+      .isLength({ min: 1, max: 50 })
+      .withMessage("Username must be between 1 and 50 characters"),
     body("email").notEmpty().withMessage("Email is required"),
     // .isEmail()
     // .withMessage("Invalid email format")

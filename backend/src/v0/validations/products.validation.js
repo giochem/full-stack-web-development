@@ -29,26 +29,27 @@ module.exports = {
       .withMessage("Description is required")
       .isLength({ max: 500 })
       .withMessage("Description cannot exceed 500 characters"),
-    body("color")
-      .isString()
-      .withMessage("Color must be a string")
-      .isLength({ max: 50 })
-      .withMessage("Color cannot exceed 50 characters"),
-    body("size")
-      .isString()
-      .withMessage("Size must be a string")
-      .isLength({ max: 20 })
-      .withMessage("Size cannot exceed 20 characters"),
-    body("price")
+    body("promotionID")
+      .optional()
+      .isInt()
+      .withMessage("promotionID must be an integer"),
+    body("categoryID")
       .notEmpty()
-      .withMessage("Price is required")
-      .isFloat({ min: 0 })
-      .withMessage("Price must be a positive number"),
-    body("quantity")
+      .withMessage("categoryID is required")
+      .isInt()
+      .withMessage("categoryID must be an integer"),
+  ],
+  createProductItem: [
+    body("productID")
       .notEmpty()
-      .withMessage("Quantity is required")
-      .isInt({ min: 0 })
-      .withMessage("Quantity must be a positive integer"),
+      .withMessage("productID is required")
+      .isInt()
+      .withMessage("productID must be an integer"),
+    body("productList")
+      .notEmpty()
+      .withMessage("productList is required")
+      .isArray()
+      .withMessage("productList must be an array"),
   ],
 
   updateProduct: [
@@ -94,4 +95,4 @@ module.exports = {
       .isInt()
       .withMessage("productID must be an integer"),
   ],
-}; 
+};

@@ -78,39 +78,4 @@ module.exports = {
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);
     }
   },
-
-  check: async (req, res, next) => {
-    try {
-      if (!req.session.userID) {
-        return Response.error(
-          res,
-          Message.ERROR_UNAUTHORIZED,
-          null,
-          StatusCode.UNAUTHORIZED
-        );
-      }
-      return Response.success(
-        res,
-        Message.SUCCESS_LOGIN,
-        {
-          userID: req.session.userID,
-          role: req.session.role,
-        },
-        StatusCode.OK
-      );
-    } catch (error) {
-      console.error("Error in check controller:", error);
-      return Response.serverError(res, Message.ERROR_DB_QUERY, error);
-    }
-  },
-
-  logout: async (req, res, next) => {
-    try {
-      req.session.destroy();
-      return Response.success(res, Message.SUCCESS_LOGOUT, null, StatusCode.OK);
-    } catch (error) {
-      console.error("Error in logout controller:", error);
-      return Response.serverError(res, Message.ERROR_DB_QUERY, error);
-    }
-  },
 };
