@@ -7,7 +7,7 @@
         </div>
         <div class="header-actions">
           <RouterLink to="/admin/add-product" class="primary-btn">
-            Add Product
+            <i class="ri-add-line"></i> Add Product
           </RouterLink>
         </div>
       </div>
@@ -15,13 +15,14 @@
 
     <div class="product-list">
       <div v-if="productStore.loading" class="loading-state">
-        Loading products...
+        <i class="ri-loader-4-line spinning"></i> Loading products...
       </div>
       <div v-else-if="productStore.error" class="error-state">
-        {{ productStore.error }}
+        <i class="ri-error-warning-line"></i> {{ productStore.error }}
       </div>
       <div v-else-if="products.length === 0" class="empty-state">
-        No products found
+        <i class="ri-inbox-line"></i>
+        <p>No products found</p>
       </div>
       <div v-else class="product-grid">
         <div
@@ -29,27 +30,58 @@
           :key="product.productID"
           class="product-card"
         >
-          <div class="product-image">
-            <img :src="getImageUrl(product.linkImage)" :alt="product.name" />
+          <div class="product-status" v-if="product.promotionName">
+            <span class="discount-badge">-{{ product.discount }}%</span>
           </div>
+
+          <div class="product-image">
+            <img :src="getImageUrl(product.image)" :alt="product.name" />
+          </div>
+
           <div class="product-info">
             <h3>{{ product.name }}</h3>
-            <p class="price">${{ product.price }}</p>
+            <div class="category">
+              <i class="ri-price-tag-3-line"></i>
+              {{ product.categoryName }}
+            </div>
             <p class="description">{{ product.description }}</p>
+
+            <div class="stock-info">
+              <div class="stock-item">
+                <i class="ri-store-line"></i>
+                <span>In Stock: {{ product.totalQuantityInStock }}</span>
+              </div>
+              <div class="stock-item">
+                <i class="ri-shopping-cart-line"></i>
+                <span>In Cart: {{ product.totalQuantityInCart }}</span>
+              </div>
+            </div>
+
+            <div class="promotion-info" v-if="product.promotionName">
+              <div class="promotion-name">
+                <i class="ri-gift-line"></i>
+                {{ product.promotionName }}
+              </div>
+              <div class="promotion-dates">
+                {{ formatDate(product.startDate) }} -
+                {{ formatDate(product.endDate) }}
+              </div>
+            </div>
           </div>
+
           <div class="product-actions">
             <RouterLink
               :to="'/admin/edit-product/' + product.productID"
               class="edit-btn"
             >
-              Edit
+              <i class="ri-edit-line"></i> Edit
             </RouterLink>
             <button
               @click="handleDelete(product.productID)"
               class="delete-btn"
               :disabled="productStore.loading"
             >
-              Delete
+              <i class="ri-delete-bin-line"></i> Delete
             </button>
           </div>
         </div>
@@ -61,7 +93,7 @@
           :disabled="currentPage === 0 || productStore.loading"
           @click="handlePageChange(currentPage - 1)"
         >
-          Previous
+          <i class="ri-arrow-left-s-line"></i> Previous
         </button>
         <span class="page-info">Page {{ currentPage + 1 }}</span>
         <button
@@ -69,7 +101,7 @@
           :disabled="!productStore.hasNextPage || productStore.loading"
           @click="handlePageChange(currentPage + 1)"
         >
-          Next
+          Next <i class="ri-arrow-right-s-line"></i>
         </button>
       </div>
     </div>
@@ -81,12 +113,21 @@ import { ref, onMounted, getCurrentInstance } from "vue";
 import { useProductStore } from "@/stores/product";
 import { storeToRefs } from "pinia";
 import { APP_CONSTANTS } from "@/utils/constants";
+
 const app = getCurrentInstance();
 const productStore = useProductStore();
 const { products } = storeToRefs(productStore);
 
 const currentPage = ref(0);
 const PAGE_SIZE = 12;
+
+function formatDate(dateString) {
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
 
 async function loadProducts(page = 0) {
   const result = await productStore.fetchProducts(page, PAGE_SIZE);
@@ -116,6 +157,7 @@ async function handlePageChange(newPage) {
 }
 
 function getImageUrl(linkImage) {
+  console.log(linkImage);
   if (!linkImage) return "";
   return /^https?:\/\//i.test(linkImage)
     ? linkImage
@@ -170,10 +212,77 @@ onMounted(async () => {
 }
 
 .product-card {
+  position: relative;
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.product-status {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+}
+
+.discount-badge {
+  background: var(--primary-color);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.category {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--secondary-color);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.stock-info {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+
+.stock-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-color);
+}
+
+.promotion-info {
+  background: var(--light-bg-color);
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+}
+
+.promotion-name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--primary-color);
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.promotion-dates {
+  font-size: 0.85rem;
+  color: var(--text-light-color);
 }
 
 .product-image {
@@ -212,53 +321,95 @@ onMounted(async () => {
 .product-actions {
   padding: 1rem;
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
   border-top: 1px solid var(--border-color);
-}
-
-.edit-btn,
-.delete-btn {
-  flex: 1;
-  padding: 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  text-align: center;
-  text-decoration: none;
-  transition: all 0.3s ease;
 }
 
 .edit-btn {
   background: var(--secondary-color);
   color: white;
   border: none;
+  flex: 1;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-weight: 500;
 }
 
 .edit-btn:hover {
   background: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(66, 185, 131, 0.3);
+  transform: translateY(-1px);
+}
+
+.edit-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(66, 185, 131, 0.2);
 }
 
 .delete-btn {
   background: white;
   color: var(--danger-color);
   border: 1px solid var(--danger-color);
+  flex: 1;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-weight: 500;
 }
 
 .delete-btn:hover:not(:disabled) {
-  background: var(--danger-color);
+  background: #ff3b3b;
   color: white;
+  border-color: #ff3b3b;
+  box-shadow: 0 2px 8px rgba(255, 59, 59, 0.3);
+  transform: translateY(-1px);
+}
+
+.delete-btn:active:not(:disabled) {
+  background: #e53535;
+  border-color: #e53535;
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(229, 53, 53, 0.2);
 }
 
 .delete-btn:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
   cursor: not-allowed;
+  background: #f8f9fa;
+  border-color: #dee2e6;
+  color: #6c757d;
 }
 
 .loading-state,
 .error-state,
 .empty-state {
-  text-align: center;
-  padding: 2rem;
-  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 3rem;
+  font-size: 1.1rem;
+}
+
+.empty-state {
+  flex-direction: column;
+  color: var(--text-light-color);
+}
+
+.empty-state i {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
 }
 
 .error-state {
@@ -299,5 +450,37 @@ onMounted(async () => {
   .product-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Animation for loading spinner */
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Updated button styles */
+.edit-btn,
+.delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.primary-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 </style>
