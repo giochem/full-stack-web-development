@@ -107,21 +107,6 @@ module.exports = {
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);
     }
   },
-  searchUsers: async (req, res, next) => {
-    try {
-      const { searchText } = req.query;
-      const data = await userService.searchUsers(searchText);
-      return Response.success(
-        res,
-        Message.SUCCESS_SEARCH_USERS,
-        data,
-        StatusCode.OK
-      );
-    } catch (error) {
-      console.error("Error in searchUsers controller:", error);
-      return Response.serverError(res, Message.ERROR_DB_QUERY, error);
-    }
-  },
   deleteUser: async (req, res, next) => {
     try {
       const { userID } = req.params;

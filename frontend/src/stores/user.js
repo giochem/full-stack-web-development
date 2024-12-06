@@ -26,22 +26,25 @@ export const useUserStore = defineStore("user", {
   }),
 
   actions: {
-    async fetchUsers(page = 0, size = 10) {
+    async fetchUsers(page = 0, size = 10, filters = {}) {
       try {
         this.loading = true;
         this.error = null;
 
-        // If there's search text, use search endpoint
-        if (this.searchText) {
-          return await this.searchUsers(this.searchText);
-        }
+        const params = {
+          page,
+          size,
+          sortBy: filters.sortBy || "userID",
+          sortOrder: filters.sortOrder || "asc",
+          ...(filters.filterRole && { role: filters.filterRole }),
+          ...(filters.searchText && { searchText: filters.searchText }),
+        };
 
         const response = await axios[
           API_ENDPOINTS.USERS.LIST.method.toLowerCase()
-        ](API_ENDPOINTS.USERS.LIST.url(page, size));
+        ](API_ENDPOINTS.USERS.LIST.url(page, size), { params });
 
         this.users = response.data.data;
-        // If we get less items than the page size, we know there's no next page
         this.hasNextPage = this.users.length >= size;
 
         return {
@@ -129,10 +132,9 @@ export const useUserStore = defineStore("user", {
         this.loading = true;
         this.error = null;
 
-        const response = await axios[API_ENDPOINTS.USERS.CREATE.method.toLowerCase()](
-          API_ENDPOINTS.USERS.CREATE.url,
-          userData
-        );
+        const response = await axios[
+          API_ENDPOINTS.USERS.CREATE.method.toLowerCase()
+        ](API_ENDPOINTS.USERS.CREATE.url, userData);
 
         return {
           success: response.data.success,

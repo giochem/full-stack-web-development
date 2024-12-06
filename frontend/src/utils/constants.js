@@ -20,7 +20,7 @@ export const API_ENDPOINTS = {
   },
   USERS: {
     LIST: {
-      url: (page = 0, size = 10) => `/users?page=${page}&size=${size}`,
+      url: (page = 0, size = 10) => `/users`,
       method: "GET",
     },
     SEARCH: {

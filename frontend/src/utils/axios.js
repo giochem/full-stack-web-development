@@ -13,9 +13,14 @@ const axiosInstance = axios.create({
 // Request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
+    // Construct full URL with query parameters
+    const fullUrl = config.baseURL + config.url + 
+      (config.params ? '?' + new URLSearchParams(config.params).toString() : '');
+
     console.log("🚀 Request:", {
       method: config.method.toUpperCase(),
-      url: config.url,
+      fullUrl,
+      params: config.params,
       data: config.data,
       headers: config.headers,
     });
