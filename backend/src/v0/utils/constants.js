@@ -21,6 +21,7 @@ const Message = {
   SUCCESS_GET_PRODUCT: "Successfully retrieved product",
   SUCCESS_CREATE_PRODUCT: "Successfully created product",
   SUCCESS_UPDATE_PRODUCT: "Successfully updated product",
+  SUCCESS_CREATE_PRODUCT_ITEM: "Successfully created product item",
   SUCCESS_DELETE_PRODUCT: "Successfully deleted product",
   ERROR_PRODUCT_NOT_FOUND: "Product not found",
   ERROR_PRODUCT_IMAGE_REQUIRED: "Product image is required",
