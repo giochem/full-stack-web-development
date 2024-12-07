@@ -1,0 +1,42 @@
+{
+  "Components": {
+    "Layouts": {
+      "HeaderDefault": {
+        "Home": "Trang chủ",
+        "Auth": "Xác thực"
+      },
+      "FooterDefault": {
+        "CompanyName": "Công ty cổ phần thời trang 369",
+        "Newsletter": "Đăng ký nhận tin",
+        "Hotline": "Số hỗ trợ",
+        "GPKD": "Giấy phép kinh doanh",
+        "EmailPlaceholder": "Nhập email của bạn",
+        "Subscribe": "Đăng ký",
+        "ShortCompanyName": "Thời Trang 369"
+      }
+    }
+  },
+  "Views": {
+    "Auth": {
+      "ShortCompanyName": "Thời Trang 369",
+      "NewsletterDescription": "Khám phá xu hướng thời trang mới nhất cùng với 369 Fashion",
+      "Login": "Đăng nhập",
+      "Register": "Đăng ký",
+      "LabelEmail": "Email",
+      "PlaceholderEmail": "Nhập email của bạn",
+      "LabelPassword": "Mật khẩu",
+      "PlaceholderPassword": "Nhập mật khẩu của bạn",
+      "LabelPassword2": "Nhập lại mật khẩu",
+      "PlaceholderPassword2": "Nhập lại mật khẩu của bạn",
+      "CreateAccount": "Tạo tài khoản mới",
+      "HaveAccount": "Đã có tài khoản?",
+      "ForgotPassword": "Quên mật khẩu?"
+    },
+    "Client": {
+      "Title": "Sản phẩm nổi bật",
+      "Loading": "Đang tải sản phẩm...",
+      "Error": "Đã có lỗi xảy ra",
+      "NoProducts": "Cửa hàng hiện đang không có sản phẩm."
+    }
+  }
+}

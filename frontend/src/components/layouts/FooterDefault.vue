@@ -3,38 +3,53 @@
     <div class="container">
       <div class="footer-content">
         <div class="company-info">
-          <h3>Công ty cổ phần thời trang 369</h3>
+          <h3>{{ $t("Components.Layouts.FooterDefault.CompanyName") }}</h3>
           <ul class="contact-list">
             <li>
-              <strong>Hotline:</strong>
+              <strong
+                >{{ $t("Components.Layouts.FooterDefault.Hotline") }}:
+              </strong>
               <a href="tel:0973285886">0973 285 886</a>
             </li>
             <li>
-              <strong>Email:</strong>
-              <a href="mailto:369boutique.vn@gmail.com">369boutique.vn@gmail.com</a>
+              <strong>Email: </strong>
+              <a href="mailto:369boutique.vn@gmail.com"
+                >369boutique.vn@gmail.com</a
+              >
             </li>
             <li>
-              <strong>GPKD:</strong> 0107756568
+              <strong
+                >{{ $t("Components.Layouts.FooterDefault.GPKD") }}:</strong
+              >
+              0107756568
             </li>
           </ul>
         </div>
-        
+
         <div class="newsletter">
           <div class="subscribe-form">
-            <input 
-              type="email" 
-              placeholder="Nhập email của bạn"
+            <input
+              type="email"
+              :placeholder="
+                $t('Components.Layouts.FooterDefault.EmailPlaceholder')
+              "
               class="subscribe-input"
             />
-            <button class="subscribe-btn">ĐĂNG KÝ</button>
+            <button class="subscribe-btn">
+              {{ $t("Components.Layouts.FooterDefault.Subscribe") }}
+            </button>
           </div>
         </div>
       </div>
     </div>
-    
+
     <div class="copyright">
       <div class="container">
-        <p>Copyright 2024 © Thời Trang 369 - All rights reserved.</p>
+        <p>
+          Copyright 2024 ©
+          {{ $t("Components.Layouts.FooterDefault.ShortCompanyName") }} - All
+          rights reserved.
+        </p>
       </div>
     </div>
   </footer>
