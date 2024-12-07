@@ -26,6 +26,14 @@ const Message = {
   ERROR_PRODUCT_NOT_FOUND: "Product not found",
   ERROR_PRODUCT_IMAGE_REQUIRED: "Product image is required",
 
+  // Variation related messages
+  SUCCESS_GET_VARIATIONS: "Successfully retrieved variations",
+  SUCCESS_CREATE_VARIATION: "Successfully created variation",
+  SUCCESS_UPDATE_VARIATION: "Successfully updated variation",
+  SUCCESS_DELETE_VARIATION: "Successfully deleted variation",
+  ERROR_VARIATION_NOT_FOUND: "Variation not found",
+  ERROR_VARIATION_NAME_EXISTS: "Variation name already exists",
+
   // Cart related messages
   SUCCESS_GET_CART: "Successfully retrieved cart",
   SUCCESS_ADD_TO_CART: "Successfully added to cart",

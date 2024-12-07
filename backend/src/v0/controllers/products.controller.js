@@ -1,6 +1,7 @@
 const productService = require("../services/products.service");
 const Response = require("../configs/response");
 const { Message, StatusCode, Path } = require("../utils/constants");
+const { randomUUID } = require("crypto");
 const fs = require("fs");
 
 module.exports = {
@@ -64,9 +65,10 @@ module.exports = {
 
   createProduct: async (req, res, next) => {
     try {
-      const { name, description, promotionID, categoryID } = req.body;
-
-      if (!req.file) {
+      let { name, description, promotionID, categoryID, productList } =
+        req.body;
+      productList = JSON.parse(productList);
+      if (!req.files || req.files.length === 0) {
         return Response.error(
           res,
           Message.ERROR_PRODUCT_IMAGE_REQUIRED,
@@ -74,19 +76,25 @@ module.exports = {
           StatusCode.BAD_REQUEST
         );
       }
-
-      const image = req.file.filename;
-      const newProduct = await productService.createProduct({
+      const image = req.files[0]?.filename;
+      for (let i = 1; i <= productList.length; i++) {
+        productList[i - 1].sku =
+          productList[i - 1].variationOptionIDs.join("-") + "+" + randomUUID();
+        productList[i - 1].image = req.files[i]?.filename;
+      }
+      console.log(productList, image);
+      await productService.createProduct({
         promotionID,
         categoryID,
         name,
         description,
         image,
+        productList,
       });
       return Response.success(
         res,
         Message.SUCCESS_CREATE_PRODUCT,
-        newProduct,
+        null,
         StatusCode.CREATED
       );
     } catch (error) {
@@ -94,29 +102,12 @@ module.exports = {
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);
     }
   },
-  createProductItem: async (req, res, next) => {
-    try {
-      const { productID, productList } = req.body;
-
-      const newProductItem = await productService.createProductItem({
-        productID,
-        productList,
-      });
-      return Response.success(
-        res,
-        Message.SUCCESS_CREATE_PRODUCT_ITEM,
-        newProductItem,
-        StatusCode.CREATED
-      );
-    } catch (error) {
-      console.error("Error in createProductItem controller:", error);
-      return Response.serverError(res, Message.ERROR_DB_QUERY, error);
-    }
-  },
 
   updateProduct: async (req, res, next) => {
     try {
-      let { name, description, promotionID, categoryID } = req.body;
+      let { name, description, image, promotionID, categoryID, productList } =
+        req.body;
+      productList = JSON.parse(productList);
       const { productID } = req.params;
 
       const product = await productService.getProductByProductID(productID);
@@ -128,13 +119,17 @@ module.exports = {
           StatusCode.NOT_FOUND
         );
       }
+      // update new image
+      image = req.files[0]?.filename;
 
-      if (image && fs.existsSync(`${Path.UPLOAD_DIR}/${image}`)) {
-        fs.unlinkSync(`${Path.UPLOAD_DIR}/${image}`);
-      }
+      for (let i = 1; i <= productList.length; i++) {
+        productList[i - 1].sku = productList[i - 1].sku
+          ? productList[i - 1].sku
+          : productList[i - 1].variationOptionIDs.join("-") +
+            "+" +
+            randomUUID();
 
-      if (req.file) {
-        image = req.file.filename;
+        productList[i - 1].image = req.files[i]?.filename;
       }
 
       await productService.updateProduct({
@@ -144,6 +139,7 @@ module.exports = {
         name,
         description,
         image,
+        productList,
       });
       return Response.success(
         res,

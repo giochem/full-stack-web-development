@@ -6,7 +6,7 @@ const collectionRouter = require("./collections.router");
 const promotionRouter = require("./promotions.router");
 const cartRouter = require("./carts.router");
 const orderRouter = require("./orders.router");
-
+const variationRouter = require("./variations.router");
 const apiRoute = express();
 
 apiRoute.get("", (req, res) => {
@@ -15,10 +15,10 @@ apiRoute.get("", (req, res) => {
 
 apiRoute.use("/auth", authRouter);
 apiRoute.use("/users", userRouter);
+apiRoute.use("/variations", variationRouter);
 apiRoute.use("/products", productRouter);
 apiRoute.use("/collections", collectionRouter);
 apiRoute.use("/promotions", promotionRouter);
 apiRoute.use("/carts", cartRouter);
 apiRoute.use("/orders", orderRouter);
-
 module.exports = apiRoute;

@@ -16,7 +16,6 @@ module.exports = {
     conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
     console.log("procedure getProductsByOffsetBased");
-
     const data = await conn
       .request()
       .input("offset", sql.Int, offset)
@@ -35,56 +34,82 @@ module.exports = {
     console.log("Connected to SQLServer...");
     console.log("procedure getProductByProductID");
 
-    const data = await conn
+    const result = await conn
       .request()
       .input("productID", sql.Int, productID)
       .execute("getProductByProductID");
 
-    return data.recordset;
+    return result.recordsets;
   },
   createProduct: async (product) => {
-    let conn;
-    const { promotionID, categoryID, name, description, image } = product;
+    const { promotionID, categoryID, name, description, image, productList } =
+      product;
 
-    conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
     console.log("procedure createProduct");
+    const conn = await sql.connect(config);
+    const productItemList = new sql.Table("productItemList");
+    productItemList.create = true;
+    productItemList.columns.add("sku", sql.VarChar(255));
+    productItemList.columns.add("price", sql.Int);
+    productItemList.columns.add("quantity", sql.Int);
+    productItemList.columns.add("image", sql.NVarChar(255));
+    productItemList.columns.add("variationOptionIDs", sql.VarChar(255));
 
-    const data = await conn
+    productList.forEach((item) => {
+      productItemList.rows.add(
+        item.sku,
+        item.price,
+        item.quantity,
+        item.image,
+        item.variationOptionIDs.join(",")
+      );
+    });
+
+    const result = await conn
       .request()
-      .input("promotionID", sql.Int, promotionID)
-      .input("categoryID", sql.Int, categoryID)
       .input("name", sql.NVarChar(255), name)
       .input("description", sql.Text, description)
       .input("image", sql.NVarChar(255), image)
+      .input("promotionID", sql.Int, promotionID)
+      .input("categoryID", sql.Int, categoryID)
+      .input("productItemTable", productItemList)
       .execute("createProduct");
-
-    return data.recordset;
-  },
-  createProductItem: async (product) => {
-    const { productID, productList } = product;
-    const { variationID, variationOptionID, price, quantity } = productList[0];
-    const conn = await sql.connect(config);
-    console.log("Connected to SQLServer...");
-    console.log("procedure createProductItem");
-
-    const data = await conn
-      .request()
-      .input("productID", sql.Int, productID)
-      .input("variationID", sql.Int, variationID)
-      .input("variationOptionID", sql.Int, variationOptionID)
-      .input("price", sql.Int, price)
-      .input("quantity", sql.Int, quantity)
-      .execute("createProductItem");
+    await conn.close();
+    console.log("Connection closed.");
   },
   updateProduct: async (product) => {
-    const { productID, promotionID, categoryID, name, description, image } =
-      product;
+    const {
+      productID,
+      promotionID,
+      categoryID,
+      name,
+      description,
+      image,
+      productList,
+    } = product;
     const conn = await sql.connect(config);
-    console.log("Connected to SQLServer...");
-    console.log("procedure updateProduct");
+    const productItemList = new sql.Table("productItemList");
+    productItemList.create = true;
+    productItemList.columns.add("productItemID", sql.Int);
+    productItemList.columns.add("sku", sql.VarChar(255));
+    productItemList.columns.add("price", sql.Int);
+    productItemList.columns.add("quantity", sql.Int);
+    productItemList.columns.add("image", sql.NVarChar(255));
+    productItemList.columns.add("variationOptionIDs", sql.VarChar(255));
 
-    await conn
+    productList.forEach((item) => {
+      productItemList.rows.add(
+        item.productItemID,
+        item.sku,
+        item.price,
+        item.quantity,
+        item.image,
+        item.variationOptionIDs.join(",")
+      );
+    });
+
+    const result = await conn
       .request()
       .input("productID", sql.Int, productID)
       .input("promotionID", sql.Int, promotionID)
@@ -92,7 +117,10 @@ module.exports = {
       .input("name", sql.NVarChar(255), name)
       .input("description", sql.Text, description)
       .input("image", sql.NVarChar(255), image)
+      .input("productItemTable", productItemList)
       .execute("updateProduct");
+    await conn.close();
+    console.log("Connection closed.");
   },
 
   deleteProduct: async (productID) => {

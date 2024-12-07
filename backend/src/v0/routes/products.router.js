@@ -22,18 +22,12 @@ router.get(
 router.post(
   "/",
   // authorizeRoles("admin"),
-  upload.single("file"),
+  upload.array("file", 10),
   productValidation.createProduct,
   validate,
   productController.createProduct
 );
-router.post(
-  "/product-item",
-  // authorizeRoles("admin"),
-  productValidation.createProductItem,
-  validate,
-  productController.createProductItem
-);
+
 router.put(
   "/:productID",
   // authorizeRoles("admin"),
