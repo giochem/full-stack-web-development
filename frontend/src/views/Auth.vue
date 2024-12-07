@@ -5,9 +5,9 @@
         <!-- Left side - Brand Section -->
         <div class="brand-section">
           <div class="brand-content">
-            <h1>Thời trang 369</h1>
+            <h1>{{ $t("Views.Auth.ShortCompanyName") }}</h1>
             <p class="brand-description">
-              Khám phá xu hướng thời trang mới nhất cùng với 369 Fashion
+              {{ $t("Views.Auth.NewsletterDescription") }}
             </p>
             <div class="brand-image">
               <img
@@ -21,38 +21,46 @@
         <!-- Right side - Auth Form -->
         <div class="auth-form-container">
           <form class="auth-form" @submit.prevent>
-            <h2>{{ status === "login" ? "Đăng nhập" : "Đăng ký" }}</h2>
+            <h2>
+              {{
+                status === "login"
+                  ? $t("Views.Auth.Login")
+                  : $t("Views.Auth.Register")
+              }}
+            </h2>
 
             <div class="form-group">
-              <label for="email">Email</label>
+              <label for="email">{{ $t("Views.Auth.LabelEmail") }}</label>
               <input
                 id="email"
                 v-model="form.email"
                 type="email"
                 required
-                placeholder="Nhập email của bạn"
+                :placeholder="$t('Views.Auth.PlaceholderEmail')"
               />
             </div>
 
             <div class="form-group">
-              <label for="password">Mật khẩu</label>
+              <label for="password">{{ $t("Views.Auth.LabelPassword") }}</label>
               <input
                 id="password"
                 v-model="form.password"
                 type="password"
                 required
-                placeholder="Nhập mật khẩu"
+                :placeholder="$t('Views.Auth.PlaceholderPassword')"
               />
             </div>
 
             <div v-if="status === 'register'" class="form-group">
-              <label for="password2">Xác nhận mật khẩu</label>
+              <label for="password2">{{
+                $t("Views.Auth.LabelPassword2")
+              }}</label>
               <input
                 id="password2"
                 v-model="form.password2"
                 type="password"
                 required
-                placeholder="Nhập lại mật khẩu"
+                :placeholder="$t('Views.Auth.PlaceholderPassword2')"
               />
             </div>
 
@@ -61,20 +69,24 @@
                 class="primary-btn"
                 @click="status === 'login' ? login() : register()"
               >
-                {{ status === "login" ? "Đăng nhập" : "Đăng ký" }}
+                {{
+                  status === "login"
+                    ? $t("Views.Auth.Login")
+                    : $t("Views.Auth.Register")
+                }}
               </button>
 
               <div class="secondary-actions">
                 <button class="text-btn" @click="toggleStatus">
                   {{
                     status === "login"
-                      ? "Tạo tài khoản mới"
-                      : "Đã có tài khoản?"
+                      ? $t("Views.Auth.CreateAccount")
+                      : $t("Views.Auth.HaveAccount")
                   }}
                 </button>
 
                 <button class="text-btn" @click="forgotPassword">
-                  Quên mật khẩu?
+                  {{ $t("Views.Auth.ForgotPassword") }}
                 </button>
               </div>
             </div>

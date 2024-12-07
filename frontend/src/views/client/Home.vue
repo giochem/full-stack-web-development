@@ -2,31 +2,34 @@
   <div class="home">
     <div class="container">
       <section class="products-section">
-        <h2>Sản phẩm nổi bật</h2>
-        
+        <h2>{{ $t("Views.Client.Title") }}</h2>
+
         <div v-if="loading" class="loading">
-          <p>Đang tải sản phẩm...</p>
+          <p>{{ $t("Views.Client.Loading") }}</p>
         </div>
-        
+
         <div v-else-if="productStore.error" class="error">
           <p>{{ productStore.error }}</p>
         </div>
-        
+
         <div v-else-if="productStore.products.length === 0" class="no-products">
-          <p>Cửa hàng hiện đang không có sản phẩm.</p>
+          <p>{{ $t("Views.Client.NoProducts") }}</p>
         </div>
-        
+
         <div v-else class="products-grid">
-          <div 
-            v-for="product in productStore.products" 
+          <div
+            v-for="product in productStore.products"
             :key="product.productID"
             class="product-card"
             @click="navigateTo(`/product/${product.productID}`)"
           >
             <div class="product-image">
-              <img src="http://localhost:5000/uploads/1.png" alt="Product Image" />
+              <img
+                src="http://localhost:5000/uploads/1.png"
+                alt="Product Image"
+              />
             </div>
-            
+
             <div class="product-info">
               <h3>{{ product.name }}</h3>
               <div class="product-price">
@@ -161,7 +164,8 @@ function navigateTo(path) {
   }
 }
 
-.loading, .error {
+.loading,
+.error {
   text-align: center;
   padding: 2rem;
   color: var(--light-text-color);
