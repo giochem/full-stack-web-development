@@ -267,7 +267,7 @@
                           :key="variation.variationID"
                           :value="variation.variationID"
                         >
-                          {{ variation.name }}
+                          {{ variation.nameAtribute }}
                         </option>
                       </select>
                     </div>
@@ -342,7 +342,7 @@
 import { onMounted, ref, computed, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useProductStore } from "@/stores/product";
-import { useVariationStore } from '@/stores/variation';
+import { useVariationStore } from "@/stores/variation";
 import { getCurrentInstance } from "vue";
 import { APP_CONSTANTS } from "@/utils/constants";
 import axios from "axios";
@@ -368,9 +368,7 @@ const { currentProductItems, loading, variations } = storeToRefs(productStore);
 
 function getImageUrl(image) {
   if (!image) return APP_CONSTANTS.UPLOAD.DEFAULT_IMAGE;
-  return /^https?:\/\//i.test(image)
-    ? image
-    : `${APP_CONSTANTS.UPLOAD.UPLOAD_URL}${image}`;
+  return image;
 }
 
 function uploadMainImage(e) {
@@ -414,17 +412,6 @@ async function handleSave() {
     formData.append("file", mainImageFile.value);
   }
 
-  // Add product items
-  // formData.append("productItems", JSON.stringify(productItems.value));
-  // formData.append("deletedItemIds", JSON.stringify(deletedItemIds.value));
-
-  // Add variation images
-  // productItems.value.forEach((item, index) => {
-  //   if (item.newImage) {
-  //     formData.append(`variationImage${index}`, item.newImage);
-  //   }
-  // });
-
   const result = await productStore.updateProduct(
     route.params.productID,
     formData
@@ -440,11 +427,12 @@ async function handleSave() {
 onMounted(async () => {
   await Promise.all([
     productStore.fetchExtraInfo(),
-    variationStore.fetchVariations()
+    variationStore.fetchVariations(),
   ]);
 
   const result = await productStore.fetchProductById(route.params.productID);
   if (result.success) {
+    console.log(result.data);
     const [productData, productItemsData] = result.data;
     product.value = {
       ...productData,
@@ -1288,7 +1276,7 @@ function getPromotionStatusClass(promotion) {
 
 /* Add these CSS variables to your root/global styles */
 :root {
-  --text-light-color-rgb: 108, 117, 125;  /* RGB values for your text light color */
-  --text-color-rgb: 33, 37, 41;           /* RGB values for your text color */
+  --text-light-color-rgb: 108, 117, 125; /* RGB values for your text light color */
+  --text-color-rgb: 33, 37, 41; /* RGB values for your text color */
 }
 </style>

@@ -182,24 +182,26 @@ export const useProductStore = defineStore("product", {
         this.loading = true;
         this.error = null;
 
-        const [categoriesRes, promotionsRes] = await Promise.all([
-          axios.get('/api/categories'),
-          axios.get('/api/promotions'),
-        ]);
-
-        this.categories = categoriesRes.data.data.map((category) => ({
+        const result = await axios[
+          API_ENDPOINTS.PRODUCTS.EXTRA_INFO.method.toLowerCase()
+        ](API_ENDPOINTS.PRODUCTS.EXTRA_INFO.url);
+        const [categories, promotions, variations] = result.data.data;
+        this.categories = categories.map((category) => ({
           categoryID: category.categoryID,
           name: category.name,
         }));
 
-        this.promotions = promotionsRes.data.data.map((promotion) => ({
+        this.promotions = promotions.map((promotion) => ({
           promotionID: promotion.promotionID,
           name: promotion.name,
           discount: promotion.discount,
           startDate: promotion.startDate,
           endDate: promotion.endDate,
         }));
-
+        this.variations = variations.map((variation) => ({
+          variationID: variation.variationID,
+          nameAtribute: variation.nameAtribute,
+        }));
         return {
           success: true,
           message: "Successfully fetched product extra info",
@@ -318,7 +320,7 @@ export const useProductStore = defineStore("product", {
 
       this.currentProductItems[itemIndex].attributes.push({
         variationID: defaultVariation.variationID,
-        nameAtribute: defaultVariation.name,
+        nameAtribute: defaultVariation.nameAtribute,
         value: "",
       });
       this.modifiedItems.add(itemIndex);
@@ -335,7 +337,7 @@ export const useProductStore = defineStore("product", {
       );
       if (variation) {
         this.currentProductItems[itemIndex].attributes[attrIndex].nameAtribute =
-          variation.name;
+          variation.nameAtribute;
       }
       this.modifiedItems.add(itemIndex);
     },
