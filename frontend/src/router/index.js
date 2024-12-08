@@ -140,6 +140,11 @@ const router = createRouter({
           name: "edit-order",
           component: () => import("../views/admin/EditOrder.vue"),
         },
+        {
+          path: "/admin/manage-variations",
+          name: "ManageVariations",
+          component: () => import("../views/admin/ManageVariations.vue"),
+        },
       ],
     },
   ],

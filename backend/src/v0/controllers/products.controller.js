@@ -38,7 +38,20 @@ module.exports = {
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);
     }
   },
-
+  getProductExtraInfo: async (req, res, next) => {
+    try {
+      const data = await productService.getProductExtraInfo();
+      return Response.success(
+        res,
+        Message.SUCCESS_GET_PRODUCT_EXTRA_INFO,
+        data,
+        StatusCode.OK
+      );
+    } catch (error) {
+      console.error("Error in getProductExtraInfo controller:", error);
+      return Response.serverError(res, Message.ERROR_DB_QUERY, error);
+    }
+  },
   getProduct: async (req, res, next) => {
     try {
       const { productID } = req.params;
@@ -63,124 +76,131 @@ module.exports = {
     }
   },
 
-  createProduct: async (req, res, next) => {
+  upsertProduct: async (req, res, next) => {
     try {
-      let { name, description, promotionID, categoryID, productList } =
+      let { productID, promotionID, categoryID, name, description, image } =
         req.body;
-      productList = JSON.parse(productList);
-      if (!req.files || req.files.length === 0) {
-        return Response.error(
-          res,
-          Message.ERROR_PRODUCT_IMAGE_REQUIRED,
-          null,
-          StatusCode.BAD_REQUEST
-        );
+      if (req.file?.filename) {
+        image = req.file.filename;
       }
-      const image = req.files[0]?.filename;
-      for (let i = 1; i <= productList.length; i++) {
-        productList[i - 1].sku =
-          productList[i - 1].variationOptionIDs.join("-") + "+" + randomUUID();
-        productList[i - 1].image = req.files[i]?.filename;
-      }
-      console.log(productList, image);
-      await productService.createProduct({
-        promotionID,
-        categoryID,
-        name,
-        description,
-        image,
-        productList,
-      });
-      return Response.success(
-        res,
-        Message.SUCCESS_CREATE_PRODUCT,
-        null,
-        StatusCode.CREATED
-      );
-    } catch (error) {
-      console.error("Error in createProduct controller:", error);
-      return Response.serverError(res, Message.ERROR_DB_QUERY, error);
-    }
-  },
-
-  updateProduct: async (req, res, next) => {
-    try {
-      let { name, description, image, promotionID, categoryID, productList } =
-        req.body;
-      productList = JSON.parse(productList);
-      const { productID } = req.params;
-
-      const product = await productService.getProductByProductID(productID);
-      if (!product || product.length === 0) {
-        return Response.error(
-          res,
-          Message.ERROR_PRODUCT_NOT_FOUND,
-          null,
-          StatusCode.NOT_FOUND
-        );
-      }
-      // update new image
-      image = req.files[0]?.filename;
-
-      for (let i = 1; i <= productList.length; i++) {
-        productList[i - 1].sku = productList[i - 1].sku
-          ? productList[i - 1].sku
-          : productList[i - 1].variationOptionIDs.join("-") +
-            "+" +
-            randomUUID();
-
-        productList[i - 1].image = req.files[i]?.filename;
-      }
-
-      await productService.updateProduct({
+      await productService.upsertProduct({
         productID,
         promotionID,
         categoryID,
         name,
         description,
         image,
-        productList,
       });
       return Response.success(
         res,
-        Message.SUCCESS_UPDATE_PRODUCT,
+        Message.SUCCESS_UPSERT_PRODUCT,
         null,
         StatusCode.OK
       );
     } catch (error) {
-      console.error("Error in updateProduct controller:", error);
+      console.error("Error in createProduct controller:", error);
+      return Response.serverError(res, Message.ERROR_DB_QUERY, error);
+    }
+  },
+  upsertProductItem: async (req, res, next) => {
+    try {
+      let {
+        productID,
+        productItemID,
+        sku,
+        price,
+        quantity,
+        image,
+        variationOptionList,
+      } = req.body;
+      if (req.file?.filename) {
+        image = req.file.filename;
+      }
+      await productService.upsertProductItem({
+        productID,
+        productItemID,
+        sku,
+        price,
+        quantity,
+        image,
+        variationOptionList: JSON.parse(variationOptionList),
+      });
+      return Response.success(
+        res,
+        Message.SUCCESS_UPSERT_PRODUCT_ITEM,
+        null,
+        StatusCode.OK
+      );
+    } catch (error) {
+      console.error("Error in upsertProductItem controller:", error);
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);
     }
   },
 
   deleteProduct: async (req, res, next) => {
     try {
-      const { productID } = req.params;
-      const product = await productService.getProductByProductID(productID);
+      const { productID, productItemID } = req.query;
+      if (productID) {
+        const product = await productService.getProductByProductID(productID);
 
-      if (!product || product.length === 0) {
+        if (!product || product.length === 0) {
+          return Response.error(
+            res,
+            Message.ERROR_PRODUCT_NOT_FOUND,
+            null,
+            StatusCode.NOT_FOUND
+          );
+        }
+
+        if (
+          product[0].image &&
+          fs.existsSync(`${Path.UPLOAD_DIR}/${product[0].image}`)
+        ) {
+          fs.unlinkSync(`${Path.UPLOAD_DIR}/${product[0].linkImage}`);
+        }
+
+        await productService.deleteProduct(productID);
+        return Response.success(
+          res,
+          Message.SUCCESS_DELETE_PRODUCT,
+          null,
+          StatusCode.OK
+        );
+      } else if (productItemID) {
+        const productItem = await productService.getProductItemByProductItemID(
+          productItemID
+        );
+
+        if (!productItem || productItem.length === 0) {
+          return Response.error(
+            res,
+            Message.ERROR_PRODUCT_ITEM_NOT_FOUND,
+            null,
+            StatusCode.NOT_FOUND
+          );
+        }
+        if (
+          productItem[0].image &&
+          fs.existsSync(`${Path.UPLOAD_DIR}/${productItem[0].image}`)
+        ) {
+          fs.unlinkSync(`${Path.UPLOAD_DIR}/${productItem[0].linkImage}`);
+        }
+
+        await productService.deleteProductItem(productItemID);
+        return Response.success(
+          res,
+          Message.SUCCESS_DELETE_PRODUCT_ITEM,
+          null,
+          StatusCode.OK
+        );
+      } else {
         return Response.error(
           res,
-          Message.ERROR_PRODUCT_NOT_FOUND,
+          Message.ERROR_INVALID_QUERY,
           null,
-          StatusCode.NOT_FOUND
+          StatusCode.BAD_REQUEST
         );
       }
-
-      if (
-        product[0].image &&
-        fs.existsSync(`${Path.UPLOAD_DIR}/${product[0].image}`)
-      ) {
-        fs.unlinkSync(`${Path.UPLOAD_DIR}/${product[0].linkImage}`);
-      }
-
-      await productService.deleteProduct(productID);
-      return Response.success(
-        res,
-        Message.SUCCESS_DELETE_PRODUCT,
-        null,
-        StatusCode.OK
-      );
     } catch (error) {
       console.error("Error in deleteProduct controller:", error);
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);

@@ -34,8 +34,8 @@ export const useUserStore = defineStore("user", {
         const params = {
           page,
           size,
-          sortBy: filters.sortBy || "userID",
-          sortOrder: filters.sortOrder || "asc",
+          sortBy: filters.sortBy,
+          sortOrder: filters.sortOrder,
           ...(filters.filterRole && { role: filters.filterRole }),
           ...(filters.searchText && { searchText: filters.searchText }),
         };

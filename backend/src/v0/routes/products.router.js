@@ -12,33 +12,34 @@ router.get(
   validate,
   productController.getProducts
 );
-
+router.get("/extra-info", productController.getProductExtraInfo);
 router.get(
   "/:productID",
   productValidation.getProduct,
   validate,
   productController.getProduct
 );
-router.post(
+
+router.put(
   "/",
   // authorizeRoles("admin"),
-  upload.array("file", 10),
-  productValidation.createProduct,
+  upload.single("file"),
+  productValidation.upsertProduct,
   validate,
-  productController.createProduct
+  productController.upsertProduct
 );
 
 router.put(
-  "/:productID",
+  "/product-item",
   // authorizeRoles("admin"),
   upload.single("file"),
-  productValidation.updateProduct,
+  productValidation.upsertProductItem,
   validate,
-  productController.updateProduct
+  productController.upsertProductItem
 );
 
 router.delete(
-  "/:productID",
+  "",
   // authorizeRoles("admin"),
   productValidation.deleteProduct,
   validate,

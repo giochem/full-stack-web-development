@@ -29,6 +29,14 @@ module.exports = {
 
     return data.recordset;
   },
+  getProductExtraInfo: async () => {
+    const conn = await sql.connect(config);
+    console.log("Connected to SQLServer...");
+    console.log("procedure getProductExtraInfo");
+
+    const result = await conn.request().execute("getProductExtraInfo");
+    return result.recordsets;
+  },
   getProductByProductID: async (productID) => {
     const conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
@@ -41,75 +49,26 @@ module.exports = {
 
     return result.recordsets;
   },
-  createProduct: async (product) => {
-    const { promotionID, categoryID, name, description, image, productList } =
-      product;
-
-    console.log("Connected to SQLServer...");
-    console.log("procedure createProduct");
+  getProductItemByProductItemID: async (productItemID) => {
     const conn = await sql.connect(config);
-    const productItemList = new sql.Table("productItemList");
-    productItemList.create = true;
-    productItemList.columns.add("sku", sql.VarChar(255));
-    productItemList.columns.add("price", sql.Int);
-    productItemList.columns.add("quantity", sql.Int);
-    productItemList.columns.add("image", sql.NVarChar(255));
-    productItemList.columns.add("variationOptionIDs", sql.VarChar(255));
-
-    productList.forEach((item) => {
-      productItemList.rows.add(
-        item.sku,
-        item.price,
-        item.quantity,
-        item.image,
-        item.variationOptionIDs.join(",")
-      );
-    });
+    console.log("Connected to SQLServer...");
+    console.log("procedure getProductItemByProductItemID");
 
     const result = await conn
       .request()
-      .input("name", sql.NVarChar(255), name)
-      .input("description", sql.Text, description)
-      .input("image", sql.NVarChar(255), image)
-      .input("promotionID", sql.Int, promotionID)
-      .input("categoryID", sql.Int, categoryID)
-      .input("productItemTable", productItemList)
-      .execute("createProduct");
-    await conn.close();
-    console.log("Connection closed.");
+      .input("productItemID", sql.Int, productItemID)
+      .execute("getProductItemByProductItemID");
+
+    return result.recordsets;
   },
-  updateProduct: async (product) => {
-    const {
-      productID,
-      promotionID,
-      categoryID,
-      name,
-      description,
-      image,
-      productList,
-    } = product;
+  upsertProduct: async (product) => {
+    const { productID, promotionID, categoryID, name, description, image } =
+      product;
     const conn = await sql.connect(config);
-    const productItemList = new sql.Table("productItemList");
-    productItemList.create = true;
-    productItemList.columns.add("productItemID", sql.Int);
-    productItemList.columns.add("sku", sql.VarChar(255));
-    productItemList.columns.add("price", sql.Int);
-    productItemList.columns.add("quantity", sql.Int);
-    productItemList.columns.add("image", sql.NVarChar(255));
-    productItemList.columns.add("variationOptionIDs", sql.VarChar(255));
+    console.log("Connected to SQLServer...");
+    console.log("procedure upsertProduct");
 
-    productList.forEach((item) => {
-      productItemList.rows.add(
-        item.productItemID,
-        item.sku,
-        item.price,
-        item.quantity,
-        item.image,
-        item.variationOptionIDs.join(",")
-      );
-    });
-
-    const result = await conn
+    await conn
       .request()
       .input("productID", sql.Int, productID)
       .input("promotionID", sql.Int, promotionID)
@@ -117,12 +76,45 @@ module.exports = {
       .input("name", sql.NVarChar(255), name)
       .input("description", sql.Text, description)
       .input("image", sql.NVarChar(255), image)
-      .input("productItemTable", productItemList)
-      .execute("updateProduct");
+      .execute("upsertProduct");
     await conn.close();
     console.log("Connection closed.");
   },
+  upsertProductItem: async (productItem) => {
+    const {
+      productID,
+      productItemID,
+      sku,
+      price,
+      quantity,
+      image,
+      variationOptionList,
+    } = productItem;
+    const conn = await sql.connect(config);
+    console.log("Connected to SQLServer...");
+    console.log("procedure upsertProductItem");
+    const variationOptionTable = new sql.Table("variationOptionList");
+    variationOptionTable.create = true;
+    variationOptionTable.columns.add("variationID", sql.Int);
+    variationOptionTable.columns.add("value", sql.NVarChar(255));
 
+    variationOptionList.forEach((item) => {
+      variationOptionTable.rows.add(item.variationID, item.value);
+    });
+    console.log(productItem);
+    await conn
+      .request()
+      .input("productID", sql.Int, productID)
+      .input("productItemID", sql.Int, productItemID)
+      .input("sku", sql.NVarChar(255), sku)
+      .input("price", sql.Int, price)
+      .input("quantity", sql.Int, quantity)
+      .input("image", sql.NVarChar(255), image)
+      .input("variationOptionTable", variationOptionTable)
+      .execute("upsertProductItem");
+    await conn.close();
+    console.log("Connection closed.");
+  },
   deleteProduct: async (productID) => {
     const conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
@@ -132,5 +124,15 @@ module.exports = {
       .request()
       .input("productID", sql.Int, productID)
       .execute("deleteProduct");
+  },
+  deleteProductItem: async (productItemID) => {
+    const conn = await sql.connect(config);
+    console.log("Connected to SQLServer...");
+    console.log("procedure deleteProductItem");
+
+    await conn
+      .request()
+      .input("productItemID", sql.Int, productItemID)
+      .execute("deleteProductItem");
   },
 };

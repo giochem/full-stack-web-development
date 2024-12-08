@@ -19,13 +19,15 @@ const Message = {
   // Product related messages
   SUCCESS_GET_PRODUCTS: "Successfully retrieved products",
   SUCCESS_GET_PRODUCT: "Successfully retrieved product",
-  SUCCESS_CREATE_PRODUCT: "Successfully created product",
-  SUCCESS_UPDATE_PRODUCT: "Successfully updated product",
-  SUCCESS_CREATE_PRODUCT_ITEM: "Successfully created product item",
+  SUCCESS_UPSERT_PRODUCT: "Successfully upserted product",
+  SUCCESS_UPSERT_PRODUCT_ITEM: "Successfully upserted product item",
   SUCCESS_DELETE_PRODUCT: "Successfully deleted product",
+  SUCCESS_GET_PRODUCT_EXTRA_INFO: "Successfully retrieved product extra info",
   ERROR_PRODUCT_NOT_FOUND: "Product not found",
   ERROR_PRODUCT_IMAGE_REQUIRED: "Product image is required",
-
+  SUCCESS_DELETE_PRODUCT_ITEM: "Successfully deleted product item",
+  ERROR_PRODUCT_ITEM_NOT_FOUND: "Product item not found",
+  ERROR_INVALID_QUERY: "Invalid query",
   // Variation related messages
   SUCCESS_GET_VARIATIONS: "Successfully retrieved variations",
   SUCCESS_CREATE_VARIATION: "Successfully created variation",

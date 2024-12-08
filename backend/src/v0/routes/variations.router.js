@@ -16,7 +16,7 @@ router.put(
 );
 
 router.delete(
-  "/",
+  "/:variationID",
   authorizeRoles("admin"),
   variationValidation.deleteVariation,
   validate,

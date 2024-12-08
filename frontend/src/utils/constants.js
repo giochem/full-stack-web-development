@@ -42,24 +42,40 @@ export const API_ENDPOINTS = {
   },
   PRODUCTS: {
     LIST: {
-      url: (page = 0, size = 10) => `/products?page=${page}&size=${size}`,
+      url: (page = 0, size = 12, filters = {}) =>
+        `/products?page=${page}&size=${size}` +
+        `&sortBy=${filters.sortBy || "productID"}` +
+        `&sortOrder=${filters.sortOrder || "asc"}` +
+        (filters.searchText ? `&searchText=${filters.searchText}` : "") +
+        (filters.filterCategory
+          ? `&filterCategory=${filters.filterCategory}`
+          : "") +
+        (filters.filterPromotion
+          ? `&filterPromotion=${filters.filterPromotion}`
+          : ""),
       method: "GET",
     },
     DETAIL: {
       url: (id) => `/products/${id}`,
       method: "GET",
     },
-    CREATE: {
+    UPSERT: {
       url: "/products",
-      method: "POST",
-    },
-    UPDATE: {
-      url: (id) => `/products/${id}`,
       method: "PUT",
     },
     DELETE: {
       url: (id) => `/products/${id}`,
       method: "DELETE",
+    },
+    EXTRA_INFO: {
+      url: "/products/extra-info",
+      method: "GET",
+    },
+  },
+  PRODUCT_ITEM: {
+    UPSERT: {
+      url: "/products/product-item",
+      method: "PUT",
     },
   },
   CART: {
@@ -84,6 +100,20 @@ export const API_ENDPOINTS = {
     CREATE: {
       url: "/orders",
       method: "POST",
+    },
+  },
+  VARIATIONS: {
+    LIST: {
+      url: "/variations",
+      method: "GET",
+    },
+    UPSERT: {
+      url: "/variations",
+      method: "PUT",
+    },
+    DELETE: {
+      url: (id) => `/variations/${id}`,
+      method: "DELETE",
     },
   },
 };

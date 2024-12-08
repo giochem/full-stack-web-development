@@ -13,33 +13,30 @@ module.exports = {
   },
 
   upsertVariation: async (variation) => {
-    const { variationID, nameAtribute, variationOptionID, value } = variation;
+    const { variationID, nameAtribute } = variation;
+    console.log(variation);
     const conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
     console.log("procedure upsertVariation");
 
     const data = await conn
       .request()
-      .input("variationID", sql.Int, variationID)
+      .input("variationID", sql.Int, variationID || null)
       .input("nameAtribute", sql.NVarChar(255), nameAtribute)
-      .input("variationOptionID", sql.Int, variationOptionID)
-      .input("value", sql.NVarChar(255), value)
       .execute("upsertVariation");
 
     return data.recordset;
   },
 
-  deleteVariation: async (variation) => {
-    const { variationID, variationOptionID } = variation;
+  deleteVariationByVariationID: async (variationID) => {
     const conn = await sql.connect(config);
-    console.log(variationID, variationOptionID);
+    console.log(variationID);
     console.log("Connected to SQLServer...");
     console.log("procedure deleteVariation");
 
     await conn
       .request()
       .input("variationID", sql.Int, variationID)
-      .input("variationOptionID", sql.Int, variationOptionID)
       .execute("deleteVariation");
   },
 };

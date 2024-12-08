@@ -119,7 +119,7 @@
       </table>
     </div>
 
-    <div class="pagination" v-if="!searchQuery">
+    <div class="pagination">
       <div class="pagination-controls">
         <button
           class="page-btn prev-btn"

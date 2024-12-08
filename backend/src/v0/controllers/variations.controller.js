@@ -20,13 +20,11 @@ module.exports = {
 
   upsertVariation: async (req, res, next) => {
     try {
-      const { variationID, nameAtribute, variationOptionID, value } = req.body;
+      const { variationID, nameAtribute } = req.body;
 
       const newVariation = await variationService.upsertVariation({
         variationID,
         nameAtribute,
-        variationOptionID,
-        value,
       });
       return Response.success(
         res,
@@ -42,11 +40,8 @@ module.exports = {
 
   deleteVariation: async (req, res, next) => {
     try {
-      const { variationID, variationOptionID } = req.query;
-      await variationService.deleteVariation({
-        variationID,
-        variationOptionID,
-      });
+      const { variationID } = req.params;
+      await variationService.deleteVariationByVariationID(variationID);
       return Response.success(
         res,
         Message.SUCCESS_DELETE_VARIATION,

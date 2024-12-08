@@ -16,11 +16,22 @@
           </RouterLink>
         </li>
         
-        <li class="nav-item">
-          <RouterLink to="/admin/manage-product" class="nav-link">
-            <i class="ri-shopping-bag-line"></i>
-            <span>Products</span>
-          </RouterLink>
+        <li class="nav-group">
+          <span class="nav-group-title">Products</span>
+          <ul class="nav-sublist">
+            <li class="nav-item">
+              <RouterLink to="/admin/manage-product" class="nav-link">
+                <i class="ri-shopping-bag-line"></i>
+                <span>Products</span>
+              </RouterLink>
+            </li>
+            <li class="nav-item">
+              <RouterLink to="/admin/manage-variations" class="nav-link">
+                <i class="ri-list-settings-line"></i>
+                <span>Variations</span>
+              </RouterLink>
+            </li>
+          </ul>
         </li>
         
         <li class="nav-item">
@@ -85,6 +96,7 @@
   color: var(--secondary-dark-color);
   text-decoration: none;
   transition: all 0.3s ease;
+  position: relative;
 }
 
 .nav-link:hover,
@@ -100,5 +112,39 @@
 .nav-link span {
   font-weight: 500;
   text-transform: capitalize;
+}
+
+.nav-group {
+  margin: 0.5rem 0;
+}
+
+.nav-group-title {
+  display: block;
+  padding: 0.5rem 1.5rem;
+  color: var(--text-light-color);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.nav-sublist {
+  padding-left: 1rem;
+}
+
+.nav-sublist .nav-link {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+}
+
+.nav-sublist .nav-link.router-link-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 1.5rem;
+  background-color: var(--primary-color);
+  border-radius: 0 2px 2px 0;
 }
 </style>
