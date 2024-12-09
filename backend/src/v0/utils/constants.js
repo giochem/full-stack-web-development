@@ -53,14 +53,14 @@ const Message = {
   SUCCESS_DELETE_ORDER: "Successfully deleted order",
   ERROR_ORDER_NOT_FOUND: "Order not found",
 
-  // Collection related messages
-  SUCCESS_GET_COLLECTIONS: "Successfully retrieved collections",
-  SUCCESS_GET_COLLECTION: "Successfully retrieved collection",
-  SUCCESS_CREATE_COLLECTION: "Successfully created collection",
-  SUCCESS_UPDATE_COLLECTION: "Successfully updated collection",
-  SUCCESS_DELETE_COLLECTION: "Successfully deleted collection",
-  ERROR_COLLECTION_NOT_FOUND: "Collection not found",
-  ERROR_COLLECTION_NAME_EXISTS: "Collection name already exists",
+  // Category related messages
+  SUCCESS_GET_CATEGORIES: "Successfully retrieved categories",
+  SUCCESS_GET_CATEGORY: "Successfully retrieved category",
+  SUCCESS_CREATE_CATEGORY: "Successfully created category",
+  SUCCESS_UPDATE_CATEGORY: "Successfully updated category",
+  SUCCESS_DELETE_CATEGORY: "Successfully deleted category",
+  ERROR_CATEGORY_NOT_FOUND: "Category not found",
+  ERROR_CATEGORY_NAME_EXISTS: "Category name already exists",
 
   // Promotion related messages
   SUCCESS_GET_PROMOTIONS: "Successfully retrieved promotions",

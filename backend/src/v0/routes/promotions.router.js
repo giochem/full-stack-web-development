@@ -5,33 +5,21 @@ const { validate } = require("../middlewares/validate.middleware");
 const promotionValidation = require("../validations/promotions.validation");
 const promotionController = require("../controllers/promotions.controller");
 
-router.post("/",
-  authorizeRoles("admin"),
-  promotionValidation.createPromotion,
-  validate,
-  promotionController.createPromotion
-);
-
-router.get("/",
-  promotionValidation.getPromotions,
-  validate,
+router.get(
+  "/",
   promotionController.getPromotions
 );
 
-router.get("/:promotionID",
-  promotionValidation.getPromotion,
-  validate,
-  promotionController.getPromotion
-);
-
-router.put("/:promotionID",
+router.put(
+  "/",
   authorizeRoles("admin"),
-  promotionValidation.updatePromotion,
+  promotionValidation.upsertPromotion,
   validate,
-  promotionController.updatePromotion
+  promotionController.upsertPromotion
 );
 
-router.delete("/:promotionID",
+router.delete(
+  "/:promotionID",
   authorizeRoles("admin"),
   promotionValidation.deletePromotion,
   validate,
