@@ -93,22 +93,6 @@ const router = createRouter({
           name: "add-product",
           component: () => import("../views/admin/AddProduct.vue"),
         },
-        // manage collection
-        {
-          path: "/admin/manage-collection",
-          name: "manage-collection",
-          component: () => import("../views/admin/ManageCollection.vue"),
-        },
-        {
-          path: "/admin/edit-collection/:collectionID",
-          name: "edit-collection",
-          component: () => import("../views/admin/EditCollection.vue"),
-        },
-        {
-          path: "/admin/add-collection",
-          name: "add-collection",
-          component: () => import("../views/admin/AddCollection.vue"),
-        },
         // manage promotion
         {
           path: "/admin/manage-promotion",
@@ -116,14 +100,9 @@ const router = createRouter({
           component: () => import("../views/admin/ManagePromotion.vue"),
         },
         {
-          path: "/admin/edit-promotion/:promotionID",
-          name: "edit-promotion",
-          component: () => import("../views/admin/EditPromotion.vue"),
-        },
-        {
-          path: "/admin/add-promotion",
-          name: "add-promotion",
-          component: () => import("../views/admin/AddPromotion.vue"),
+          path: "/admin/manage-category",
+          name: "manage-category",
+          component: () => import("../views/admin/ManageCategory.vue"),
         },
         {
           path: "/admin/manage-cart",

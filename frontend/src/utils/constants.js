@@ -116,6 +116,34 @@ export const API_ENDPOINTS = {
       method: "DELETE",
     },
   },
+  CATEGORIES: {
+    LIST: {
+      url: "/categories",
+      method: "GET",
+    },
+    UPSERT: {
+      url: "/categories",
+      method: "PUT",
+    },
+    DELETE: {
+      url: (id) => `/categories/${id}`,
+      method: "DELETE",
+    },
+  },
+  PROMOTIONS: {
+    LIST: {
+      url: "/promotions",
+      method: "GET",
+    },
+    UPSERT: {
+      url: "/promotions",
+      method: "PUT",
+    },
+    DELETE: {
+      url: (id) => `/promotions/${id}`,
+      method: "DELETE",
+    },
+  },
 };
 
 // App Constants

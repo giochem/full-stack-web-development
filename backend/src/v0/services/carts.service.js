@@ -2,7 +2,7 @@ const { pool, config } = require("../configs/db");
 const sql = require("mssql");
 
 module.exports = {
-  getCartsByOffsetBased: async (offset, limit) => {
+  getCartsByOffsetBased: async (offset, limit, queryText) => {
     const conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
     console.log("procedure getCartsByOffsetBased");
@@ -11,9 +11,8 @@ module.exports = {
       .request()
       .input("offset", sql.Int, offset)
       .input("limit", sql.Int, limit)
-      .query(
-        "SELECT * FROM CartItem ORDER BY userID OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY"
-      );
+      .input("queryText", sql.NVarChar(255), queryText)
+      .query("getCartsByOffsetBased");
 
     return data.recordset;
   },

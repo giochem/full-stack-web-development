@@ -31,14 +31,13 @@
                 <span>Variations</span>
               </RouterLink>
             </li>
+            <li class="nav-item">
+              <RouterLink to="/admin/manage-category" class="nav-link">
+                <i class="ri-folder-2-line"></i>
+                <span>Categories</span>
+              </RouterLink>
+            </li>
           </ul>
-        </li>
-        
-        <li class="nav-item">
-          <RouterLink to="/admin/manage-collection" class="nav-link">
-            <i class="ri-folder-line"></i>
-            <span>Collections</span>
-          </RouterLink>
         </li>
         
         <li class="nav-item">

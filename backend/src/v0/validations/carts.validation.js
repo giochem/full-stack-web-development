@@ -8,6 +8,10 @@ module.exports = {
     query("size")
       .isInt({ min: 1 })
       .withMessage("size in query is required and >= 1"),
+    query("searchText")
+      .optional()
+      .isString()
+      .withMessage("searchText in query must be a string"),
   ],
 
   getCart: [
@@ -18,14 +22,17 @@ module.exports = {
       .withMessage("userID must be an integer"),
   ],
 
-  updateCart: [
-    body("productID")
+  upsertCart: [
+    body("userID")
       .notEmpty()
-      .withMessage("productID is required")
+      .withMessage("userID is required")
       .isInt()
-      .withMessage("productID must be an integer"),
-    body("quantity")
+      .withMessage("userID must be an integer"),
+    body("productItemID")
       .optional()
+      .isInt()
+      .withMessage("productItemID must be an integer"),
+    body("quantity")
       .isInt({ min: 1 })
       .withMessage("Quantity must be at least 1"),
   ],

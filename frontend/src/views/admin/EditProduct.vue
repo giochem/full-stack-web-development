@@ -73,14 +73,11 @@
                     :key="promotion.promotionID"
                     :value="promotion.promotionID"
                     :class="getPromotionStatusClass(promotion)"
+                    class="promotion-status promotion-discoun"
                   >
                     {{ promotion.name }}
-                    <span class="promotion-status">{{
-                      getPromotionStatus(promotion)
-                    }}</span>
-                    <span class="promotion-discount"
-                      >({{ promotion.discount }}% off)</span
-                    >
+                    {{ getPromotionStatus(promotion) }}
+                    ({{ promotion.discount }}% off)
                   </option>
                 </select>
                 <i class="ri-arrow-down-s-line select-arrow"></i>
@@ -432,7 +429,6 @@ onMounted(async () => {
 
   const result = await productStore.fetchProductById(route.params.productID);
   if (result.success) {
-    console.log(result.data);
     const [productData, productItemsData] = result.data;
     product.value = {
       ...productData,

@@ -13,17 +13,24 @@ router.get(
   cartController.getCarts
 );
 router.get(
+  "/:userID",
+  authorizeRoles("admin"),
+  cartValidation.getCart,
+  validate,
+  cartController.getCart
+);
+router.get(
   "/owner",
   authorizeRoles("admin", "client"),
   cartController.getOwnerCart
 );
 
-router.put(
-  "/",
-  authorizeRoles("client", "admin"),
-  cartValidation.updateCart,
-  validate,
-  cartController.updateCart
-);
+// router.put(
+//   "/",
+//   authorizeRoles("client", "admin"),
+//   cartValidation.upsertCart,
+//   validate,
+//   cartController.upsertCart
+// );
 
 module.exports = router;

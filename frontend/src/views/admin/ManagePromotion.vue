@@ -1,26 +1,29 @@
 <template>
-  <div class="admin-page">
-    <header class="page-header">
-      <div class="header-content">
-        <h1>Manage Promotions</h1>
-        <div class="header-actions">
-          <div class="search-box">
-            <i class="ri-search-line"></i>
-            <input type="text" placeholder="Search promotions..." />
-          </div>
-          <RouterLink to="/admin/add-promotion" class="add-button">
-            <i class="ri-add-line"></i>
-            Add Promotion
-          </RouterLink>
-        </div>
-      </div>
-    </header>
+  <div class="manage-promotion">
+    <div class="header">
+      <h2>Manage Promotions</h2>
+      <button class="btn-primary" @click="openAddModal">
+        <i class="ri-add-line"></i> Add Promotion
+      </button>
+    </div>
 
-    <div class="table-container">
-      <table class="data-table">
+    <div v-if="promotionStore.loading" class="loading">
+      <i class="ri-loader-4-line spin"></i> Loading...
+    </div>
+
+    <div v-else-if="promotionStore.error" class="error">
+      {{ promotionStore.error }}
+    </div>
+
+    <div v-else-if="!promotionStore.promotions.length" class="empty-state">
+      <i class="ri-inbox-line"></i>
+      <p>No promotions found. Create your first promotion!</p>
+    </div>
+
+    <div v-else class="promotions-list">
+      <table>
         <thead>
           <tr>
-            <th>ID</th>
             <th>Name</th>
             <th>Discount</th>
             <th>Start Date</th>
@@ -30,302 +33,437 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(promotion, index) in promotions" :key="promotion.promotionID">
-            <td>{{ index + 1 }}</td>
+          <tr
+            v-for="promotion in promotionStore.promotions"
+            :key="promotion.promotionID"
+          >
             <td>{{ promotion.name }}</td>
-            <td>{{ promotion.reduce }}%</td>
-            <td>{{ formatDate(promotion.startTime) }}</td>
-            <td>{{ formatDate(promotion.endTime) }}</td>
+            <td>{{ promotion.discount }}%</td>
+            <td>{{ formatDate(promotion.startDate) }}</td>
+            <td>{{ formatDate(promotion.endDate) }}</td>
             <td>
               <span :class="['status-badge', getPromotionStatus(promotion)]">
                 {{ getPromotionStatus(promotion) }}
               </span>
             </td>
-            <td>
-              <div class="action-buttons">
-                <RouterLink 
-                  :to="`/admin/edit-promotion/${promotion.promotionID}`"
-                  class="edit-btn"
-                >
-                  <i class="ri-edit-line"></i>
-                </RouterLink>
-                <button 
-                  @click="remove(promotion.promotionID)"
-                  class="delete-btn"
-                >
-                  <i class="ri-delete-bin-line"></i>
-                </button>
-              </div>
+            <td class="actions">
+              <button
+                class="btn-icon"
+                @click="editPromotion(promotion)"
+                title="Edit"
+              >
+                <i class="ri-edit-line"></i>
+              </button>
+              <button
+                class="btn-icon delete"
+                @click="confirmDelete(promotion)"
+                title="Delete"
+              >
+                <i class="ri-delete-bin-line"></i>
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <div class="pagination">
-      <button 
-        class="page-btn"
-        @click="changePage(currentPage - 1)"
-        :disabled="currentPage <= 0"
-      >
-        <i class="ri-arrow-left-s-line"></i>
-      </button>
-      
-      <button 
-        v-for="page in displayedPages"
-        :key="page"
-        @click="changePage(page)"
-        :class="['page-btn', { active: currentPage === page }]"
-      >
-        {{ page + 1 }}
-      </button>
-      
-      <button 
-        class="page-btn"
-        @click="changePage(currentPage + 1)"
-        :disabled="!hasMorePages"
-      >
-        <i class="ri-arrow-right-s-line"></i>
-      </button>
-    </div>
+    <Modal v-model="showModal" :title="modalTitle">
+      <form @submit.prevent="handleSubmit" class="promotion-form">
+        <div class="form-group">
+          <label for="name">Promotion Name</label>
+          <input
+            id="name"
+            v-model="formData.name"
+            type="text"
+            required
+            placeholder="Enter promotion name"
+            :class="{ error: validationErrors.name }"
+          />
+          <span v-if="validationErrors.name" class="error-message">
+            {{ validationErrors.name }}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="discount">Discount (%)</label>
+          <input
+            id="discount"
+            v-model.number="formData.discount"
+            type="number"
+            required
+            min="0"
+            max="100"
+            placeholder="Enter discount percentage"
+            :class="{ error: validationErrors.discount }"
+          />
+          <span v-if="validationErrors.discount" class="error-message">
+            {{ validationErrors.discount }}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="startDate">Start Date</label>
+          <input
+            id="startDate"
+            v-model="formData.startDate"
+            type="date"
+            required
+            :min="formatDateForInput(new Date())"
+            @change="handleStartDateChange"
+            :class="{ error: validationErrors.startDate }"
+          />
+          <span v-if="validationErrors.startDate" class="error-message">
+            {{ validationErrors.startDate }}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="endDate">End Date</label>
+          <input
+            id="endDate"
+            v-model="formData.endDate"
+            type="date"
+            required
+            :min="formData.startDate"
+            :class="{ error: validationErrors.endDate }"
+          />
+          <span v-if="validationErrors.endDate" class="error-message">
+            {{ validationErrors.endDate }}
+          </span>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" @click="closeModal">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn-primary"
+            :disabled="promotionStore.loading"
+          >
+            <i v-if="promotionStore.loading" class="ri-loader-4-line spin"></i>
+            {{ isEditing ? "Update" : "Create" }}
+          </button>
+        </div>
+      </form>
+    </Modal>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from "vue";
-import axios from "axios";
-import { useRouter } from "vue-router";
+import { ref, onMounted, computed } from "vue";
+import { usePromotionStore } from "@/stores/promotion";
+import Modal from "@/components/common/Modal.vue";
 
-const router = useRouter();
-const promotions = ref([]);
-const currentPage = ref(0);
-const itemsPerPage = 10;
-const totalPages = ref(1);
+const promotionStore = usePromotionStore();
+const showModal = ref(false);
+const isEditing = ref(false);
+const editingId = ref(null);
+const validationErrors = ref({});
 
-const displayedPages = computed(() => {
-  const pages = [];
-  const start = Math.max(0, currentPage.value - 1);
-  const end = Math.min(totalPages.value - 1, start + 2);
-  
-  for (let i = start; i <= end; i++) {
-    pages.push(i);
+const formData = ref({
+  name: "",
+  discount: 0,
+  startDate: "",
+  endDate: "",
+});
+
+const modalTitle = computed(() =>
+  isEditing.value ? "Edit Promotion" : "Add Promotion"
+);
+
+onMounted(async () => {
+  await promotionStore.fetchPromotions();
+});
+
+const validateForm = () => {
+  const errors = {};
+
+  if (!formData.value.name?.trim()) {
+    errors.name = "Promotion name is required";
   }
-  return pages;
-});
 
-const hasMorePages = computed(() => {
-  return currentPage.value < totalPages.value - 1;
-});
+  if (
+    !formData.value.discount ||
+    formData.value.discount < 0 ||
+    formData.value.discount > 100
+  ) {
+    errors.discount = "Discount must be between 0 and 100";
+  }
 
-function formatDate(dateString) {
-  return new Date(dateString).toLocaleString("vi-VN");
-}
+  if (!formData.value.startDate) {
+    errors.startDate = "Start date is required";
+  }
 
-function getPromotionStatus(promotion) {
+  if (!formData.value.endDate) {
+    errors.endDate = "End date is required";
+  }
+
+  if (formData.value.startDate && formData.value.endDate) {
+    const start = new Date(formData.value.startDate);
+    const end = new Date(formData.value.endDate);
+    if (start >= end) {
+      errors.endDate = "End date must be after start date";
+    }
+  }
+
+  validationErrors.value = errors;
+  return Object.keys(errors).length === 0;
+};
+
+const formatDateForInput = (dateString) => {
+  const date = new Date(dateString);
+  return date.toISOString().split("T")[0];
+};
+
+const formatDate = (date) => {
+  return new Date(date).toLocaleDateString();
+};
+
+const getPromotionStatus = (promotion) => {
   const now = new Date();
-  const startTime = new Date(promotion.startTime);
-  const endTime = new Date(promotion.endTime);
+  const startDate = new Date(promotion.startDate);
+  const endDate = new Date(promotion.endDate);
 
-  if (now < startTime) return "upcoming";
-  if (now > endTime) return "expired";
+  if (now < startDate) return "upcoming";
+  if (now > endDate) return "expired";
   return "active";
-}
+};
 
-async function fetchPromotions(page = 0) {
-  try {
-    const response = await axios.get(
-      `http://localhost:5000/api/promotions?page=${page}&size=${itemsPerPage}`,
-      { withCredentials: true }
-    );
-    promotions.value = response.data.data;
-    totalPages.value = Math.ceil(response.data.total / itemsPerPage);
-  } catch (error) {
-    console.error("Error fetching promotions:", error);
+const handleStartDateChange = (e) => {
+  formData.value.startDate = e.target.value;
+  if (new Date(formData.value.endDate) <= new Date(formData.value.startDate)) {
+    formData.value.endDate = formData.value.startDate;
   }
-}
+  validateForm();
+};
 
-async function changePage(newPage) {
-  if (newPage < 0 || newPage >= totalPages.value) return;
-  currentPage.value = newPage;
-  await fetchPromotions(newPage);
-}
+const resetForm = () => {
+  formData.value = {
+    name: "",
+    discount: 0,
+    startDate: formatDateForInput(new Date()),
+    endDate: formatDateForInput(
+      new Date(new Date().setDate(new Date().getDate() + 30))
+    ),
+  };
+  validationErrors.value = {};
+};
 
-async function remove(promotionID) {
-  if (!confirm("Are you sure you want to delete this promotion?")) return;
-  
-  try {
-    await axios.delete(`http://localhost:5000/api/promotions/${promotionID}`, {
-      withCredentials: true,
-    });
-    await fetchPromotions(currentPage.value);
-  } catch (error) {
-    console.error("Error deleting promotion:", error);
+const openAddModal = () => {
+  isEditing.value = false;
+  editingId.value = null;
+  resetForm();
+  showModal.value = true;
+};
+
+const editPromotion = (promotion) => {
+  isEditing.value = true;
+  editingId.value = promotion.promotionID;
+  formData.value = {
+    name: promotion.name,
+    discount: promotion.discount,
+    startDate: formatDateForInput(promotion.startDate),
+    endDate: formatDateForInput(promotion.endDate),
+  };
+  validationErrors.value = {};
+  showModal.value = true;
+};
+
+const closeModal = () => {
+  showModal.value = false;
+  resetForm();
+};
+
+const handleSubmit = async () => {
+  if (!validateForm()) return;
+
+  const result = await promotionStore.upsertPromotion({
+    ...formData.value,
+    promotionID: isEditing.value ? editingId.value : undefined,
+  });
+
+  if (result.success) {
+    alert(result.message);
+    closeModal();
+  } else {
+    alert(result.message);
   }
-}
+};
 
-onMounted(() => {
-  fetchPromotions();
-});
+const confirmDelete = async (promotion) => {
+  if (
+    confirm(`Are you sure you want to delete promotion "${promotion.name}"?`)
+  ) {
+    const result = await promotionStore.deletePromotion(promotion.promotionID);
+    alert(result.message);
+  }
+};
 </script>
 
 <style scoped>
-.admin-page {
-  padding: 1.5rem;
+.manage-promotion {
+  padding: 2rem;
 }
 
-.page-header {
-  margin-bottom: 2rem;
-}
-
-.header-content {
+.header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 2rem;
 }
 
-.header-actions {
-  display: flex;
-  gap: 1rem;
+.header h2 {
+  margin: 0;
+  color: var(--secondary-dark-color);
 }
 
-.search-box {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: white;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-}
-
-.search-box input {
-  border: none;
-  outline: none;
-  width: 200px;
-}
-
-.add-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: var(--primary-color);
-  color: white;
-  border-radius: 4px;
-  text-decoration: none;
-  transition: background-color 0.3s;
-}
-
-.add-button:hover {
-  background: var(--secondary-color);
-}
-
-.table-container {
+.promotions-list {
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
 }
 
-.data-table {
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-light-color);
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.data-table th,
-.data-table td {
+th,
+td {
   padding: 1rem;
   text-align: left;
   border-bottom: 1px solid var(--border-color);
 }
 
-.data-table th {
-  background: var(--light-bg-color);
+th {
+  background-color: var(--background-color);
   font-weight: 600;
+  color: var(--secondary-dark-color);
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  color: var(--text-light-color);
+  transition: color 0.3s ease;
+}
+
+.btn-icon:hover {
+  color: var(--primary-color);
+}
+
+.btn-icon.delete:hover {
+  color: var(--danger-color);
+}
+
+.promotion-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: var(--secondary-dark-color);
+}
+
+.form-group input {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.form-group input.error {
+  border-color: var(--danger-color);
+}
+
+.error-message {
+  color: var(--danger-color);
+  font-size: 0.875rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-light-color);
+}
+
+.error {
+  color: var(--danger-color);
+  padding: 1rem;
+  text-align: center;
+  background: var(--danger-light-color);
+  border-radius: 4px;
+  margin: 1rem 0;
 }
 
 .status-badge {
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: capitalize;
 }
 
 .status-badge.active {
-  background: var(--primary-color);
-  color: white;
+  background-color: var(--success-light-color);
+  color: var(--success-color);
 }
 
 .status-badge.upcoming {
-  background: var(--secondary-color);
-  color: white;
+  background-color: var(--primary-light-color);
+  color: var(--primary-color);
 }
 
 .status-badge.expired {
-  background: #dc3545;
-  color: white;
+  background-color: var(--danger-light-color);
+  color: var(--danger-color);
 }
 
-.action-buttons {
-  display: flex;
-  gap: 0.5rem;
+.spin {
+  animation: spin 1s linear infinite;
 }
 
-.edit-btn,
-.delete-btn {
-  padding: 0.5rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.edit-btn {
-  color: var(--secondary-color);
-  background: rgba(121, 74, 250, 0.1);
-}
-
-.delete-btn {
-  color: #dc3545;
-  background: rgba(220, 53, 69, 0.1);
-}
-
-.edit-btn:hover {
-  background: rgba(121, 74, 250, 0.2);
-}
-
-.delete-btn:hover {
-  background: rgba(220, 53, 69, 0.2);
-}
-
-.pagination {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 2rem;
-}
-
-.page-btn {
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--border-color);
-  background: white;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.page-btn:hover:not(:disabled) {
-  background: var(--light-bg-color);
-  border-color: var(--primary-color);
-}
-
-.page-btn.active {
-  background: var(--primary-color);
-  color: white;
-  border-color: var(--primary-color);
-}
-
-.page-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

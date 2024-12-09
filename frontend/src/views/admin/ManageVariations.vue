@@ -24,7 +24,11 @@
         <p>No variations found</p>
       </div>
       <div v-else class="variations-grid">
-        <div v-for="variation in variations" :key="variation.variationID" class="variation-card">
+        <div
+          v-for="variation in variations"
+          :key="variation.variationID"
+          class="variation-card"
+        >
           <div class="variation-content">
             <h3>{{ variation.name }}</h3>
           </div>
@@ -33,7 +37,10 @@
               <i class="ri-edit-line"></i>
               Edit
             </button>
-            <button class="delete-btn" @click="handleDelete(variation.variationID)">
+            <button
+              class="delete-btn"
+              @click="handleDelete(variation.variationID)"
+            >
               <i class="ri-delete-bin-line"></i>
               Delete
             </button>
@@ -43,7 +50,10 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <Modal v-model="showModal" :title="isEditing ? 'Edit Variation' : 'Add Variation'">
+    <Modal
+      v-model="showModal"
+      :title="isEditing ? 'Edit Variation' : 'Add Variation'"
+    >
       <form @submit.prevent="handleSubmit" class="variation-form">
         <div class="form-group">
           <label for="nameAtribute">Variation Name</label>
@@ -57,8 +67,13 @@
             ref="inputRef"
             @input="validateInput"
           />
-          <small>Enter a name for the variation attribute (e.g. Size, Color, Material)</small>
-          <span v-if="errorMessage" class="error-message">{{ errorMessage }}</span>
+          <small
+            >Enter a name for the variation attribute (e.g. Size, Color,
+            Material)</small
+          >
+          <span v-if="errorMessage" class="error-message">{{
+            errorMessage
+          }}</span>
         </div>
 
         <div class="form-actions">
@@ -68,7 +83,7 @@
             :disabled="loading || !!errorMessage"
           >
             <i class="ri-save-line"></i>
-            {{ isEditing ? 'Update' : 'Create' }}
+            {{ isEditing ? "Update" : "Create" }}
           </button>
           <button
             type="button"
@@ -85,10 +100,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, getCurrentInstance } from 'vue';
-import { useVariationStore } from '@/stores/variation';
-import { storeToRefs } from 'pinia';
-import Modal from '@/components/common/Modal.vue';
+import { ref, onMounted, nextTick, getCurrentInstance } from "vue";
+import { useVariationStore } from "@/stores/variation";
+import { storeToRefs } from "pinia";
+import Modal from "@/components/common/Modal.vue";
 
 const app = getCurrentInstance();
 const variationStore = useVariationStore();
@@ -98,27 +113,27 @@ const showModal = ref(false);
 const isEditing = ref(false);
 const selectedVariation = ref(null);
 const inputRef = ref(null);
-const errorMessage = ref('');
+const errorMessage = ref("");
 
 const form = ref({
-  nameAtribute: ''
+  nameAtribute: "",
 });
 
 function validateInput(e) {
   const value = e.target.value;
   if (value.length < 2) {
-    errorMessage.value = 'Name must be at least 2 characters long';
+    errorMessage.value = "Name must be at least 2 characters long";
   } else if (value.length > 50) {
-    errorMessage.value = 'Name must be less than 50 characters';
+    errorMessage.value = "Name must be less than 50 characters";
   } else {
-    errorMessage.value = '';
+    errorMessage.value = "";
   }
 }
 
 function handleAdd() {
   isEditing.value = false;
   selectedVariation.value = null;
-  form.value.nameAtribute = '';
+  form.value.nameAtribute = "";
   showModal.value = true;
   nextTick(() => {
     inputRef.value?.focus();
@@ -136,7 +151,11 @@ function handleEdit(variation) {
 }
 
 async function handleDelete(variationID) {
-  if (confirm('Are you sure you want to delete this variation?')) {
+  if (
+    confirm(
+      "Are you sure you want to delete this variation?\nThis action effect all products that use this variation"
+    )
+  ) {
     const result = await variationStore.deleteVariation(variationID);
     if (result.success) {
       app?.proxy.$notify(result.message, "success");
@@ -150,15 +169,15 @@ function closeModal() {
   showModal.value = false;
   isEditing.value = false;
   selectedVariation.value = null;
-  form.value.nameAtribute = '';
-  errorMessage.value = '';
+  form.value.nameAtribute = "";
+  errorMessage.value = "";
 }
 
 async function handleSubmit() {
   try {
     const result = await variationStore.upsertVariation({
       variationID: selectedVariation.value?.variationID,
-      nameAtribute: form.value.nameAtribute
+      nameAtribute: form.value.nameAtribute,
     });
 
     if (result.success) {
@@ -168,7 +187,7 @@ async function handleSubmit() {
       app?.proxy.$notify(result.message, "error");
     }
   } catch (error) {
-    console.error('Error saving variation:', error);
+    console.error("Error saving variation:", error);
     app?.proxy.$notify("An error occurred while saving the variation", "error");
   }
 }
@@ -403,8 +422,12 @@ onMounted(async () => {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Add error message styling */
@@ -424,4 +447,4 @@ onMounted(async () => {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 2px rgba(66, 185, 131, 0.1);
 }
-</style> 
+</style>
