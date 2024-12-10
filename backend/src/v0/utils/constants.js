@@ -44,6 +44,7 @@ const Message = {
   SUCCESS_CLEAR_CART: "Successfully cleared cart",
   ERROR_CART_NOT_FOUND: "Cart not found",
   ERROR_INSUFFICIENT_STOCK: "Insufficient stock",
+  SUCCESS_UPSERT_CART: "Successfully upserted cart",
 
   // Order related messages
   SUCCESS_GET_ORDERS: "Successfully retrieved orders",
@@ -72,6 +73,13 @@ const Message = {
   ERROR_PROMOTION_NAME_EXISTS: "Promotion name already exists",
   ERROR_PROMOTION_EXPIRED: "Promotion has expired",
   ERROR_PROMOTION_NOT_STARTED: "Promotion has not started yet",
+
+  // Payment related messages
+  SUCCESS_GET_PAYMENTS: "Successfully retrieved payments",
+  SUCCESS_CREATE_PAYMENT: "Successfully created payment",
+  SUCCESS_UPDATE_PAYMENT: "Successfully updated payment",
+  SUCCESS_DELETE_PAYMENT: "Successfully deleted payment",
+  ERROR_PAYMENT_NOT_FOUND: "Payment not found",
 
   // Database related messages
   ERROR_DB_CONNECTION: "Database connection error",

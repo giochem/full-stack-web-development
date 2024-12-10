@@ -5,13 +5,24 @@ const { Message, StatusCode } = require("../utils/constants");
 module.exports = {
   getCarts: async (req, res, next) => {
     try {
-      const { page, size, queryText } = req.query;
+      const { page, size, searchText, sortBy, sortOrder, userID } = req.query;
+      if (userID) {
+        const data = await cartService.getCartByUserID(userID);
+        return Response.success(
+          res,
+          Message.SUCCESS_GET_CART,
+          data,
+          StatusCode.OK
+        );
+      }
       const offset = page * size;
-      const data = await cartService.getCartsByOffsetBased(
+      const data = await cartService.getCartsByOffsetBased({
         offset,
-        size,
-        queryText
-      );
+        limit: size,
+        searchText,
+        sortBy,
+        sortOrder,
+      });
       return Response.success(
         res,
         Message.SUCCESS_GET_CART,
@@ -52,17 +63,20 @@ module.exports = {
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);
     }
   },
-  updateCart: async (req, res, next) => {
+  upsertCart: async (req, res, next) => {
     try {
-      const { productID, quantity } = req.body;
-      await cartService.updateCart({
-        userID: req.session.userID,
-        productID,
+      let { userID, productItemID, quantity } = req.body;
+      if (!userID) {
+        userID = req.session.userID;
+      }
+      await cartService.upsertCart({
+        userID,
+        productItemID,
         quantity,
       });
       return Response.success(
         res,
-        Message.SUCCESS_UPDATE_CART,
+        Message.SUCCESS_UPSERT_CART,
         null,
         StatusCode.OK
       );

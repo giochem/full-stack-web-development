@@ -16,6 +16,7 @@ module.exports = {
     conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
     console.log("procedure getProductsByOffsetBased");
+
     const data = await conn
       .request()
       .input("offset", sql.Int, offset)
@@ -101,7 +102,6 @@ module.exports = {
     variationOptionList.forEach((item) => {
       variationOptionTable.rows.add(item.variationID, item.value);
     });
-    console.log(productItem);
     await conn
       .request()
       .input("productID", sql.Int, productID)

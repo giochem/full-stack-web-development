@@ -25,16 +25,37 @@
           >
             <div class="product-image">
               <img
-                src="http://localhost:5000/uploads/1.png"
-                alt="Product Image"
+                :src="`${APP_CONSTANTS.UPLOAD.UPLOAD_URL}${product.image}`"
+                :alt="product.name"
               />
+              <div 
+                v-if="product.discount" 
+                class="discount-badge"
+                :class="getDiscountStatus(product)"
+              >
+                -{{ product.discount }}%
+              </div>
             </div>
 
             <div class="product-info">
               <h3>{{ product.name }}</h3>
-              <div class="product-price">
-                <span class="current-price">{{ product.price }} đ</span>
-                <span class="old-price">{{ product.oldPrice }}</span>
+              <div 
+                v-if="product.discount" 
+                class="discount-period"
+                :class="getDiscountStatus(product)"
+              >
+                <i class="ri-time-line"></i>
+                <span>
+                  <template v-if="getDiscountStatus(product) === 'active'">
+                    Sale ends {{ formatDiscountPeriod(product) }}
+                  </template>
+                  <template v-else-if="getDiscountStatus(product) === 'upcoming'">
+                    Sale starts {{ formatStartDate(product) }}
+                  </template>
+                  <template v-else>
+                    Sale ended {{ formatDiscountPeriod(product) }}
+                  </template>
+                </span>
               </div>
             </div>
           </div>
@@ -48,6 +69,8 @@
 import { onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useProductStore } from "@/stores/product";
+import { APP_CONSTANTS } from "@/utils/constants";
+import { parseISO, isAfter, isBefore, formatDistanceToNow } from "date-fns";
 
 const router = useRouter();
 const productStore = useProductStore();
@@ -60,6 +83,30 @@ onMounted(async () => {
 
 function navigateTo(path) {
   router.push(path);
+}
+
+function getDiscountStatus(product) {
+  if (!product.startDate || !product.endDate || !product.discount) return 'none';
+  
+  const now = new Date();
+  const startDate = parseISO(product.startDate);
+  const endDate = parseISO(product.endDate);
+  
+  if (isBefore(now, startDate)) return 'upcoming';
+  if (isAfter(now, endDate)) return 'expired';
+  return 'active';
+}
+
+function formatStartDate(product) {
+  if (!product.startDate) return "";
+  const startDate = parseISO(product.startDate);
+  return formatDistanceToNow(startDate, { addSuffix: true });
+}
+
+function formatDiscountPeriod(product) {
+  if (!product.endDate) return "";
+  const endDate = parseISO(product.endDate);
+  return formatDistanceToNow(endDate, { addSuffix: true });
 }
 </script>
 
@@ -134,21 +181,52 @@ function navigateTo(path) {
   color: var(--secondary-dark-color);
 }
 
-.product-price {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+.discount-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-weight: 500;
+  z-index: 1;
+  color: white;
 }
 
-.current-price {
-  font-weight: bold;
+.discount-badge.active {
+  background-color: var(--primary-color);
+}
+
+.discount-badge.upcoming {
+  background-color: #f59e0b; /* Amber color for upcoming */
+}
+
+.discount-badge.expired {
+  background-color: var(--light-text-color); /* Grey for expired */
+}
+
+.discount-period {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85em;
+  margin-top: 8px;
+}
+
+.discount-period.active {
   color: var(--primary-color);
 }
 
-.old-price {
+.discount-period.upcoming {
+  color: #f59e0b;
+}
+
+.discount-period.expired {
   color: var(--light-text-color);
-  text-decoration: line-through;
-  font-size: 0.9rem;
+}
+
+.discount-period i {
+  font-size: 1.1em;
 }
 
 @media (max-width: 768px) {

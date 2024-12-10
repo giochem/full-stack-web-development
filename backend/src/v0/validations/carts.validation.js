@@ -23,17 +23,13 @@ module.exports = {
   ],
 
   upsertCart: [
-    body("userID")
-      .notEmpty()
-      .withMessage("userID is required")
-      .isInt()
-      .withMessage("userID must be an integer"),
+    body("userID").optional().isInt().withMessage("userID must be an integer"),
     body("productItemID")
       .optional()
       .isInt()
       .withMessage("productItemID must be an integer"),
     body("quantity")
-      .isInt({ min: 1 })
-      .withMessage("Quantity must be at least 1"),
+      .isInt({ min: 0 })
+      .withMessage("Quantity must be at least 0"),
   ],
 };
