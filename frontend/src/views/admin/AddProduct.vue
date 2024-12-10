@@ -9,17 +9,41 @@
     </header>
 
     <div class="form-container">
-      <form class="admin-form" @submit.prevent="handleSave">
-        <div class="form-group">
-          <label for="name">Name</label>
-          <input
-            id="name"
-            v-model="product.name"
-            type="text"
-            placeholder="Enter product name"
-            :disabled="productStore.loading"
-            required
-          />
+      <div v-if="loading" class="loading-state">
+        <i class="ri-loader-4-line spinning"></i> Loading...
+      </div>
+      <form v-else class="admin-form" @submit.prevent="handleSave">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Product Name</label>
+            <input
+              id="name"
+              v-model="product.name"
+              type="text"
+              placeholder="Enter product name"
+              :disabled="productStore.loading"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="category">Category</label>
+            <select
+              id="category"
+              v-model="product.categoryID"
+              required
+              :disabled="productStore.loading"
+            >
+              <option value="">Select Category</option>
+              <option
+                v-for="category in categories"
+                :key="category.categoryID"
+                :value="category.categoryID"
+              >
+                {{ category.name }}
+              </option>
+            </select>
+          </div>
         </div>
 
         <div class="form-group">
@@ -34,65 +58,32 @@
           ></textarea>
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="color">Colors</label>
-            <input
-              id="color"
-              v-model="product.color"
-              type="text"
-              placeholder="e.g. Red-Blue-Green"
-              :disabled="productStore.loading"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="size">Sizes</label>
-            <input
-              id="size"
-              v-model="product.size"
-              type="text"
-              placeholder="e.g. S-M-L-XL"
-              :disabled="productStore.loading"
-              required
-            />
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="price">Price</label>
-            <input
-              id="price"
-              v-model.number="product.price"
-              type="number"
-              min="0"
-              placeholder="Enter price"
-              :disabled="productStore.loading"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="quantity">Quantity</label>
-            <input
-              id="quantity"
-              v-model.number="product.quantity"
-              type="number"
-              min="0"
-              placeholder="Enter quantity"
-              :disabled="productStore.loading"
-              required
-            />
-          </div>
+        <div class="form-group">
+          <label for="promotion">Promotion (Optional)</label>
+          <select
+            id="promotion"
+            v-model="product.promotionID"
+            :disabled="productStore.loading"
+          >
+            <option value="">No Promotion</option>
+            <option
+              v-for="promotion in activePromotions"
+              :key="promotion.promotionID"
+              :value="promotion.promotionID"
+            >
+              {{ promotion.name }} ({{ promotion.discount }}% off)
+            </option>
+          </select>
+          <small v-if="selectedPromotion" class="promotion-dates">
+            Valid from {{ formatDate(selectedPromotion.startDate) }} to
+            {{ formatDate(selectedPromotion.endDate) }}
+          </small>
         </div>
 
         <div class="form-group">
-          <label for="image">Product Image</label>
+          <label>Main Product Image</label>
           <div class="image-upload">
             <input
-              id="image"
               type="file"
               @change="uploadImage"
               accept="image/*"
@@ -113,14 +104,10 @@
             class="primary-btn"
             :disabled="productStore.loading"
           >
-            Add Product
+            <i class="ri-save-line"></i> Save Product
           </button>
-          <RouterLink
-            to="/admin/manage-product"
-            class="secondary-btn"
-            :class="{ disabled: productStore.loading }"
-          >
-            Cancel
+          <RouterLink to="/admin/manage-product" class="secondary-btn">
+            <i class="ri-arrow-left-line"></i> Cancel
           </RouterLink>
         </div>
       </form>
@@ -129,9 +116,11 @@
 </template>
 
 <script setup>
-import { ref, computed, getCurrentInstance } from "vue";
+import { ref, computed, getCurrentInstance, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useProductStore } from "@/stores/product";
+import { storeToRefs } from "pinia";
+import { APP_CONSTANTS } from "@/utils/constants";
 
 const app = getCurrentInstance();
 const router = useRouter();
@@ -139,21 +128,44 @@ const productStore = useProductStore();
 const previewImage = ref(null);
 const newImage = ref(null);
 
+// Get reactive refs from store
+const { categories, promotions, loading } = storeToRefs(productStore);
 const product = ref({
   name: "",
   description: "",
-  color: "",
-  size: "",
-  price: "",
-  quantity: "",
+  categoryID: "",
+  promotionID: "",
+});
+
+const activePromotions = computed(() => {
+  const now = new Date();
+  return promotions.value.filter((promo) => {
+    const startDate = new Date(promo.startDate);
+    const endDate = new Date(promo.endDate);
+    return startDate <= now && endDate >= now;
+  });
+});
+
+const selectedPromotion = computed(() => {
+  return promotions.value.find(
+    (p) => p.promotionID === product.value.promotionID
+  );
 });
 
 const imagePreviewUrl = computed(() => {
   if (previewImage.value?.src) {
     return previewImage.value.src;
   }
-  return "https://via.placeholder.com/200";
+  return APP_CONSTANTS.UPLOAD.DEFAULT_IMAGE;
 });
+
+function formatDate(dateString) {
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
 
 function uploadImage(e) {
   const file = e.target.files[0];
@@ -167,26 +179,23 @@ async function handleSave() {
   if (
     !product.value.name ||
     !product.value.description ||
-    product.value.price <= 0 ||
-    product.value.quantity < 0
+    !product.value.categoryID
   ) {
-    app?.proxy.$notify(
-      "Please fill in all required fields correctly",
-      "warning"
-    );
+    app?.proxy.$notify("Please fill in all required fields", "warning");
     return;
   }
 
   const formData = new FormData();
   formData.append("name", product.value.name);
   formData.append("description", product.value.description);
-  formData.append("color", product.value.color);
-  formData.append("size", product.value.size);
-  formData.append("price", product.value.price);
-  formData.append("quantity", product.value.quantity);
+  formData.append("categoryID", product.value.categoryID);
+  if (product.value.promotionID) {
+    formData.append("promotionID", product.value.promotionID);
+  }
   if (newImage.value) {
     formData.append("file", newImage.value);
   }
+
   const result = await productStore.createProduct(formData);
   if (result.success) {
     app?.proxy.$notify(result.message, "success");
@@ -195,6 +204,14 @@ async function handleSave() {
     app?.proxy.$notify(result.message, "error");
   }
 }
+
+// Update onMounted to use store action
+onMounted(async () => {
+  const result = await productStore.fetchExtraInfo();
+  if (!result.success) {
+    app?.proxy.$notify(result.message, "error");
+  }
+});
 </script>
 
 <style scoped>
@@ -344,6 +361,67 @@ async function handleSave() {
 
   .form-actions {
     flex-direction: column;
+  }
+}
+
+.promotion-dates {
+  display: block;
+  color: var(--text-light-color);
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}
+
+select {
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+  background: white;
+  width: 100%;
+  cursor: pointer;
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+select:disabled {
+  background-color: var(--light-bg-color);
+  cursor: not-allowed;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem;
+  color: var(--text-light-color);
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 </style>

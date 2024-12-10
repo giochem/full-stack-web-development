@@ -6,22 +6,13 @@ const { validate } = require("../middlewares/validate.middleware");
 const productValidation = require("../validations/products.validation");
 const productController = require("../controllers/products.controller");
 
-router.post(
-  "/",
-  authorizeRoles("admin"),
-  upload.single("file"),
-  productValidation.createProduct,
-  validate,
-  productController.createProduct
-);
-
 router.get(
   "/",
   productValidation.getProducts,
   validate,
   productController.getProducts
 );
-
+router.get("/extra-info", productController.getProductExtraInfo);
 router.get(
   "/:productID",
   productValidation.getProduct,
@@ -30,17 +21,26 @@ router.get(
 );
 
 router.put(
-  "/:productID",
-  authorizeRoles("admin"),
+  "/",
+  // authorizeRoles("admin"),
   upload.single("file"),
-  productValidation.updateProduct,
+  productValidation.upsertProduct,
   validate,
-  productController.updateProduct
+  productController.upsertProduct
+);
+
+router.put(
+  "/product-item",
+  // authorizeRoles("admin"),
+  upload.single("file"),
+  productValidation.upsertProductItem,
+  validate,
+  productController.upsertProductItem
 );
 
 router.delete(
-  "/:productID",
-  authorizeRoles("admin"),
+  "",
+  // authorizeRoles("admin"),
   productValidation.deleteProduct,
   validate,
   productController.deleteProduct

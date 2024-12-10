@@ -5,10 +5,18 @@ const { Message, StatusCode } = require("../utils/constants");
 module.exports = {
   getUsers: async (req, res, next) => {
     try {
-      const { page, size } = req.query;
+      const { page, size, sortBy, sortOrder, searchText, filterRole } =
+        req.query;
       // offset-based
       const offset = page * size;
-      const data = await userService.getUsersByOffsetBased(offset, size);
+      const data = await userService.getUsersByOffsetBased({
+        offset,
+        limit: size,
+        sortBy,
+        sortOrder,
+        searchText,
+        filterRole,
+      });
       // keyset-based
       // const data = await userService.getUsersByKeysetBased(lastID, limit);
       return Response.success(
@@ -99,18 +107,18 @@ module.exports = {
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);
     }
   },
-  searchUsers: async (req, res, next) => {
+  deleteUser: async (req, res, next) => {
     try {
-      const { searchText } = req.query;
-      const data = await userService.searchUsers(searchText);
+      const { userID } = req.params;
+      await userService.deleteUser(userID);
       return Response.success(
         res,
-        Message.SUCCESS_SEARCH_USERS,
-        data,
+        Message.SUCCESS_DELETE_USER,
+        null,
         StatusCode.OK
       );
     } catch (error) {
-      console.error("Error in searchUsers controller:", error);
+      console.error("Error in deleteUser controller:", error);
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);
     }
   },

@@ -19,11 +19,22 @@ const Message = {
   // Product related messages
   SUCCESS_GET_PRODUCTS: "Successfully retrieved products",
   SUCCESS_GET_PRODUCT: "Successfully retrieved product",
-  SUCCESS_CREATE_PRODUCT: "Successfully created product",
-  SUCCESS_UPDATE_PRODUCT: "Successfully updated product",
+  SUCCESS_UPSERT_PRODUCT: "Successfully upserted product",
+  SUCCESS_UPSERT_PRODUCT_ITEM: "Successfully upserted product item",
   SUCCESS_DELETE_PRODUCT: "Successfully deleted product",
+  SUCCESS_GET_PRODUCT_EXTRA_INFO: "Successfully retrieved product extra info",
   ERROR_PRODUCT_NOT_FOUND: "Product not found",
   ERROR_PRODUCT_IMAGE_REQUIRED: "Product image is required",
+  SUCCESS_DELETE_PRODUCT_ITEM: "Successfully deleted product item",
+  ERROR_PRODUCT_ITEM_NOT_FOUND: "Product item not found",
+  ERROR_INVALID_QUERY: "Invalid query",
+  // Variation related messages
+  SUCCESS_GET_VARIATIONS: "Successfully retrieved variations",
+  SUCCESS_CREATE_VARIATION: "Successfully created variation",
+  SUCCESS_UPDATE_VARIATION: "Successfully updated variation",
+  SUCCESS_DELETE_VARIATION: "Successfully deleted variation",
+  ERROR_VARIATION_NOT_FOUND: "Variation not found",
+  ERROR_VARIATION_NAME_EXISTS: "Variation name already exists",
 
   // Cart related messages
   SUCCESS_GET_CART: "Successfully retrieved cart",
@@ -33,6 +44,7 @@ const Message = {
   SUCCESS_CLEAR_CART: "Successfully cleared cart",
   ERROR_CART_NOT_FOUND: "Cart not found",
   ERROR_INSUFFICIENT_STOCK: "Insufficient stock",
+  SUCCESS_UPSERT_CART: "Successfully upserted cart",
 
   // Order related messages
   SUCCESS_GET_ORDERS: "Successfully retrieved orders",
@@ -42,14 +54,14 @@ const Message = {
   SUCCESS_DELETE_ORDER: "Successfully deleted order",
   ERROR_ORDER_NOT_FOUND: "Order not found",
 
-  // Collection related messages
-  SUCCESS_GET_COLLECTIONS: "Successfully retrieved collections",
-  SUCCESS_GET_COLLECTION: "Successfully retrieved collection",
-  SUCCESS_CREATE_COLLECTION: "Successfully created collection",
-  SUCCESS_UPDATE_COLLECTION: "Successfully updated collection",
-  SUCCESS_DELETE_COLLECTION: "Successfully deleted collection",
-  ERROR_COLLECTION_NOT_FOUND: "Collection not found",
-  ERROR_COLLECTION_NAME_EXISTS: "Collection name already exists",
+  // Category related messages
+  SUCCESS_GET_CATEGORIES: "Successfully retrieved categories",
+  SUCCESS_GET_CATEGORY: "Successfully retrieved category",
+  SUCCESS_CREATE_CATEGORY: "Successfully created category",
+  SUCCESS_UPDATE_CATEGORY: "Successfully updated category",
+  SUCCESS_DELETE_CATEGORY: "Successfully deleted category",
+  ERROR_CATEGORY_NOT_FOUND: "Category not found",
+  ERROR_CATEGORY_NAME_EXISTS: "Category name already exists",
 
   // Promotion related messages
   SUCCESS_GET_PROMOTIONS: "Successfully retrieved promotions",
@@ -61,6 +73,13 @@ const Message = {
   ERROR_PROMOTION_NAME_EXISTS: "Promotion name already exists",
   ERROR_PROMOTION_EXPIRED: "Promotion has expired",
   ERROR_PROMOTION_NOT_STARTED: "Promotion has not started yet",
+
+  // Payment related messages
+  SUCCESS_GET_PAYMENTS: "Successfully retrieved payments",
+  SUCCESS_CREATE_PAYMENT: "Successfully created payment",
+  SUCCESS_UPDATE_PAYMENT: "Successfully updated payment",
+  SUCCESS_DELETE_PAYMENT: "Successfully deleted payment",
+  ERROR_PAYMENT_NOT_FOUND: "Payment not found",
 
   // Database related messages
   ERROR_DB_CONNECTION: "Database connection error",

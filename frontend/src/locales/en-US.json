@@ -1,0 +1,41 @@
+{
+  "Components": {
+    "Layouts": {
+      "HeaderDefault": {
+        "Home": "Home",
+        "Auth": "Authentication"
+      },
+      "FooterDefault": {
+        "CompanyName": "369 Fashion Joint Stock Company",
+        "Newsletter": "Subscribe",
+        "Hotline": "Support Number",
+        "GPKD": "Business License",
+        "EmailPlaceholder": "Enter your email",
+        "Subscribe": "Sign Up",
+        "ShortCompanyName": "369 Fashion"
+      }
+    }
+  },
+  "Views": {
+    "Auth": {
+      "ShortCompanyName": "369 Fashion",
+      "NewsletterDescription": "Discover the latest fashion trends with 369 Fashion",
+      "Login": "Sign Up enter",
+      "Register": "Register",
+      "LabelEmail": "Email",
+      "PlaceholderEmail": "Enter your email",
+      "LabelPassword": "Password",
+      "PlaceholderPassword": "Enter your password",
+      "LabelPassword2": "Re-enter your password",
+      "CreateAccount": "Create a new account",
+      "HaveAccount": "Already have an account?",
+      "ForgotPassword": "Forgot password?"
+    },
+    "Client": {
+      "Title": "Featured products",
+      "Loading": "Loading products...",
+      "Error": "An error occurred",
+      "NoProducts": "The store currently has no products."
+    }
+  }
+}

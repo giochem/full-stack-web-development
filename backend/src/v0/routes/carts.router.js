@@ -7,11 +7,18 @@ const cartController = require("../controllers/carts.controller");
 
 router.get(
   "/",
-  authorizeRoles("admin", "client"),
+  // authorizeRoles("admin", "client"),
   cartValidation.getCarts,
   validate,
   cartController.getCarts
 );
+// router.get(
+//   "/:userID",
+//   // authorizeRoles("admin"),
+//   cartValidation.getCart,
+//   validate,
+//   cartController.getCart
+// );
 router.get(
   "/owner",
   authorizeRoles("admin", "client"),
@@ -21,9 +28,9 @@ router.get(
 router.put(
   "/",
   authorizeRoles("client", "admin"),
-  cartValidation.updateCart,
+  cartValidation.upsertCart,
   validate,
-  cartController.updateCart
+  cartController.upsertCart
 );
 
 module.exports = router;

@@ -6,18 +6,27 @@ const axiosInstance = axios.create({
   timeout: APP_CONSTANTS.API_TIMEOUT,
   withCredentials: true,
   headers: {
-    "Content-Type": "application/json",
-  },
+    "Content-Type": "application/json"
+  }
 });
 
 // Request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
+    // Construct full URL with query parameters
+    const fullUrl =
+      config.baseURL +
+      config.url +
+      (config.params
+        ? "?" + new URLSearchParams(config.params).toString()
+        : "");
+
     console.log("🚀 Request:", {
       method: config.method.toUpperCase(),
-      url: config.url,
+      fullUrl,
+      params: config.params,
       data: config.data,
-      headers: config.headers,
+      headers: config.headers
     });
 
     return config;
@@ -34,7 +43,7 @@ axiosInstance.interceptors.response.use(
     console.log("✅ Response:", {
       status: response.status,
       data: response.data,
-      url: response.config.url,
+      url: response.config.url
     });
     return response;
   },
@@ -43,7 +52,7 @@ axiosInstance.interceptors.response.use(
       status: error.response?.status,
       data: error.response?.data,
       url: error.config?.url,
-      message: error.message,
+      message: error.message
     });
 
     if (error.response) {

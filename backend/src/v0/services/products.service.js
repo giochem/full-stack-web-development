@@ -3,105 +3,136 @@ const sql = require("mssql");
 const { Message } = require("../utils/constants");
 
 module.exports = {
-  getProductsByOffsetBased: async (offset, limit) => {
+  getProductsByOffsetBased: async (
+    offset,
+    limit,
+    sortBy,
+    sortOrder,
+    searchText,
+    filterPromotion,
+    filterCategory
+  ) => {
     let conn;
-    try {
-      conn = await sql.connect(config);
-      console.log("Connected to SQLServer...");
-      console.log("procedure getProductsByOffsetBased");
-      
-      const data = await conn
-        .request()
-        .input("offset", sql.Int, offset)
-        .input("limit", sql.Int, limit)
-        .query("SELECT * FROM Products ORDER BY productID OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY");
-      
-      return data.recordset;
-    } catch (error) {
-      console.error("Error in getProductsByOffsetBased:", error);
-      throw error;
-    } finally {
-      if (conn) {
-        await conn.close();
-        console.log("Connection closed.");
-      }
-    }
-  },
+    conn = await sql.connect(config);
+    console.log("Connected to SQLServer...");
+    console.log("procedure getProductsByOffsetBased");
 
+    const data = await conn
+      .request()
+      .input("offset", sql.Int, offset)
+      .input("limit", sql.Int, limit)
+      .input("sortBy", sql.NVarChar(255), sortBy)
+      .input("sortOrder", sql.NVarChar(255), sortOrder)
+      .input("searchText", sql.NVarChar(255), searchText)
+      .input("filterPromotion", sql.NVarChar(255), filterPromotion)
+      .input("filterCategory", sql.NVarChar(255), filterCategory)
+      .execute("getProductsByOffsetBased");
+
+    return data.recordset;
+  },
+  getProductExtraInfo: async () => {
+    const conn = await sql.connect(config);
+    console.log("Connected to SQLServer...");
+    console.log("procedure getProductExtraInfo");
+
+    const result = await conn.request().execute("getProductExtraInfo");
+    return result.recordsets;
+  },
   getProductByProductID: async (productID) => {
     const conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
     console.log("procedure getProductByProductID");
-    
-    const data = await conn
+
+    const result = await conn
       .request()
       .input("productID", sql.Int, productID)
-      .query("SELECT * FROM Products WHERE productID = @productID");
-    
-    return data.recordset;
-  },
+      .execute("getProductByProductID");
 
-  createProduct: async (product) => {
-    let conn;
-    try {
-      const { name, description, color, size, linkImage, price, quantity } = product;
-      const createAt = new Date().toISOString().slice(0, 19).replace("T", " ");
-      
-      conn = await sql.connect(config);
-      console.log("Connected to SQLServer...");
-      console.log("procedure createProduct");
-      
-      const data = await conn
-        .request()
-        .input("name", sql.NVarChar(255), name)
-        .input("description", sql.Text, description)
-        .input("color", sql.NVarChar(255), color)
-        .input("size", sql.VarChar(255), size)
-        .input("linkImage", sql.NVarChar(255), linkImage)
-        .input("price", sql.Int, price)
-        .input("quantity", sql.SmallInt, quantity)
-        .input("createAt", sql.DateTime, createAt)
-        .query("INSERT INTO Products (name, description, color, size, linkImage, price, quantity, createAt) VALUES (@name, @description, @color, @size, @linkImage, @price, @quantity, @createAt); SELECT SCOPE_IDENTITY() AS productID;");
-      
-      return data.recordset;
-    } catch (error) {
-      console.error("Error in createProduct:", error);
-      throw error;
-    } finally {
-      if (conn) {
-        await conn.close();
-        console.log("Connection closed.");
-      }
-    }
+    return result.recordsets;
   },
-
-  updateProduct: async (product) => {
-    const { productID, name, description, color, size, linkImage, price, quantity } = product;
+  getProductItemByProductItemID: async (productItemID) => {
     const conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
-    console.log("procedure updateProduct");
-    
+    console.log("procedure getProductItemByProductItemID");
+
+    const result = await conn
+      .request()
+      .input("productItemID", sql.Int, productItemID)
+      .execute("getProductItemByProductItemID");
+
+    return result.recordsets;
+  },
+  upsertProduct: async (product) => {
+    const { productID, promotionID, categoryID, name, description, image } =
+      product;
+    const conn = await sql.connect(config);
+    console.log("Connected to SQLServer...");
+    console.log("procedure upsertProduct");
+
     await conn
       .request()
       .input("productID", sql.Int, productID)
+      .input("promotionID", sql.Int, promotionID)
+      .input("categoryID", sql.Int, categoryID)
       .input("name", sql.NVarChar(255), name)
       .input("description", sql.Text, description)
-      .input("color", sql.NVarChar(255), color)
-      .input("size", sql.VarChar(255), size)
-      .input("linkImage", sql.NVarChar(255), linkImage)
-      .input("price", sql.Int, price)
-      .input("quantity", sql.SmallInt, quantity)
-      .execute("updateProduct");
+      .input("image", sql.NVarChar(255), image)
+      .execute("upsertProduct");
+    await conn.close();
+    console.log("Connection closed.");
   },
+  upsertProductItem: async (productItem) => {
+    const {
+      productID,
+      productItemID,
+      sku,
+      price,
+      quantity,
+      image,
+      variationOptionList,
+    } = productItem;
+    const conn = await sql.connect(config);
+    console.log("Connected to SQLServer...");
+    console.log("procedure upsertProductItem");
+    const variationOptionTable = new sql.Table("variationOptionList");
+    variationOptionTable.create = true;
+    variationOptionTable.columns.add("variationID", sql.Int);
+    variationOptionTable.columns.add("value", sql.NVarChar(255));
 
+    variationOptionList.forEach((item) => {
+      variationOptionTable.rows.add(item.variationID, item.value);
+    });
+    await conn
+      .request()
+      .input("productID", sql.Int, productID)
+      .input("productItemID", sql.Int, productItemID)
+      .input("sku", sql.NVarChar(255), sku)
+      .input("price", sql.Int, price)
+      .input("quantity", sql.Int, quantity)
+      .input("image", sql.NVarChar(255), image)
+      .input("variationOptionTable", variationOptionTable)
+      .execute("upsertProductItem");
+    await conn.close();
+    console.log("Connection closed.");
+  },
   deleteProduct: async (productID) => {
     const conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
     console.log("procedure deleteProduct");
-    
+
     await conn
       .request()
       .input("productID", sql.Int, productID)
       .execute("deleteProduct");
+  },
+  deleteProductItem: async (productItemID) => {
+    const conn = await sql.connect(config);
+    console.log("Connected to SQLServer...");
+    console.log("procedure deleteProductItem");
+
+    await conn
+      .request()
+      .input("productItemID", sql.Int, productItemID)
+      .execute("deleteProductItem");
   },
 };

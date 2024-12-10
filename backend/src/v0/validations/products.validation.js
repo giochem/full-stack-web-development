@@ -8,6 +8,26 @@ module.exports = {
     query("size")
       .isInt({ min: 1 })
       .withMessage("size in query is required and >= 1"),
+    query("sortBy")
+      .optional()
+      .isString()
+      .withMessage("sortBy in query must be a string"),
+    query("sortOrder")
+      .optional()
+      .isString()
+      .withMessage("sortOrder in query must be a string"),
+    query("searchText")
+      .optional()
+      .isString()
+      .withMessage("searchText in query must be a string"),
+    query("filterPromotion")
+      .optional()
+      .isInt()
+      .withMessage("filterPromotion in query must be an integer"),
+    query("filterCategory")
+      .optional()
+      .isInt()
+      .withMessage("filterCategory in query must be an integer"),
   ],
 
   getProduct: [
@@ -18,45 +38,19 @@ module.exports = {
       .withMessage("productID must be an integer"),
   ],
 
-  createProduct: [
-    body("name")
-      .notEmpty()
-      .withMessage("Name is required")
-      .isLength({ min: 2, max: 100 })
-      .withMessage("Name must be between 2 and 100 characters"),
-    body("description")
-      .notEmpty()
-      .withMessage("Description is required")
-      .isLength({ max: 500 })
-      .withMessage("Description cannot exceed 500 characters"),
-    body("color")
-      .isString()
-      .withMessage("Color must be a string")
-      .isLength({ max: 50 })
-      .withMessage("Color cannot exceed 50 characters"),
-    body("size")
-      .isString()
-      .withMessage("Size must be a string")
-      .isLength({ max: 20 })
-      .withMessage("Size cannot exceed 20 characters"),
-    body("price")
-      .notEmpty()
-      .withMessage("Price is required")
-      .isFloat({ min: 0 })
-      .withMessage("Price must be a positive number"),
-    body("quantity")
-      .notEmpty()
-      .withMessage("Quantity is required")
-      .isInt({ min: 0 })
-      .withMessage("Quantity must be a positive integer"),
-  ],
-
-  updateProduct: [
-    param("productID")
-      .notEmpty()
-      .withMessage("productID is required")
+  upsertProduct: [
+    body("productID")
+      .optional()
       .isInt()
       .withMessage("productID must be an integer"),
+    body("promotionID")
+      .optional()
+      .isInt()
+      .withMessage("promotionID must be an integer"),
+    body("categoryID")
+      .optional()
+      .isInt()
+      .withMessage("categoryID must be an integer"),
     body("name")
       .optional()
       .isLength({ min: 2, max: 100 })
@@ -65,33 +59,34 @@ module.exports = {
       .optional()
       .isLength({ max: 500 })
       .withMessage("Description cannot exceed 500 characters"),
-    body("color")
+    body("image").optional().isString().withMessage("image must be a string"),
+  ],
+  upsertProductItem: [
+    body("productID")
       .optional()
-      .isString()
-      .withMessage("Color must be a string")
-      .isLength({ max: 50 })
-      .withMessage("Color cannot exceed 50 characters"),
-    body("size")
+      .isInt()
+      .withMessage("productID must be an integer"),
+    body("productItemID")
       .optional()
-      .isString()
-      .withMessage("Size must be a string")
-      .isLength({ max: 20 })
-      .withMessage("Size cannot exceed 20 characters"),
-    body("price")
-      .optional()
-      .isFloat({ min: 0 })
-      .withMessage("Price must be a positive number"),
+      .isInt()
+      .withMessage("productItemID must be an integer"),
+    body("sku").optional().isString().withMessage("sku must be a string"),
+    body("price").optional().isInt().withMessage("price must be an integer"),
     body("quantity")
       .optional()
-      .isInt({ min: 0 })
-      .withMessage("Quantity must be a positive integer"),
+      .isInt()
+      .withMessage("quantity must be an integer"),
+    body("image").optional().isString().withMessage("image must be a string"),
   ],
 
   deleteProduct: [
-    param("productID")
-      .notEmpty()
-      .withMessage("productID is required")
+    query("productID")
+      .optional()
       .isInt()
       .withMessage("productID must be an integer"),
+    query("productItemID")
+      .optional()
+      .isInt()
+      .withMessage("productItemID must be an integer"),
   ],
-}; 
+};

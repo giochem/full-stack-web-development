@@ -5,6 +5,11 @@ const authValidation = require("../validations/auth.validation");
 const authController = require("../controllers/auth.controller");
 const { authorizeRoles } = require("../middlewares/authen.middleware");
 
+router.get(
+  "/profile",
+  authorizeRoles("client", "admin"),
+  authController.getProfile
+);
 router.post(
   "/register",
   authValidation.register,
@@ -12,11 +17,5 @@ router.post(
   authController.register
 );
 router.post("/login", authValidation.login, validate, authController.login);
-router.get(
-  "/profile",
-  authorizeRoles("client", "admin"),
-  authController.getProfile
-);
-//router.get("/logout", authController.logout);
-
+router.post("/logout", authController.logout);
 module.exports = router;
