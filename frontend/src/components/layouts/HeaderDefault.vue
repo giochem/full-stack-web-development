@@ -25,11 +25,18 @@
                 </span>
               </div>
             </RouterLink>
+            <button @click="handleLogout" class="action-button logout" :disabled="isLoggingOut">
+              <i class="ri-logout-box-line"></i>
+              <span class="button-text">{{ isLoggingOut ? 'Logging out...' : 'Logout' }}</span>
+            </button>
           </template>
           <template v-else>
-            <RouterLink to="/auth" class="nav-link">{{
-              $t("Components.Layouts.HeaderDefault.Auth")
-            }}</RouterLink>
+            <RouterLink to="/auth" class="action-button login">
+              <i class="ri-login-box-line"></i>
+              <span class="button-text">
+                {{ $t("Components.Layouts.HeaderDefault.Auth") }}
+              </span>
+            </RouterLink>
           </template>
 
           <div class="lang-selector">
@@ -56,31 +63,71 @@
 
 <script setup>
 import { RouterLink, useRouter } from "vue-router";
-import { onMounted, watch, computed } from "vue";
+import { onMounted, watch, computed, ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useCartStore } from "@/stores/cart";
+import axios from "axios";
 
 const router = useRouter();
 const cartStore = useCartStore();
 const { itemCount: cartItemCount } = storeToRefs(cartStore);
+const isLoggingOut = ref(false);
 
 const isLoggedIn = computed(() => {
   return window.sessionStorage.getItem("logined") === "true";
 });
 
-onMounted(() => {
+async function handleLogout() {
+  try {
+    isLoggingOut.value = true;
+    await axios.post(
+      "http://localhost:5000/api/auth/logout",
+      {},
+      {
+        withCredentials: true,
+      }
+    );
+
+    // Clear session storage
+    window.sessionStorage.removeItem("logined");
+
+    // Reset cart count
+    cartStore.itemCount = 0;
+
+    // Redirect to home page
+    router.push("/");
+  } catch (error) {
+    console.error("Logout failed:", error);
+  } finally {
+    isLoggingOut.value = false;
+  }
+}
+
+// Update cart count when component mounts and user is logged in
+onMounted(async () => {
   if (isLoggedIn.value) {
-    cartStore.updateCartCount();
+    await cartStore.updateCartCount();
   }
 });
+
+// Update cart count when route changes and user is logged in
 watch(
   () => router.currentRoute.value.path,
-  () => {
+  async () => {
     if (isLoggedIn.value) {
-      cartStore.updateCartCount();
+      await cartStore.updateCartCount();
     }
   }
 );
+
+// Also watch login status to update cart count
+watch(isLoggedIn, async (newValue) => {
+  if (newValue) {
+    await cartStore.updateCartCount();
+  } else {
+    cartStore.itemCount = 0;
+  }
+});
 </script>
 
 <style scoped>
@@ -243,6 +290,75 @@ watch(
 
   .lang-btn span {
     display: none;
+  }
+}
+
+/* Add new shared button styles */
+.action-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: none;
+  border: 2px solid;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.action-button i {
+  font-size: 1.25rem;
+  transition: transform 0.3s ease;
+}
+
+.action-button:hover i {
+  transform: translateX(2px);
+}
+
+/* Login button specific styles */
+.action-button.login {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.action-button.login:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
+/* Logout button specific styles */
+.action-button.logout {
+  border-color: #fecaca;
+  color: #ef4444;
+}
+
+.action-button.logout:hover:not(:disabled) {
+  background: #ef4444;
+  color: white;
+  border-color: #ef4444;
+}
+
+.action-button.logout:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #fef2f2;
+}
+
+.button-text {
+  display: none;
+}
+
+/* Show button text on larger screens */
+@media (min-width: 768px) {
+  .button-text {
+    display: inline;
+  }
+  
+  .action-button {
+    margin-left: 1rem;
   }
 }
 </style>

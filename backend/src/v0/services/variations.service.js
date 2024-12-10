@@ -14,7 +14,6 @@ module.exports = {
 
   upsertVariation: async (variation) => {
     const { variationID, nameAtribute } = variation;
-    console.log(variation);
     const conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
     console.log("procedure upsertVariation");

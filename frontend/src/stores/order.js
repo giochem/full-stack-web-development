@@ -12,13 +12,12 @@ export const useOrderStore = defineStore("order", {
   }),
 
   actions: {
-    async createOrder(shippingInfo) {
+    async createOrder(orderData) {
       try {
         this.loading = true;
-        const response = await axios[API_ENDPOINTS.ORDERS.CREATE.method.toLowerCase()](
-          API_ENDPOINTS.ORDERS.CREATE.url,
-          shippingInfo
-        );
+        const response = await axios[
+          API_ENDPOINTS.ORDERS.CREATE.method.toLowerCase()
+        ](API_ENDPOINTS.ORDERS.CREATE.url, orderData);
         if (response.data.success) {
           this.successOrder = true;
           return {
@@ -49,9 +48,9 @@ export const useOrderStore = defineStore("order", {
     async fetchOwnerOrders() {
       try {
         this.loading = true;
-        const response = await axios[API_ENDPOINTS.ORDERS.OWNER.method.toLowerCase()](
-          API_ENDPOINTS.ORDERS.OWNER.url
-        );
+        const response = await axios[
+          API_ENDPOINTS.ORDERS.OWNER.method.toLowerCase()
+        ](API_ENDPOINTS.ORDERS.OWNER.url);
         this.orders = response.data.data;
         return { success: true, orders: this.orders };
       } catch (error) {
@@ -68,9 +67,9 @@ export const useOrderStore = defineStore("order", {
     async fetchOrderList(page = 0, size = 10) {
       try {
         this.loading = true;
-        const response = await axios[API_ENDPOINTS.ORDERS.LIST.method.toLowerCase()](
-          API_ENDPOINTS.ORDERS.LIST.url(page, size)
-        );
+        const response = await axios[
+          API_ENDPOINTS.ORDERS.LIST.method.toLowerCase()
+        ](API_ENDPOINTS.ORDERS.LIST.url(page, size));
         this.orders = response.data.data;
         return { success: true, orders: this.orders };
       } catch (error) {

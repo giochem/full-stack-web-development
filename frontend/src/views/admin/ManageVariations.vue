@@ -151,17 +151,13 @@ function handleEdit(variation) {
 }
 
 async function handleDelete(variationID) {
-  if (
-    confirm(
-      "Are you sure you want to delete this variation?\nThis action effect all products that use this variation"
-    )
-  ) {
-    const result = await variationStore.deleteVariation(variationID);
-    if (result.success) {
-      app?.proxy.$notify(result.message, "success");
-    } else {
-      app?.proxy.$notify(result.message, "error");
-    }
+  if (confirm("Functionality is not implemented yet")) {
+    // const result = await variationStore.deleteVariation(variationID);
+    // if (result.success) {
+    //   app?.proxy.$notify(result.message, "success");
+    // } else {
+    //   app?.proxy.$notify(result.message, "error");
+    // }
   }
 }
 

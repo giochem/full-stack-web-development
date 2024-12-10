@@ -6,17 +6,9 @@ const { validate } = require("../middlewares/validate.middleware");
 const orderValidation = require("../validations/orders.validation");
 const orderController = require("../controllers/orders.controller");
 
-router.post(
-  "/",
-  authorizeRoles("client", "admin"),
-  orderValidation.createOrder,
-  validate,
-  orderController.createOrder
-);
-
 router.get(
   "/",
-  authorizeRoles("admin", "client"),
+  // authorizeRoles("admin", "client"),
   orderValidation.getOrders,
   validate,
   orderController.getOrders
@@ -27,14 +19,13 @@ router.get(
   orderController.getOwnerOrders
 );
 
-router.get(
-  "/:orderID",
-  authorizeRoles("admin", "client"),
-  orderValidation.getOrderItem,
+router.post(
+  "/",
+  authorizeRoles("client", "admin"),
+  orderValidation.createOrder,
   validate,
-  orderController.getOrderItem
+  orderController.createOrder
 );
-
 router.put(
   "/:orderID",
   authorizeRoles("admin", "client"),

@@ -78,4 +78,8 @@ module.exports = {
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);
     }
   },
+  logout: async (req, res, next) => {
+    req.session.destroy();
+    return Response.success(res, Message.SUCCESS_LOGOUT, null, StatusCode.OK);
+  },
 };

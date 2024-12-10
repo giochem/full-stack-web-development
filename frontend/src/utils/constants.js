@@ -80,12 +80,16 @@ export const API_ENDPOINTS = {
   },
   CART: {
     LIST: {
-      url: "/carts/owner",
+      url: "/carts",
       method: "GET",
     },
     UPSERT: {
       url: "/carts",
       method: "PUT",
+    },
+    OWNER: {
+      url: "/carts/owner",
+      method: "GET",
     },
   },
   ORDERS: {

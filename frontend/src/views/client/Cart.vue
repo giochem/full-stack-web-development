@@ -17,7 +17,17 @@
 
             <div class="item-details">
               <h3 class="item-name">{{ item.name }}</h3>
-              <p class="item-price">{{ formatPrice(item.price) }} đ</p>
+              <div class="item-price">
+                <span v-if="item.discount && isDiscountActive(item)" class="original-price">
+                  {{ formatPrice(item.price) }} đ
+                </span>
+                <span :class="{ 'discounted-price': isDiscountActive(item) }">
+                  {{ formatPrice(calculateFinalPrice(item)) }} đ
+                </span>
+                <span v-if="item.discount && isDiscountActive(item)" class="discount-badge">
+                  -{{ item.discount }}%
+                </span>
+              </div>
 
               <div class="item-options">
                 <span class="item-color">Color: {{ item.color }}</span>
@@ -48,7 +58,7 @@
             </div>
 
             <div class="item-total">
-              {{ formatPrice(item.price * item.quantity) }} đ
+              {{ formatPrice(calculateItemTotal(item)) }} đ
             </div>
           </div>
         </div>
@@ -56,7 +66,11 @@
         <div class="cart-summary">
           <div class="summary-row">
             <span>Subtotal</span>
-            <span>{{ formatPrice(subtotal) }} đ</span>
+            <span>{{ formatPrice(originalSubtotal) }} đ</span>
+          </div>
+          <div v-if="totalSavings > 0" class="summary-row savings">
+            <span>Discount Savings</span>
+            <span>-{{ formatPrice(totalSavings) }} đ</span>
           </div>
           <div class="summary-row">
             <span>Shipping</span>
@@ -88,21 +102,30 @@ import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useCartStore } from "@/stores/cart";
 import { APP_CONSTANTS } from "@/utils/constants";
+import { parseISO, isAfter, isBefore } from "date-fns";
 
 const router = useRouter();
 const cartStore = useCartStore();
 const cartItems = ref([]);
 const shippingFee = APP_CONSTANTS.ORDER.SHIPPING_FEE;
 
-const subtotal = computed(() => {
+const originalSubtotal = computed(() => {
   return cartItems.value.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) => sum + (item.price * item.quantity),
     0
   );
 });
 
+const totalSavings = computed(() => {
+  return cartItems.value.reduce((sum, item) => {
+    if (!isDiscountActive(item)) return sum;
+    const savings = (item.price * item.discount / 100) * item.quantity;
+    return sum + savings;
+  }, 0);
+});
+
 const total = computed(() => {
-  return subtotal.value + shippingFee;
+  return originalSubtotal.value - totalSavings.value + shippingFee;
 });
 
 function formatPrice(price) {
@@ -110,7 +133,7 @@ function formatPrice(price) {
 }
 
 async function fetchCartItems() {
-  const result = await cartStore.fetchCartItems();
+  const result = await cartStore.updateCartCount();
   if (result.success) {
     cartItems.value = result.data;
   }
@@ -120,14 +143,20 @@ async function updateQuantity(item, change) {
   const newQuantity = item.quantity + change;
   if (newQuantity < 1) return;
 
-  const result = await cartStore.addToCart(item.productID, newQuantity);
+  const result = await cartStore.addToCart({
+    quantity: newQuantity,
+    productItemId: item.productItemID,
+  });
   if (result.success) {
     await fetchCartItems();
   }
 }
 
 async function removeItem(item) {
-  const result = await cartStore.addToCart(item.productID, 0);
+  const result = await cartStore.addToCart({
+    quantity: 0,
+    productItemId: item.productItemID,
+  });
   if (result.success) {
     await fetchCartItems();
   }
@@ -140,6 +169,25 @@ function checkout() {
 onMounted(() => {
   fetchCartItems();
 });
+
+function isDiscountActive(item) {
+  if (!item.startDate || !item.endDate || !item.discount) return false;
+  
+  const now = new Date();
+  const startDate = parseISO(item.startDate);
+  const endDate = parseISO(item.endDate);
+  
+  return isAfter(now, startDate) && isBefore(now, endDate);
+}
+
+function calculateFinalPrice(item) {
+  if (!isDiscountActive(item)) return item.price;
+  return (item.price * (100 - item.discount)) / 100;
+}
+
+function calculateItemTotal(item) {
+  return calculateFinalPrice(item) * item.quantity;
+}
 </script>
 
 <style scoped>
@@ -203,7 +251,29 @@ onMounted(() => {
 }
 
 .item-price {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.original-price {
+  text-decoration: line-through;
+  color: var(--light-text-color);
+  font-size: 0.9em;
+}
+
+.discounted-price {
   color: var(--primary-color);
+  font-weight: 500;
+}
+
+.discount-badge {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75em;
   font-weight: 500;
 }
 
@@ -335,6 +405,12 @@ onMounted(() => {
 
 .continue-shopping:hover {
   background: var(--secondary-color);
+}
+
+.savings {
+  color: var(--primary-color);
+  font-weight: 500;
+  font-style: italic;
 }
 
 @media (max-width: 768px) {

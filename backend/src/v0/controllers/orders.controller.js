@@ -5,10 +5,39 @@ const { Message, StatusCode } = require("../utils/constants");
 module.exports = {
   getOrders: async (req, res, next) => {
     try {
-      const { page, size } = req.query;
+      const {
+        page,
+        size,
+        searchText,
+        sortBy,
+        sortOrder,
+        filterStatus,
+        userID,
+      } = req.query;
       const offset = page * size;
-      const data = await orderService.getOrdersByOffsetBased(offset, size);
-      return Response.success(res, Message.SUCCESS_GET_ORDERS, data, StatusCode.OK);
+      if (userID) {
+        const data = await orderService.getOrdersByUserID(userID);
+        return Response.success(
+          res,
+          Message.SUCCESS_GET_ORDERS,
+          data,
+          StatusCode.OK
+        );
+      }
+      const data = await orderService.getOrdersByOffsetBased({
+        offset,
+        limit: size,
+        searchText,
+        sortBy,
+        sortOrder,
+        filterStatus,
+      });
+      return Response.success(
+        res,
+        Message.SUCCESS_GET_ORDERS,
+        data,
+        StatusCode.OK
+      );
     } catch (error) {
       console.error("Error in getOrders controller:", error);
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);
@@ -19,23 +48,14 @@ module.exports = {
     try {
       const { userID } = req.session;
       const data = await orderService.getOrdersByUserID(userID);
-      return Response.success(res, Message.SUCCESS_GET_ORDERS, data, StatusCode.OK);
+      return Response.success(
+        res,
+        Message.SUCCESS_GET_ORDERS,
+        data,
+        StatusCode.OK
+      );
     } catch (error) {
       console.error("Error in getOwnerOrders controller:", error);
-      return Response.serverError(res, Message.ERROR_DB_QUERY, error);
-    }
-  },
-
-  getOrderItem: async (req, res, next) => {
-    try {
-      const { orderID } = req.params;
-      const data = await orderService.getOrderItemByOrderID(orderID);
-      if (!data || data.length === 0) {
-        return Response.error(res, Message.ERROR_ORDER_NOT_FOUND, null, StatusCode.NOT_FOUND);
-      }
-      return Response.success(res, Message.SUCCESS_GET_ORDER, data, StatusCode.OK);
-    } catch (error) {
-      console.error("Error in getOrderItem controller:", error);
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);
     }
   },
@@ -50,7 +70,12 @@ module.exports = {
         address,
         note,
       });
-      return Response.success(res, Message.SUCCESS_CREATE_ORDER, null, StatusCode.CREATED);
+      return Response.success(
+        res,
+        Message.SUCCESS_CREATE_ORDER,
+        null,
+        StatusCode.CREATED
+      );
     } catch (error) {
       console.error("Error in createOrder controller:", error);
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);
@@ -64,14 +89,24 @@ module.exports = {
 
       const order = await orderService.getOrderByOrderID(orderID);
       if (!order || order.length === 0) {
-        return Response.error(res, Message.ERROR_ORDER_NOT_FOUND, null, StatusCode.NOT_FOUND);
+        return Response.error(
+          res,
+          Message.ERROR_ORDER_NOT_FOUND,
+          null,
+          StatusCode.NOT_FOUND
+        );
       }
 
       await orderService.updateOrder({
         orderID,
         status,
       });
-      return Response.success(res, Message.SUCCESS_UPDATE_ORDER, null, StatusCode.OK);
+      return Response.success(
+        res,
+        Message.SUCCESS_UPDATE_ORDER,
+        null,
+        StatusCode.OK
+      );
     } catch (error) {
       console.error("Error in updateOrder controller:", error);
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);

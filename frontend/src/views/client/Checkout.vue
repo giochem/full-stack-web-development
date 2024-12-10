@@ -66,7 +66,7 @@
             >
               <div class="item-image">
                 <img
-                  :src="`http://localhost:5000/uploads/${item.linkImage}`"
+                  :src="`${APP_CONSTANTS.UPLOAD.UPLOAD_URL}${item.image}`"
                   :alt="item.name"
                 />
               </div>
@@ -75,9 +75,23 @@
                 <p class="item-details">
                   {{ item.color }} / {{ item.size }} × {{ item.quantity }}
                 </p>
-                <p class="item-price">
-                  {{ formatPrice(item.price * item.quantity) }} đ
-                </p>
+                <div class="item-price">
+                  <span
+                    v-if="item.discount && isDiscountActive(item)"
+                    class="original-price"
+                  >
+                    {{ formatPrice(item.price * item.quantity) }} đ
+                  </span>
+                  <span :class="{ 'discounted-price': isDiscountActive(item) }">
+                    {{ formatPrice(calculateItemTotal(item)) }} đ
+                  </span>
+                  <span
+                    v-if="item.discount && isDiscountActive(item)"
+                    class="discount-badge"
+                  >
+                    -{{ item.discount }}%
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -85,7 +99,11 @@
           <div class="price-summary">
             <div class="summary-row">
               <span>Subtotal</span>
-              <span>{{ formatPrice(subtotal) }} đ</span>
+              <span>{{ formatPrice(originalSubtotal) }} đ</span>
+            </div>
+            <div v-if="totalSavings > 0" class="summary-row savings">
+              <span>Discount Savings</span>
+              <span>-{{ formatPrice(totalSavings) }} đ</span>
             </div>
             <div class="summary-row">
               <span>Shipping Fee</span>
@@ -116,6 +134,7 @@ import { useRouter } from "vue-router";
 import { useCartStore } from "@/stores/cart";
 import { useOrderStore } from "@/stores/order";
 import { APP_CONSTANTS } from "@/utils/constants";
+import { parseISO, isAfter, isBefore } from "date-fns";
 
 const app = getCurrentInstance();
 const router = useRouter();
@@ -133,15 +152,23 @@ const shippingInfo = ref({
   note: "",
 });
 
-const subtotal = computed(() => {
+const originalSubtotal = computed(() => {
   return cartItems.value.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
 });
 
+const totalSavings = computed(() => {
+  return cartItems.value.reduce((sum, item) => {
+    if (!isDiscountActive(item)) return sum;
+    const savings = ((item.price * item.discount) / 100) * item.quantity;
+    return sum + savings;
+  }, 0);
+});
+
 const total = computed(() => {
-  return subtotal.value + shippingFee;
+  return originalSubtotal.value - totalSavings.value + shippingFee;
 });
 
 function formatPrice(price) {
@@ -150,7 +177,7 @@ function formatPrice(price) {
 
 async function fetchCartItems() {
   try {
-    const response = await cartStore.fetchCartItems();
+    const response = await cartStore.updateCartCount();
     if (response.success) {
       cartItems.value = response.data;
     } else {
@@ -168,8 +195,6 @@ async function placeOrder() {
     isProcessing.value = true;
     const orderData = {
       ...shippingInfo.value,
-      total: total.value,
-      items: cartItems.value,
     };
 
     const result = await orderStore.createOrder(orderData);
@@ -199,6 +224,25 @@ function validateForm() {
     return false;
   }
   return true;
+}
+
+function calculateFinalPrice(item) {
+  if (!isDiscountActive(item)) return item.price;
+  return (item.price * (100 - item.discount)) / 100;
+}
+
+function calculateItemTotal(item) {
+  return calculateFinalPrice(item) * item.quantity;
+}
+
+function isDiscountActive(item) {
+  if (!item.startDate || !item.endDate || !item.discount) return false;
+
+  const now = new Date();
+  const startDate = parseISO(item.startDate);
+  const endDate = parseISO(item.endDate);
+
+  return isAfter(now, startDate) && isBefore(now, endDate);
 }
 
 onMounted(() => {
@@ -314,8 +358,36 @@ onMounted(() => {
 }
 
 .item-price {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.original-price {
+  text-decoration: line-through;
+  color: var(--light-text-color);
+  font-size: 0.9em;
+}
+
+.discounted-price {
   color: var(--primary-color);
   font-weight: 500;
+}
+
+.discount-badge {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75em;
+  font-weight: 500;
+}
+
+.savings {
+  color: var(--primary-color);
+  font-weight: 500;
+  font-style: italic;
 }
 
 .price-summary {

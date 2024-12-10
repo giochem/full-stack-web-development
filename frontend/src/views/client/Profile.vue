@@ -46,10 +46,15 @@
               </div>
               <div class="order-details">
                 <div class="order-info">
-                  <p class="order-date">{{ formatDate(order.createAt) }}</p>
-                  <p class="order-total">
-                    {{ formatPrice(order.totalAmount) }} đ
-                  </p>
+                  <p class="order-date">{{ formatDate(order.createdAt) }}</p>
+                  <div class="shipping-details">
+                    <p><i class="ri-user-line"></i> {{ order.fullName }}</p>
+                    <p><i class="ri-phone-line"></i> {{ order.phone }}</p>
+                    <p><i class="ri-map-pin-line"></i> {{ order.address }}</p>
+                    <p v-if="order.note">
+                      <i class="ri-file-list-line"></i> {{ order.note }}
+                    </p>
+                  </div>
                 </div>
                 <button
                   @click="viewOrderDetails(order.orderID)"
@@ -151,7 +156,8 @@ function formatPrice(price) {
 }
 
 function viewOrderDetails(orderID) {
-  router.push(`/orders/${orderID}`);
+  alert("this function is not implemented yet");
+  // router.push(`/orders/${orderID}`);
 }
 
 async function handleUpdateProfile() {
@@ -319,12 +325,31 @@ onMounted(async () => {
 }
 
 .order-info {
-  color: var(--light-text-color);
+  flex: 1;
 }
 
-.order-total {
-  font-weight: 500;
-  color: var(--primary-color);
+.order-date {
+  color: var(--light-text-color);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.shipping-details {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--secondary-dark-color);
+}
+
+.shipping-details p {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.25rem 0;
+}
+
+.shipping-details i {
+  color: var(--light-text-color);
+  font-size: 1.1rem;
 }
 
 .view-btn {
