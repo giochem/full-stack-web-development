@@ -2,3 +2,4 @@
 *.env
 backend/src/uploads/*
 backend/src/**/uploads/
+*.session.sql
