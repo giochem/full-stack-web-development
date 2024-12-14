@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model shipment {
+  shipment_id             Int      @id @default(autoincrement())
+  partner_id              Int
+  label                   String
+  fee                     Int      @default(0)
+  insurance_fee           Int      @default(0)
+  estimated_pick_time     DateTime @default(now())
+  estimated_delivery_time DateTime @default(now())
+}
+
+model detail_shipment {
+  detail_shipment_id Int     @id @default(autoincrement())
+  is_freeship        Boolean
+  weight_option      String
+  total_weight       Float
+  pick_work_shift    Int
+  deliver_work_shift Int
+
+  pick_name       String
+  pick_money      Int
+  pick_address_id Int
+  pick_address    String
+  pick_province   String
+  pick_district   String
+  pick_ward       String
+  pick_street     String
+  pick_telephone  String
+  pick_email      String
+
+  delivery_name      String
+  delivery_address   String
+  delivery_province  String
+  delivery_district  String
+  delivery_ward      String
+  delivery_street    String
+  delivery_telephone String
+  delivery_email     String
+  delivery_note      String
+
+  use_return_address Boolean
+  return_name        String
+  return_address     String
+  return_province    String
+  return_district    String
+  return_ward        String
+  return_street      String
+  return_telephone   String
+  return_email       String
+}
+
+model partner_address {
+  partner_address_id Int    @id @default(autoincrement())
+  partner_id         Int
+  name               String
+  address            String
+  province           String
+  district           String
+  ward               String
+  street             String
+  telephone          String
+  email              String
+}
+
+model Partner {
+  partner_id   Int    @id @default(autoincrement())
+  partner_name String
+}
