@@ -8,7 +8,7 @@ module.exports = {
     sortBy,
     sortOrder,
     searchText,
-    filterRole,
+    filterRole
   }) => {
     const conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
@@ -55,7 +55,6 @@ module.exports = {
     const conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
     console.log("procedure getUserByEmail");
-
     const data = await conn
       .request()
       .input("email", sql.NVarChar(255), email)
@@ -129,5 +128,5 @@ module.exports = {
 
     await conn.close();
     console.log("Connection closed.");
-  },
+  }
 };

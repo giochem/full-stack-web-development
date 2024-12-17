@@ -3,24 +3,27 @@
     <header class="page-header">
       <div class="header-content">
         <div class="header-title">
-          <h1>Add Product</h1>
+          <h1>{{ $t("Views.Admin.AddProduct.Title") }}</h1>
         </div>
       </div>
     </header>
 
     <div class="form-container">
       <div v-if="loading" class="loading-state">
-        <i class="ri-loader-4-line spinning"></i> Loading...
+        <i class="ri-loader-4-line spinning"></i>
+        {{ $t("Views.Admin.AddProduct.Loading") }}
       </div>
       <form v-else class="admin-form" @submit.prevent="handleSave">
         <div class="form-row">
           <div class="form-group">
-            <label for="name">Product Name</label>
+            <label for="name">{{
+              $t("Views.Admin.AddProduct.LabelName")
+            }}</label>
             <input
               id="name"
               v-model="product.name"
               type="text"
-              placeholder="Enter product name"
+              :placeholder="$t('Views.Admin.AddProduct.PlaceholderName')"
               :disabled="productStore.loading"
               required
             />
@@ -134,7 +137,7 @@ const product = ref({
   name: "",
   description: "",
   categoryID: "",
-  promotionID: "",
+  promotionID: ""
 });
 
 const activePromotions = computed(() => {
@@ -163,7 +166,7 @@ function formatDate(dateString) {
   return new Date(dateString).toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
-    day: "numeric",
+    day: "numeric"
   });
 }
 

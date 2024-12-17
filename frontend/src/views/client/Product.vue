@@ -103,13 +103,13 @@
       </div>
     </div>
 
-    <div v-else class="loading">Loading...</div>
+    <div v-else class="loading">{{ $t("Views.Client.Product.Loading") }}</div>
 
     <!-- Success Tooltip -->
     <div v-if="showTooltip" class="tooltip" :class="{ show: showTooltip }">
       <div class="tooltip-content">
         <i class="ri-check-line"></i>
-        <span>Added to cart successfully!</span>
+        <span>{{ $t("Views.Client.Product.AddedToCart") }}</span>
       </div>
     </div>
   </div>
@@ -149,7 +149,7 @@ const groupedVariations = computed(() => {
     if (!groups[item.nameAtribute]) {
       groups[item.nameAtribute] = {
         nameAtribute: item.nameAtribute,
-        values: new Set(),
+        values: new Set()
       };
     }
     groups[item.nameAtribute].values.add(item.value);
@@ -157,7 +157,7 @@ const groupedVariations = computed(() => {
 
   return Object.values(groups).map((group) => ({
     ...group,
-    values: Array.from(group.values),
+    values: Array.from(group.values)
   }));
 });
 
@@ -173,16 +173,14 @@ const selectedVariant = computed(() => {
         productItemID: key,
         price: item.price,
         quantity: item.quantity,
-        variations: [],
+        variations: []
       });
     }
     variants.get(key).variations.push({
       nameAtribute: item.nameAtribute,
-      value: item.value,
+      value: item.value
     });
   });
-  // console.log(variants);
-  // console.log(selectedVariations.value);
   // Find variant that matches all selected variations
   for (const [_, variant] of variants) {
     const matches = variant.variations.every(
@@ -214,7 +212,7 @@ const selectVariation = (attribute, value) => {
     // Select the new value for this attribute
     selectedVariations.value = {
       ...selectedVariations.value,
-      [attribute]: value,
+      [attribute]: value
     };
   }
 };
@@ -255,7 +253,7 @@ const addToCart = async () => {
     console.log(quantity.value);
     const result = await cartStore.addToCart({
       quantity: quantity.value,
-      productItemId: selectedVariant.value.productItemID,
+      productItemId: selectedVariant.value.productItemID
     });
 
     if (result.success) {
@@ -286,7 +284,7 @@ const calculateFinalPrice = (price) => {
 
 // Add these computed properties
 const isDiscountActive = computed(() => {
-  return discountStatus.value === 'active';
+  return discountStatus.value === "active";
 });
 
 const formatDiscountPeriod = computed(() => {
@@ -302,18 +300,18 @@ const formatStartDate = computed(() => {
 });
 
 const discountStatus = computed(() => {
-  if (!product.value?.startDate || !product.value?.endDate) return 'none';
-  
+  if (!product.value?.startDate || !product.value?.endDate) return "none";
+
   const now = new Date();
   const startDate = parseISO(product.value.startDate);
   const endDate = parseISO(product.value.endDate);
-  
+
   if (isBefore(now, startDate)) {
-    return 'upcoming';
+    return "upcoming";
   } else if (isAfter(now, endDate)) {
-    return 'expired';
+    return "expired";
   } else {
-    return 'active';
+    return "active";
   }
 });
 

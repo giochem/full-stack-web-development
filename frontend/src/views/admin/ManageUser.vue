@@ -2,7 +2,7 @@
   <div class="admin-page">
     <header class="page-header">
       <div class="header-content">
-        <h1>Manage Users</h1>
+        <h1>{{ $t("Views.Admin.ManageUser.Title") }}</h1>
         <div class="header-actions">
           <div class="filter-group">
             <div class="search-box">
@@ -10,7 +10,7 @@
               <input
                 type="text"
                 v-model="searchQuery"
-                placeholder="Search users..."
+                :placeholder="$t('Views.Admin.ManageUser.SearchPlaceholder')"
                 @keyup.enter="handleSearch"
                 :disabled="userStore.loading"
               />
@@ -37,7 +37,7 @@
 
           <RouterLink to="/admin/add-user" class="add-button">
             <i class="ri-add-line"></i>
-            Add User
+            {{ $t("Views.Admin.ManageUser.AddUser") }}
           </RouterLink>
         </div>
       </div>
@@ -49,32 +49,34 @@
           <tr>
             <th>
               <div class="th-content">
-                ID
+                {{ $t("Views.Admin.ManageUser.UserID") }}
                 <!-- <i :class="getSortIcon('userID')"></i> -->
               </div>
             </th>
             <th>
               <div class="th-content" @click="toggleSort('username')">
-                Username
+                {{ $t("Views.Admin.ManageUser.Username") }}
                 <i :class="getSortIcon('username')"></i>
               </div>
             </th>
             <th>
               <div class="th-content" @click="toggleSort('email')">
-                Email
+                {{ $t("Views.Admin.ManageUser.Email") }}
                 <i :class="getSortIcon('email')"></i>
               </div>
             </th>
-            <th>Role</th>
-            <th>Cart</th>
-            <th>Order</th>
+            <th>
+              {{ $t("Views.Admin.ManageUser.Role") }}
+            </th>
+            <th>{{ $t("Views.Admin.ManageUser.Carts") }}</th>
+            <th>{{ $t("Views.Admin.ManageUser.Orders") }}</th>
             <th>
               <div class="th-content" @click="toggleSort('createdAt')">
-                Created At
+                {{ $t("Views.Admin.ManageUser.CreatedAt") }}
                 <i :class="getSortIcon('createdAt')"></i>
               </div>
             </th>
-            <th>Actions</th>
+            <th>{{ $t("Views.Admin.ManageUser.Actions") }}</th>
           </tr>
         </thead>
         <tbody>
@@ -91,7 +93,9 @@
                 class="stat-link"
               >
                 <span class="stat-count">{{ user.numCartItems }}</span>
-                <span class="stat-label">items</span>
+                <span class="stat-label">{{
+                  $t("Views.Admin.ManageUser.NumItems")
+                }}</span>
               </RouterLink>
             </td>
             <td>
@@ -100,7 +104,9 @@
                 class="stat-link"
               >
                 <span class="stat-count">{{ user.numOrders }}</span>
-                <span class="stat-label">orders</span>
+                <span class="stat-label">{{
+                  $t("Views.Admin.ManageUser.NumOrders")
+                }}</span>
               </RouterLink>
             </td>
             <td class="created-at">{{ user.createdAt }}</td>
@@ -197,7 +203,7 @@ async function handleFiltersChange() {
     sortBy: sortBy.value,
     sortOrder: sortOrder.value,
     filterRole: filterRole.value,
-    searchText: searchQuery.value,
+    searchText: searchQuery.value
   });
 
   if (!result.success) {
@@ -231,7 +237,7 @@ async function changePage(newPage) {
     sortBy: sortBy.value,
     sortOrder: sortOrder.value,
     filterRole: filterRole.value,
-    searchText: searchQuery.value,
+    searchText: searchQuery.value
   });
 
   if (!result.success) {
@@ -245,7 +251,7 @@ async function handlePageSizeChange() {
     sortBy: sortBy.value,
     sortOrder: sortOrder.value,
     filterRole: filterRole.value,
-    searchText: searchQuery.value,
+    searchText: searchQuery.value
   });
 
   if (!result.success) {

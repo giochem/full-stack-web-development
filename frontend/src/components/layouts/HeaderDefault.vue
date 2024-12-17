@@ -7,9 +7,15 @@
             $t("Components.Layouts.HeaderDefault.Home")
           }}</RouterLink>
         </div>
-
+        <div class="nav-brand">
+          <RouterLink to="/category">{{
+            $t("Components.Layouts.HeaderDefault.Category")
+          }}</RouterLink>
+        </div>
         <div class="nav-logo">
-          <RouterLink to="/">.369</RouterLink>
+          <RouterLink to="/">{{
+            $t("Components.Layouts.HeaderDefault.NameStore")
+          }}</RouterLink>
         </div>
 
         <div class="nav-menu">
@@ -25,9 +31,15 @@
                 </span>
               </div>
             </RouterLink>
-            <button @click="handleLogout" class="action-button logout" :disabled="isLoggingOut">
+            <button
+              @click="handleLogout"
+              class="action-button logout"
+              :disabled="isLoggingOut"
+            >
               <i class="ri-logout-box-line"></i>
-              <span class="button-text">{{ isLoggingOut ? 'Logging out...' : 'Logout' }}</span>
+              <span class="button-text">{{
+                isLoggingOut ? "Logging out..." : "Logout"
+              }}</span>
             </button>
           </template>
           <template v-else>
@@ -84,7 +96,7 @@ async function handleLogout() {
       "http://localhost:5000/api/auth/logout",
       {},
       {
-        withCredentials: true,
+        withCredentials: true
       }
     );
 
@@ -356,7 +368,7 @@ watch(isLoggedIn, async (newValue) => {
   .button-text {
     display: inline;
   }
-  
+
   .action-button {
     margin-left: 1rem;
   }

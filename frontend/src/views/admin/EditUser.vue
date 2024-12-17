@@ -3,7 +3,7 @@
     <header class="page-header">
       <div class="header-content">
         <div class="header-title">
-          <h1>Edit User</h1>
+          <h1>{{ $t("Views.Admin.EditUser.Title") }}</h1>
         </div>
       </div>
     </header>
@@ -92,7 +92,7 @@ const form = ref({
   email: "",
   username: "",
   password: "",
-  role: "client",
+  role: "client"
 });
 
 async function handleSave() {
@@ -115,7 +115,7 @@ onMounted(async () => {
       email: result.data.email,
       username: result.data.username,
       password: "",
-      role: result.data.role,
+      role: result.data.role
     };
   } else {
     app?.proxy.$notify(result.message, "error");

@@ -35,5 +35,5 @@ module.exports = {
       .request()
       .input("categoryID", sql.Int, categoryID)
       .execute("deleteCategory");
-  },
+  }
 };

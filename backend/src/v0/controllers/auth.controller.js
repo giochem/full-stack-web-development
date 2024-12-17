@@ -1,13 +1,13 @@
 const userService = require("../services/users.service");
 const Response = require("../configs/response");
 const { Message, StatusCode } = require("../utils/constants");
-
+var sha256 = require("hash.js/lib/hash/sha/256");
 module.exports = {
   login: async (req, res, next) => {
     try {
-      const { email, password } = req.body;
+      let { email, password } = req.body;
       const user = await userService.getUserByEmail(email);
-
+      password = sha256().update(password).digest("hex").toString();
       if (user.length === 0 || user[0].password !== password) {
         return Response.error(
           res,
@@ -45,7 +45,7 @@ module.exports = {
 
   register: async (req, res, next) => {
     try {
-      const { username, email, password } = req.body;
+      let { username, email, password } = req.body;
       const user = await userService.getUserByEmail(email);
 
       if (user.length !== 0) {
@@ -56,12 +56,12 @@ module.exports = {
           StatusCode.CONFLICT
         );
       }
-
+      password = sha256().update(password).digest("hex").toString();
       const newData = await userService.createUser({
         username,
         email,
         password,
-        role: "client",
+        role: "client"
       });
 
       req.session.userID = newData[0].userID;
@@ -81,5 +81,5 @@ module.exports = {
   logout: async (req, res, next) => {
     req.session.destroy();
     return Response.success(res, Message.SUCCESS_LOGOUT, null, StatusCode.OK);
-  },
+  }
 };

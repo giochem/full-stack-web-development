@@ -2,7 +2,9 @@
   <aside class="admin-sidebar">
     <nav class="sidebar-nav">
       <div class="sidebar-header">
-        <h1 class="brand">.369</h1>
+        <h1 class="brand">
+          {{ $t("Components.Layouts.NavbarAdmin.Brand") }}
+        </h1>
       </div>
 
       <ul class="nav-list">
@@ -14,7 +16,7 @@
             exact
           >
             <i class="ri-dashboard-line"></i>
-            <span>Dashboard</span>
+            <span>{{ $t("Components.Layouts.NavbarAdmin.Dashboard") }}</span>
           </RouterLink>
         </li>
 
@@ -25,12 +27,14 @@
             :class="{ active: currentPath === '/admin/manage-user' }"
           >
             <i class="ri-user-line"></i>
-            <span>Users</span>
+            <span>{{ $t("Components.Layouts.NavbarAdmin.Users") }}</span>
           </RouterLink>
         </li>
 
         <li class="nav-group">
-          <span class="nav-group-title">Products</span>
+          <span class="nav-group-title">{{
+            $t("Components.Layouts.NavbarAdmin.Products")
+          }}</span>
           <ul class="nav-sublist">
             <li class="nav-item">
               <RouterLink
@@ -39,7 +43,7 @@
                 :class="{ active: currentPath === '/admin/manage-product' }"
               >
                 <i class="ri-shopping-bag-line"></i>
-                <span>Products</span>
+                <span>{{ $t("Components.Layouts.NavbarAdmin.Products") }}</span>
               </RouterLink>
             </li>
             <li class="nav-item">
@@ -49,7 +53,9 @@
                 :class="{ active: currentPath === '/admin/manage-variations' }"
               >
                 <i class="ri-list-settings-line"></i>
-                <span>Variations</span>
+                <span>{{
+                  $t("Components.Layouts.NavbarAdmin.Variations")
+                }}</span>
               </RouterLink>
             </li>
             <li class="nav-item">
@@ -59,7 +65,9 @@
                 :class="{ active: currentPath === '/admin/manage-category' }"
               >
                 <i class="ri-folder-2-line"></i>
-                <span>Categories</span>
+                <span>{{
+                  $t("Components.Layouts.NavbarAdmin.Categories")
+                }}</span>
               </RouterLink>
             </li>
           </ul>
@@ -72,7 +80,7 @@
             :class="{ active: currentPath === '/admin/manage-promotion' }"
           >
             <i class="ri-price-tag-3-line"></i>
-            <span>Promotions</span>
+            <span>{{ $t("Components.Layouts.NavbarAdmin.Promotions") }}</span>
           </RouterLink>
         </li>
 
@@ -83,7 +91,7 @@
             :class="{ active: currentPath === '/admin/manage-cart' }"
           >
             <i class="ri-shopping-cart-line"></i>
-            <span>Carts</span>
+            <span>{{ $t("Components.Layouts.NavbarAdmin.Carts") }}</span>
           </RouterLink>
         </li>
 
@@ -94,7 +102,7 @@
             :class="{ active: currentPath === '/admin/manage-order' }"
           >
             <i class="ri-file-list-line"></i>
-            <span>Orders</span>
+            <span>{{ $t("Components.Layouts.NavbarAdmin.Orders") }}</span>
           </RouterLink>
         </li>
       </ul>
@@ -106,7 +114,11 @@
           :disabled="isLoggingOut"
         >
           <i class="ri-logout-box-line"></i>
-          <span>{{ isLoggingOut ? "Logging out..." : "Logout" }}</span>
+          <span>{{
+            isLoggingOut
+              ? $t("Components.Layouts.NavbarAdmin.LoggingOut")
+              : $t("Components.Layouts.NavbarAdmin.Logout")
+          }}</span>
         </button>
       </div>
     </nav>
@@ -130,7 +142,7 @@ async function handleLogout() {
       "http://localhost:5000/api/auth/logout",
       {},
       {
-        withCredentials: true,
+        withCredentials: true
       }
     );
 

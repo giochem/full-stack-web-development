@@ -47,6 +47,7 @@
                 v-model="form.password"
                 type="password"
                 required
+                autocomplete="on"
                 :placeholder="$t('Views.Auth.PlaceholderPassword')"
               />
             </div>
@@ -60,6 +61,7 @@
                 v-model="form.password2"
                 type="password"
                 required
+                autocomplete="on"
                 :placeholder="$t('Views.Auth.PlaceholderPassword2')"
               />
             </div>
@@ -110,7 +112,7 @@ const status = ref("login");
 const form = ref({
   email: "",
   password: "",
-  password2: "",
+  password2: ""
 });
 
 async function login() {

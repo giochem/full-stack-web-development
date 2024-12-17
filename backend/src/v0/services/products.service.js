@@ -89,7 +89,7 @@ module.exports = {
       price,
       quantity,
       image,
-      variationOptionList,
+      variationOptionList
     } = productItem;
     const conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
@@ -134,5 +134,5 @@ module.exports = {
       .request()
       .input("productItemID", sql.Int, productItemID)
       .execute("deleteProductItem");
-  },
+  }
 };

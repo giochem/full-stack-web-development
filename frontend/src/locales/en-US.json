@@ -3,7 +3,9 @@
     "Layouts": {
       "HeaderDefault": {
         "Home": "Home",
-        "Auth": "Authentication"
+        "Auth": "Authentication",
+        "Category": "Category",
+        "NameStore": "369 Fashion"
       },
       "FooterDefault": {
         "CompanyName": "369 Fashion Joint Stock Company",
@@ -12,7 +14,7 @@
         "GPKD": "Business License",
         "EmailPlaceholder": "Enter your email",
         "Subscribe": "Sign Up",
-        "ShortCompanyName": "369 Fashion"
+        "Copyright": "Copyright 2024 © 369 Fashion - All rights reserved."
       }
     }
   },
@@ -27,12 +29,25 @@
       "LabelPassword": "Password",
       "PlaceholderPassword": "Enter your password",
       "LabelPassword2": "Re-enter your password",
+      "PlaceholderPassword2": "Re-enter your password",
       "CreateAccount": "Create a new account",
       "HaveAccount": "Already have an account?",
       "ForgotPassword": "Forgot password?"
     },
     "Client": {
-      "Title": "Featured products",
+        "Home": {
+          "Title": "Featured products",
+          "Loading": "Loading products...",
+          "Error": "An error occurred",
+          "NoProducts": "The store currently has no products."
+        },
+        "Product": {
+          "Loading": "Loading products...",
+          "AddedToCart": "Added to cart successfully!"
+        }
+    },
+    "Admin": {
+      "Title": "Manage Products",
       "Loading": "Loading products...",
       "Error": "An error occurred",
       "NoProducts": "The store currently has no products."

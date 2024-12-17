@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-
+var sha256 = require("hash.js/lib/hash/sha/256");
 // Utility functions for generating random data
 const getRandomInt = (min, max) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
@@ -32,11 +32,12 @@ const generateUsers = () => {
   let content = "INSERT INTO users (username, email, password, role) VALUES\n";
   const roles = ["client", "admin"];
 
-  content += `('admin', 'admin@example.com', '1', 'admin'),\n`;
+  const hashedPassword = sha256().update("1").digest("hex");
+  content += `('admin', 'admin@example.com', '${hashedPassword}', 'admin'),\n`;
   for (let i = 2; i <= ROWS_USERS; i++) {
     content += `('client_${i - 1}', 'client${
       i - 1
-    }@example.com', '1', 'client')`;
+    }@example.com', '${hashedPassword}', 'client')`;
     content += i === ROWS_USERS ? ";\n" : ",\n";
   }
   return content;

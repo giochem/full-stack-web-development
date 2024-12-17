@@ -1,7 +1,7 @@
 const userService = require("../services/users.service");
+var sha256 = require("hash.js/lib/hash/sha/256");
 const Response = require("../configs/response");
 const { Message, StatusCode } = require("../utils/constants");
-
 module.exports = {
   getUsers: async (req, res, next) => {
     try {
@@ -15,7 +15,7 @@ module.exports = {
         sortBy,
         sortOrder,
         searchText,
-        filterRole,
+        filterRole
       });
       // keyset-based
       // const data = await userService.getUsersByKeysetBased(lastID, limit);
@@ -56,7 +56,7 @@ module.exports = {
 
   createUser: async (req, res, next) => {
     try {
-      const { username, email, password, role } = req.body;
+      let { username, email, password, role } = req.body;
       const user = await userService.getUserByEmail(email);
       if (user.length !== 0) {
         return Response.error(
@@ -66,11 +66,12 @@ module.exports = {
           StatusCode.CONFLICT
         );
       }
+      password = sha256().update(password).digest("hex").toString();
       const newUser = await userService.createUser({
         username,
         email,
         password,
-        role,
+        role
       });
       return Response.success(
         res,
@@ -86,15 +87,15 @@ module.exports = {
 
   updateUser: async (req, res, next) => {
     try {
-      const { username, email, password, role } = req.body;
+      let { username, email, password, role } = req.body;
       const { userID } = req.params;
-
+      password = sha256().update(password).digest("hex").toString();
       await userService.updateUser({
         userID,
         username,
         email,
         password,
-        role,
+        role
       });
       return Response.success(
         res,
@@ -121,5 +122,5 @@ module.exports = {
       console.error("Error in deleteUser controller:", error);
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);
     }
-  },
+  }
 };
