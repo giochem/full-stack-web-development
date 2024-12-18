@@ -9,7 +9,7 @@ const ALLOWED_TYPES = {
   "image/jpg": "jpg",
   "image/png": "png",
   "image/gif": "gif",
-  "image/webp": "webp",
+  "image/webp": "webp"
 };
 
 const storage = multer.diskStorage({
@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     cb(null, `${randomUUID()}.${ALLOWED_TYPES[file.mimetype]}`);
-  },
+  }
 });
 
 // File filter to check file type
@@ -34,8 +34,8 @@ const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
-  },
+    fileSize: 10 * 1024 * 1024 // 10MB limit
+  }
 });
 
 module.exports = { upload };

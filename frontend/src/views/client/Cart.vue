@@ -18,13 +18,19 @@
             <div class="item-details">
               <h3 class="item-name">{{ item.name }}</h3>
               <div class="item-price">
-                <span v-if="item.discount && isDiscountActive(item)" class="original-price">
+                <span
+                  v-if="item.discount && isDiscountActive(item)"
+                  class="original-price"
+                >
                   {{ formatPrice(item.price) }} đ
                 </span>
                 <span :class="{ 'discounted-price': isDiscountActive(item) }">
                   {{ formatPrice(calculateFinalPrice(item)) }} đ
                 </span>
-                <span v-if="item.discount && isDiscountActive(item)" class="discount-badge">
+                <span
+                  v-if="item.discount && isDiscountActive(item)"
+                  class="discount-badge"
+                >
                   -{{ item.discount }}%
                 </span>
               </div>
@@ -111,7 +117,7 @@ const shippingFee = APP_CONSTANTS.ORDER.SHIPPING_FEE;
 
 const originalSubtotal = computed(() => {
   return cartItems.value.reduce(
-    (sum, item) => sum + (item.price * item.quantity),
+    (sum, item) => sum + item.price * item.quantity,
     0
   );
 });
@@ -119,7 +125,7 @@ const originalSubtotal = computed(() => {
 const totalSavings = computed(() => {
   return cartItems.value.reduce((sum, item) => {
     if (!isDiscountActive(item)) return sum;
-    const savings = (item.price * item.discount / 100) * item.quantity;
+    const savings = ((item.price * item.discount) / 100) * item.quantity;
     return sum + savings;
   }, 0);
 });
@@ -145,7 +151,7 @@ async function updateQuantity(item, change) {
 
   const result = await cartStore.addToCart({
     quantity: newQuantity,
-    productItemId: item.productItemID,
+    productItemId: item.productItemID
   });
   if (result.success) {
     await fetchCartItems();
@@ -155,7 +161,7 @@ async function updateQuantity(item, change) {
 async function removeItem(item) {
   const result = await cartStore.addToCart({
     quantity: 0,
-    productItemId: item.productItemID,
+    productItemId: item.productItemID
   });
   if (result.success) {
     await fetchCartItems();
@@ -172,11 +178,11 @@ onMounted(() => {
 
 function isDiscountActive(item) {
   if (!item.startDate || !item.endDate || !item.discount) return false;
-  
+
   const now = new Date();
   const startDate = parseISO(item.startDate);
   const endDate = parseISO(item.endDate);
-  
+
   return isAfter(now, startDate) && isBefore(now, endDate);
 }
 

@@ -12,7 +12,7 @@ const MESSAGE = {
   ERROR_USER_NOT_FOUND: "User not found",
   ERROR_UPDATE_USER: "Failed to update user",
   ERROR_CREATE_USER: "Failed to create user",
-  ERROR_SEARCH_USERS: "Failed to search users",
+  ERROR_SEARCH_USERS: "Failed to search users"
 };
 
 export const useUserStore = defineStore("user", {
@@ -22,7 +22,7 @@ export const useUserStore = defineStore("user", {
     loading: false,
     error: null,
     hasNextPage: true,
-    searchText: "",
+    searchText: ""
   }),
 
   actions: {
@@ -37,7 +37,7 @@ export const useUserStore = defineStore("user", {
           sortBy: filters.sortBy,
           sortOrder: filters.sortOrder,
           ...(filters.filterRole && { role: filters.filterRole }),
-          ...(filters.searchText && { searchText: filters.searchText }),
+          ...(filters.searchText && { searchText: filters.searchText })
         };
 
         const response = await axios[
@@ -50,7 +50,7 @@ export const useUserStore = defineStore("user", {
         return {
           success: response.data.success,
           message: response.data.message || MESSAGE.SUCCESS_GET_USERS,
-          data: this.users,
+          data: this.users
         };
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -58,7 +58,7 @@ export const useUserStore = defineStore("user", {
         this.error = errorMessage;
         return {
           success: false,
-          message: errorMessage,
+          message: errorMessage
         };
       } finally {
         this.loading = false;
@@ -74,7 +74,7 @@ export const useUserStore = defineStore("user", {
         const response = await axios[
           API_ENDPOINTS.USERS.SEARCH.method.toLowerCase()
         ](API_ENDPOINTS.USERS.SEARCH.url, {
-          params: { searchText: searchText },
+          params: { searchText: searchText }
         });
 
         this.users = response.data.data;
@@ -84,7 +84,7 @@ export const useUserStore = defineStore("user", {
         return {
           success: response.data.success,
           message: response.data.message || MESSAGE.SUCCESS_SEARCH_USERS,
-          data: this.users,
+          data: this.users
         };
       } catch (error) {
         console.error("Error searching users:", error);
@@ -92,7 +92,7 @@ export const useUserStore = defineStore("user", {
         this.error = errorMessage;
         return {
           success: false,
-          message: errorMessage,
+          message: errorMessage
         };
       } finally {
         this.loading = false;
@@ -112,7 +112,7 @@ export const useUserStore = defineStore("user", {
         return {
           success: response.data.success,
           message: response.data.message || MESSAGE.SUCCESS_GET_USER,
-          data: this.currentUser,
+          data: this.currentUser
         };
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -120,7 +120,7 @@ export const useUserStore = defineStore("user", {
         this.error = errorMessage;
         return {
           success: false,
-          message: errorMessage,
+          message: errorMessage
         };
       } finally {
         this.loading = false;
@@ -139,7 +139,7 @@ export const useUserStore = defineStore("user", {
         return {
           success: response.data.success,
           message: response.data.message || MESSAGE.SUCCESS_CREATE_USER,
-          data: response.data.data,
+          data: response.data.data
         };
       } catch (error) {
         console.error("Error creating user:", error);
@@ -147,7 +147,7 @@ export const useUserStore = defineStore("user", {
         this.error = errorMessage;
         return {
           success: false,
-          message: errorMessage,
+          message: errorMessage
         };
       } finally {
         this.loading = false;
@@ -174,6 +174,6 @@ export const useUserStore = defineStore("user", {
 
     clearError() {
       this.error = null;
-    },
-  },
+    }
+  }
 });

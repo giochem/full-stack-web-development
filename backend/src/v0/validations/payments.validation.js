@@ -10,7 +10,7 @@ module.exports = {
       .optional()
       .isLength({ min: 2, max: 100 })
       .withMessage("Name must be between 2 and 100 characters"),
-    body("price").notEmpty().isFloat().withMessage("Price is required"),
+    body("price").notEmpty().isFloat().withMessage("Price is required")
   ],
 
   deletePromotion: [
@@ -18,6 +18,6 @@ module.exports = {
       .notEmpty()
       .withMessage("promotionID is required")
       .isInt()
-      .withMessage("promotionID must be an integer"),
-  ],
+      .withMessage("promotionID must be an integer")
+  ]
 };

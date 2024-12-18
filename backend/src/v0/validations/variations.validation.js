@@ -6,10 +6,10 @@ module.exports = {
       .optional()
       .isInt()
       .withMessage("variationID must be an integer"),
-    body("nameAtribute").optional(),
+    body("nameAtribute").optional()
   ],
 
   deleteVariation: [
-    param("variationID").isInt().withMessage("variationID must be an integer"),
-  ],
+    param("variationID").isInt().withMessage("variationID must be an integer")
+  ]
 };

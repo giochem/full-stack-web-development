@@ -25,7 +25,7 @@ module.exports = {
       const newPayment = await paymentService.upsertPayment({
         paymentID,
         name,
-        price,
+        price
       });
       return Response.success(
         res,
@@ -53,5 +53,5 @@ module.exports = {
       console.error("Error in deletePayment controller:", error);
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);
     }
-  },
+  }
 };

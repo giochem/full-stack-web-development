@@ -7,7 +7,7 @@ module.exports = {
       .withMessage("page in query is required and >= 0"),
     query("size")
       .isInt({ min: 1 })
-      .withMessage("size in query is required and >= 1"),
+      .withMessage("size in query is required and >= 1")
   ],
 
   getOrderItem: [
@@ -15,7 +15,7 @@ module.exports = {
       .notEmpty()
       .withMessage("orderID is required")
       .isInt()
-      .withMessage("orderID must be an integer"),
+      .withMessage("orderID must be an integer")
   ],
 
   createOrder: [
@@ -34,7 +34,7 @@ module.exports = {
       .withMessage("address is required")
       .isString()
       .withMessage("address must be a string"),
-    body("note").optional().isString().withMessage("note must be a string"),
+    body("note").optional().isString().withMessage("note must be a string")
   ],
 
   updateOrder: [
@@ -46,7 +46,7 @@ module.exports = {
     body("status")
       .optional()
       .isIn(["processing", "completed", "cancelled"])
-      .withMessage("Invalid status value"),
+      .withMessage("Invalid status value")
   ],
 
   deleteOrder: [
@@ -54,6 +54,6 @@ module.exports = {
       .notEmpty()
       .withMessage("orderID is required")
       .isInt()
-      .withMessage("orderID must be an integer"),
-  ],
+      .withMessage("orderID must be an integer")
+  ]
 };

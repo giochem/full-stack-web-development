@@ -165,7 +165,7 @@ const formData = ref({
   name: "",
   discount: 0,
   startDate: "",
-  endDate: "",
+  endDate: ""
 });
 
 const modalTitle = computed(() =>
@@ -245,7 +245,7 @@ const resetForm = () => {
     startDate: formatDateForInput(new Date()),
     endDate: formatDateForInput(
       new Date(new Date().setDate(new Date().getDate() + 30))
-    ),
+    )
   };
   validationErrors.value = {};
 };
@@ -264,7 +264,7 @@ const editPromotion = (promotion) => {
     name: promotion.name,
     discount: promotion.discount,
     startDate: formatDateForInput(promotion.startDate),
-    endDate: formatDateForInput(promotion.endDate),
+    endDate: formatDateForInput(promotion.endDate)
   };
   validationErrors.value = {};
   showModal.value = true;
@@ -280,7 +280,7 @@ const handleSubmit = async () => {
 
   const result = await promotionStore.upsertPromotion({
     ...formData.value,
-    promotionID: isEditing.value ? editingId.value : undefined,
+    promotionID: isEditing.value ? editingId.value : undefined
   });
 
   if (result.success) {

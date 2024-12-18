@@ -37,5 +37,5 @@ module.exports = {
       .request()
       .input("variationID", sql.Int, variationID)
       .execute("deleteVariation");
-  },
+  }
 };

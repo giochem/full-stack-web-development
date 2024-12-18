@@ -11,7 +11,7 @@ module.exports = {
     query("searchText")
       .optional()
       .isString()
-      .withMessage("searchText in query must be a string"),
+      .withMessage("searchText in query must be a string")
   ],
 
   getCart: [
@@ -19,7 +19,7 @@ module.exports = {
       .notEmpty()
       .withMessage("userID is required")
       .isInt()
-      .withMessage("userID must be an integer"),
+      .withMessage("userID must be an integer")
   ],
 
   upsertCart: [
@@ -30,6 +30,6 @@ module.exports = {
       .withMessage("productItemID must be an integer"),
     body("quantity")
       .isInt({ min: 0 })
-      .withMessage("Quantity must be at least 0"),
-  ],
+      .withMessage("Quantity must be at least 0")
+  ]
 };

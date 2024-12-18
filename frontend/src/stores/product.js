@@ -13,7 +13,7 @@ const MESSAGE = {
   ERROR_GET_PRODUCT: "Failed to fetch product",
   ERROR_CREATE_PRODUCT: "Failed to create product",
   ERROR_UPDATE_PRODUCT: "Failed to update product",
-  ERROR_DELETE_PRODUCT: "Failed to delete product",
+  ERROR_DELETE_PRODUCT: "Failed to delete product"
 };
 
 export const useProductStore = defineStore("product", {
@@ -27,7 +27,7 @@ export const useProductStore = defineStore("product", {
     promotions: [],
     currentProductItems: [],
     modifiedItems: new Set(),
-    deletedItemIds: [],
+    deletedItemIds: []
   }),
 
   actions: {
@@ -46,7 +46,7 @@ export const useProductStore = defineStore("product", {
         return {
           success: response.data.success,
           message: response.data.message || MESSAGE.SUCCESS_GET_PRODUCTS,
-          data: this.products,
+          data: this.products
         };
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -54,7 +54,7 @@ export const useProductStore = defineStore("product", {
         this.error = errorMessage;
         return {
           success: false,
-          message: errorMessage,
+          message: errorMessage
         };
       } finally {
         this.loading = false;
@@ -74,7 +74,7 @@ export const useProductStore = defineStore("product", {
         return {
           success: response.data.success,
           message: response.data.message || MESSAGE.SUCCESS_GET_PRODUCT,
-          data: this.currentProduct,
+          data: this.currentProduct
         };
       } catch (error) {
         console.error("Error fetching product:", error);
@@ -82,7 +82,7 @@ export const useProductStore = defineStore("product", {
         this.error = errorMessage;
         return {
           success: false,
-          message: errorMessage,
+          message: errorMessage
         };
       } finally {
         this.loading = false;
@@ -97,14 +97,14 @@ export const useProductStore = defineStore("product", {
           API_ENDPOINTS.PRODUCTS.UPSERT.method.toLowerCase()
         ](API_ENDPOINTS.PRODUCTS.UPSERT.url, productData, {
           headers: {
-            "Content-Type": "multipart/form-data", // For image upload
-          },
+            "Content-Type": "multipart/form-data" // For image upload
+          }
         });
 
         return {
           success: response.data.success,
           message: response.data.message || MESSAGE.SUCCESS_CREATE_PRODUCT,
-          data: response.data.data,
+          data: response.data.data
         };
       } catch (error) {
         console.error("Error creating product:", error);
@@ -112,7 +112,7 @@ export const useProductStore = defineStore("product", {
         this.error = errorMessage;
         return {
           success: false,
-          message: errorMessage,
+          message: errorMessage
         };
       } finally {
         this.loading = false;
@@ -128,14 +128,14 @@ export const useProductStore = defineStore("product", {
           API_ENDPOINTS.PRODUCTS.UPSERT.method.toLowerCase()
         ](API_ENDPOINTS.PRODUCTS.UPSERT.url, productData, {
           headers: {
-            "Content-Type": "multipart/form-data", // For image upload
-          },
+            "Content-Type": "multipart/form-data" // For image upload
+          }
         });
 
         return {
           success: response.data.success,
           message: response.data.message || MESSAGE.SUCCESS_UPDATE_PRODUCT,
-          data: response.data.data,
+          data: response.data.data
         };
       } catch (error) {
         console.error("Error updating product:", error);
@@ -143,7 +143,7 @@ export const useProductStore = defineStore("product", {
         this.error = errorMessage;
         return {
           success: false,
-          message: errorMessage,
+          message: errorMessage
         };
       } finally {
         this.loading = false;
@@ -162,7 +162,7 @@ export const useProductStore = defineStore("product", {
         return {
           success: response.data.success,
           message: response.data.message || MESSAGE.SUCCESS_DELETE_PRODUCT,
-          data: response.data.data,
+          data: response.data.data
         };
       } catch (error) {
         console.error("Error deleting product:", error);
@@ -170,7 +170,7 @@ export const useProductStore = defineStore("product", {
         this.error = errorMessage;
         return {
           success: false,
-          message: errorMessage,
+          message: errorMessage
         };
       } finally {
         this.loading = false;
@@ -188,7 +188,7 @@ export const useProductStore = defineStore("product", {
         const [categories, promotions, variations] = result.data.data;
         this.categories = categories.map((category) => ({
           categoryID: category.categoryID,
-          name: category.name,
+          name: category.name
         }));
 
         this.promotions = promotions.map((promotion) => ({
@@ -196,15 +196,15 @@ export const useProductStore = defineStore("product", {
           name: promotion.name,
           discount: promotion.discount,
           startDate: promotion.startDate,
-          endDate: promotion.endDate,
+          endDate: promotion.endDate
         }));
         this.variations = variations.map((variation) => ({
           variationID: variation.variationID,
-          nameAtribute: variation.nameAtribute,
+          nameAtribute: variation.nameAtribute
         }));
         return {
           success: true,
-          message: "Successfully fetched product extra info",
+          message: "Successfully fetched product extra info"
         };
       } catch (error) {
         console.error("Error fetching extra info:", error);
@@ -212,7 +212,7 @@ export const useProductStore = defineStore("product", {
         this.error = errorMessage;
         return {
           success: false,
-          message: errorMessage,
+          message: errorMessage
         };
       } finally {
         this.loading = false;
@@ -253,7 +253,7 @@ export const useProductStore = defineStore("product", {
         const attributes = productItem.attributes.map((attr) => ({
           variationID: attr.variationID,
           nameAtribute: attr.nameAtribute,
-          value: attr.value,
+          value: attr.value
         }));
 
         formData.append("variationOptionList", JSON.stringify(attributes));
@@ -269,15 +269,15 @@ export const useProductStore = defineStore("product", {
           formData,
           {
             headers: {
-              "Content-Type": "multipart/form-data",
-            },
+              "Content-Type": "multipart/form-data"
+            }
           }
         );
 
         return {
           success: response.data.success,
           message: "Product item updated successfully",
-          data: response.data.data,
+          data: response.data.data
         };
       } catch (error) {
         console.error("Error updating product item:", error);
@@ -285,7 +285,7 @@ export const useProductStore = defineStore("product", {
         this.error = errorMessage;
         return {
           success: false,
-          message: errorMessage,
+          message: errorMessage
         };
       } finally {
         this.loading = false;
@@ -299,7 +299,7 @@ export const useProductStore = defineStore("product", {
         quantity: 0,
         image: "",
         attributes: [],
-        isNew: true,
+        isNew: true
       });
       this.modifiedItems.add(this.currentProductItems.length - 1);
     },
@@ -321,7 +321,7 @@ export const useProductStore = defineStore("product", {
       this.currentProductItems[itemIndex].attributes.push({
         variationID: defaultVariation.variationID,
         nameAtribute: defaultVariation.nameAtribute,
-        value: "",
+        value: ""
       });
       this.modifiedItems.add(itemIndex);
     },
@@ -373,6 +373,6 @@ export const useProductStore = defineStore("product", {
 
     clearDeletedItemIds() {
       this.deletedItemIds = [];
-    },
-  },
+    }
+  }
 });

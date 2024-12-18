@@ -6,14 +6,14 @@ const MESSAGE = {
   SUCCESS_SAVE_CATEGORY: "Category saved successfully",
   ERROR_SAVE_CATEGORY: "Failed to save category",
   SUCCESS_DELETE_CATEGORY: "Category deleted successfully",
-  ERROR_DELETE_CATEGORY: "Failed to delete category",
+  ERROR_DELETE_CATEGORY: "Failed to delete category"
 };
 
 export const useCategoryStore = defineStore("category", {
   state: () => ({
     categories: [],
     loading: false,
-    error: null,
+    error: null
   }),
 
   actions: {
@@ -56,7 +56,7 @@ export const useCategoryStore = defineStore("category", {
           API_ENDPOINTS.CATEGORIES.UPSERT.method.toLowerCase()
         ](API_ENDPOINTS.CATEGORIES.UPSERT.url, {
           categoryID: data.categoryID,
-          name: data.name.trim(),
+          name: data.name.trim()
         });
 
         if (response.data.success) {
@@ -64,7 +64,7 @@ export const useCategoryStore = defineStore("category", {
           return {
             success: true,
             message: MESSAGE.SUCCESS_SAVE_CATEGORY,
-            data: response.data.data,
+            data: response.data.data
           };
         }
 
@@ -73,7 +73,7 @@ export const useCategoryStore = defineStore("category", {
         console.error("Error saving category:", error);
         return {
           success: false,
-          message: this.getErrorMessage(error) || MESSAGE.ERROR_SAVE_CATEGORY,
+          message: this.getErrorMessage(error) || MESSAGE.ERROR_SAVE_CATEGORY
         };
       } finally {
         this.loading = false;
@@ -94,7 +94,7 @@ export const useCategoryStore = defineStore("category", {
           );
           return {
             success: true,
-            message: MESSAGE.SUCCESS_DELETE_CATEGORY,
+            message: MESSAGE.SUCCESS_DELETE_CATEGORY
           };
         }
 
@@ -103,11 +103,11 @@ export const useCategoryStore = defineStore("category", {
         console.error("Error deleting category:", error);
         return {
           success: false,
-          message: this.getErrorMessage(error) || MESSAGE.ERROR_DELETE_CATEGORY,
+          message: this.getErrorMessage(error) || MESSAGE.ERROR_DELETE_CATEGORY
         };
       } finally {
         this.loading = false;
       }
-    },
-  },
+    }
+  }
 });

@@ -13,7 +13,7 @@ module.exports = {
     body("parentCategoryID")
       .optional()
       .isInt()
-      .withMessage("parentCategoryID must be an integer"),
+      .withMessage("parentCategoryID must be an integer")
   ],
 
   deleteCategory: [
@@ -21,6 +21,6 @@ module.exports = {
       .notEmpty()
       .withMessage("categoryID is required")
       .isInt()
-      .withMessage("categoryID must be an integer"),
-  ],
+      .withMessage("categoryID must be an integer")
+  ]
 };

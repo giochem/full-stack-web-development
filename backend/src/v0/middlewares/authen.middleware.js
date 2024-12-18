@@ -8,5 +8,5 @@ module.exports = {
           .json({ status: false, message: "Access denied" });
       }
       next();
-    },
+    }
 };

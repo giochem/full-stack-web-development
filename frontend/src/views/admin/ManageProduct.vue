@@ -252,7 +252,7 @@ async function loadProducts() {
       sortOrder: sortOrder.value,
       searchText: searchQuery.value,
       filterCategory: filterCategory.value,
-      filterPromotion: filterPromotion.value,
+      filterPromotion: filterPromotion.value
     }
   );
 
@@ -282,7 +282,7 @@ function formatDate(dateString) {
   return new Date(dateString).toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
-    day: "numeric",
+    day: "numeric"
   });
 }
 function formatNumber(num) {
@@ -322,7 +322,7 @@ function getPromotionStatusClass(product) {
   return {
     "status-expired": status === "Expired",
     "status-active": status === "Active",
-    "status-coming": status === "Coming Soon",
+    "status-coming": status === "Coming Soon"
   };
 }
 
@@ -383,7 +383,9 @@ onMounted(async () => {
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .product-card:hover {

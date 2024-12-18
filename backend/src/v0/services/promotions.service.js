@@ -37,5 +37,5 @@ module.exports = {
       .request()
       .input("promotionID", sql.Int, promotionID)
       .execute("deletePromotion");
-  },
+  }
 };

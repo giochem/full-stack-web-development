@@ -88,7 +88,7 @@
                 <span
                   :class="[
                     'status-badge',
-                    getPromotionStatusClass(selectedPromotion),
+                    getPromotionStatusClass(selectedPromotion)
                   ]"
                 >
                   {{ getPromotionStatus(selectedPromotion) }}
@@ -357,7 +357,7 @@ const product = ref({
   description: "",
   categoryID: null,
   promotionID: null,
-  image: "",
+  image: ""
 });
 
 // Get reactive refs from store
@@ -424,7 +424,7 @@ async function handleSave() {
 onMounted(async () => {
   await Promise.all([
     productStore.fetchExtraInfo(),
-    variationStore.fetchVariations(),
+    variationStore.fetchVariations()
   ]);
 
   const result = await productStore.fetchProductById(route.params.productID);
@@ -432,7 +432,7 @@ onMounted(async () => {
     const [productData, productItemsData] = result.data;
     product.value = {
       ...productData,
-      promotionID: productData.promotionID || null,
+      promotionID: productData.promotionID || null
     };
 
     // Restructure product items data
@@ -445,13 +445,13 @@ onMounted(async () => {
           quantity: item.quantity,
           price: item.price,
           image: item.image,
-          attributes: [],
+          attributes: []
         };
       }
       groupedItems[item.productItemID].attributes.push({
         variationID: item.variationID,
         nameAtribute: item.nameAtribute,
-        value: item.value,
+        value: item.value
       });
     });
 
@@ -472,7 +472,7 @@ function formatDate(dateString) {
   return new Date(dateString).toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
-    day: "numeric",
+    day: "numeric"
   });
 }
 
@@ -488,7 +488,7 @@ async function saveProductItem(index) {
 
   const result = await productStore.updateProductItem({
     ...item,
-    productID: product.value.productID,
+    productID: product.value.productID
   });
 
   if (result.success) {
@@ -533,7 +533,7 @@ function getPromotionStatusClass(promotion) {
   return {
     "status-expired": status === "Expired",
     "status-active": status === "Active",
-    "status-coming": status === "Coming Soon",
+    "status-coming": status === "Coming Soon"
   };
 }
 </script>

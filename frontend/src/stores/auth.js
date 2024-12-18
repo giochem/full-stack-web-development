@@ -6,7 +6,7 @@ export const useAuthStore = defineStore("auth", {
   state: () => ({
     user: null,
     isAuthenticated: false,
-    loading: false,
+    loading: false
   }),
 
   actions: {
@@ -63,7 +63,7 @@ export const useAuthStore = defineStore("auth", {
         console.error("Error fetching profile:", error);
         return {
           success: false,
-          error: error.response?.data?.message || "Error fetching profile",
+          error: error.response?.data?.message || "Error fetching profile"
         };
       } finally {
         this.loading = false;
@@ -86,11 +86,11 @@ export const useAuthStore = defineStore("auth", {
         console.error("Error updating profile:", error);
         return {
           success: false,
-          error: error.response?.data?.message || "Error updating profile",
+          error: error.response?.data?.message || "Error updating profile"
         };
       } finally {
         this.loading = false;
       }
-    },
-  },
+    }
+  }
 });

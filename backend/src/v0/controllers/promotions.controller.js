@@ -27,7 +27,7 @@ module.exports = {
         name,
         discount,
         startDate,
-        endDate,
+        endDate
       });
       return Response.success(
         res,
@@ -55,5 +55,5 @@ module.exports = {
       console.error("Error in deletePromotion controller:", error);
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);
     }
-  },
+  }
 };

@@ -7,33 +7,38 @@ const collectionValidation = require("../validations/collections.validation");
 const collectionController = require("../controllers/collections.controller");
 
 // Base CRUD routes with validation and authorization
-router.post("/", 
+router.post(
+  "/",
   authorizeRoles("admin"),
   collectionValidation.createCollection,
   validate,
   collectionController.createCollection
 );
 
-router.get("/",
+router.get(
+  "/",
   collectionValidation.getCollections,
   validate,
   collectionController.getCollections
 );
 
-router.get("/:collectionID",
+router.get(
+  "/:collectionID",
   collectionValidation.getCollection,
   validate,
   collectionController.getCollection
 );
 
-router.put("/:collectionID",
+router.put(
+  "/:collectionID",
   authorizeRoles("admin"),
   collectionValidation.updateCollection,
   validate,
   collectionController.updateCollection
 );
 
-router.delete("/:collectionID",
+router.delete(
+  "/:collectionID",
   authorizeRoles("admin"),
   collectionValidation.deleteCollection,
   validate,

@@ -8,7 +8,7 @@ module.exports = {
       .withMessage("page in query is required and >= 0"),
     query("size")
       .isInt({ min: 1 })
-      .withMessage("size in query is required and >= 1"),
+      .withMessage("size in query is required and >= 1")
   ],
 
   // Get single item
@@ -17,7 +17,7 @@ module.exports = {
       .notEmpty()
       .withMessage("collectionID is required")
       .isInt()
-      .withMessage("collectionID must be an integer"),
+      .withMessage("collectionID must be an integer")
   ],
 
   // Create
@@ -26,7 +26,7 @@ module.exports = {
       .notEmpty()
       .withMessage("Name is required")
       .isLength({ min: 2, max: 100 })
-      .withMessage("Name must be between 2 and 100 characters"),
+      .withMessage("Name must be between 2 and 100 characters")
   ],
 
   // Update
@@ -45,9 +45,7 @@ module.exports = {
       .isString()
       .withMessage("ProductIDs must be a string")
       .matches(/^(\d+,)*\d+$/)
-      .withMessage(
-        "ProductIDs must be comma-separated numbers (e.g., '1,2,3')"
-      ),
+      .withMessage("ProductIDs must be comma-separated numbers (e.g., '1,2,3')")
   ],
 
   // Delete
@@ -56,6 +54,6 @@ module.exports = {
       .notEmpty()
       .withMessage("collectionID is required")
       .isInt()
-      .withMessage("collectionID must be an integer"),
-  ],
+      .withMessage("collectionID must be an integer")
+  ]
 };

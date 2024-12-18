@@ -27,7 +27,7 @@ module.exports = {
     query("filterCategory")
       .optional()
       .isInt()
-      .withMessage("filterCategory in query must be an integer"),
+      .withMessage("filterCategory in query must be an integer")
   ],
 
   getProduct: [
@@ -35,7 +35,7 @@ module.exports = {
       .notEmpty()
       .withMessage("productID is required")
       .isInt()
-      .withMessage("productID must be an integer"),
+      .withMessage("productID must be an integer")
   ],
 
   upsertProduct: [
@@ -59,7 +59,7 @@ module.exports = {
       .optional()
       .isLength({ max: 500 })
       .withMessage("Description cannot exceed 500 characters"),
-    body("image").optional().isString().withMessage("image must be a string"),
+    body("image").optional().isString().withMessage("image must be a string")
   ],
   upsertProductItem: [
     body("productID")
@@ -76,7 +76,7 @@ module.exports = {
       .optional()
       .isInt()
       .withMessage("quantity must be an integer"),
-    body("image").optional().isString().withMessage("image must be a string"),
+    body("image").optional().isString().withMessage("image must be a string")
   ],
 
   deleteProduct: [
@@ -87,6 +87,6 @@ module.exports = {
     query("productItemID")
       .optional()
       .isInt()
-      .withMessage("productItemID must be an integer"),
-  ],
+      .withMessage("productItemID must be an integer")
+  ]
 };

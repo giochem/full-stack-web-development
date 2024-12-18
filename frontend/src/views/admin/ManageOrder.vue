@@ -109,19 +109,24 @@
         <div class="items-per-page">
           <span>Show</span>
           <select v-model="itemsPerPage" @change="handlePageSizeChange">
-            <option v-for="size in [20, 50, 100, 200]" :key="size" :value="size">
+            <option
+              v-for="size in [20, 50, 100, 200]"
+              :key="size"
+              :value="size"
+            >
               {{ size }}
             </option>
           </select>
           <span>items</span>
         </div>
         <div class="items-info">
-          Showing {{ paginationInfo.from }}-{{ paginationInfo.to }} of {{ totalItems }} items
+          Showing {{ paginationInfo.from }}-{{ paginationInfo.to }} of
+          {{ totalItems }} items
         </div>
       </div>
       <div class="pagination-buttons">
-        <button 
-          class="page-btn" 
+        <button
+          class="page-btn"
           :disabled="currentPage === 0"
           @click="changePage(currentPage - 1)"
         >
@@ -139,8 +144,8 @@
           </button>
         </div>
 
-        <button 
-          class="page-btn" 
+        <button
+          class="page-btn"
           :disabled="currentPage >= totalPages - 1"
           @click="changePage(currentPage + 1)"
         >
@@ -182,11 +187,17 @@ const hasMoreItems = computed(() => {
   return orders.value.length < totalItems.value;
 });
 
-const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
+const totalPages = computed(() =>
+  Math.ceil(totalItems.value / itemsPerPage.value)
+);
 
 const paginationInfo = computed(() => {
-  const from = totalItems.value === 0 ? 0 : currentPage.value * itemsPerPage.value + 1;
-  const to = Math.min((currentPage.value + 1) * itemsPerPage.value, totalItems.value);
+  const from =
+    totalItems.value === 0 ? 0 : currentPage.value * itemsPerPage.value + 1;
+  const to = Math.min(
+    (currentPage.value + 1) * itemsPerPage.value,
+    totalItems.value
+  );
   return { from, to };
 });
 
@@ -268,7 +279,7 @@ async function fetchOrders(isLoadMore = false) {
       page: currentPage.value,
       size: itemsPerPage.value,
       sortBy: sortBy.value,
-      sortOrder: sortOrder.value,
+      sortOrder: sortOrder.value
     });
 
     if (searchText.value) {
@@ -286,7 +297,7 @@ async function fetchOrders(isLoadMore = false) {
     const response = await axios.get(
       `http://localhost:5000/api/orders?${params}`,
       {
-        withCredentials: true,
+        withCredentials: true
       }
     );
 
@@ -295,7 +306,7 @@ async function fetchOrders(isLoadMore = false) {
     } else {
       orders.value = response.data.data;
     }
-    
+
     totalItems.value = response.data.total;
   } catch (error) {
     console.error("Error fetching orders:", error);

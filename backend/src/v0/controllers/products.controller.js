@@ -15,7 +15,7 @@ module.exports = {
         sortOrder,
         searchText,
         filterPromotion,
-        filterCategory,
+        filterCategory
       } = req.query;
       const offset = page * size;
       const data = await productService.getProductsByOffsetBased(
@@ -89,7 +89,7 @@ module.exports = {
         categoryID,
         name,
         description,
-        image,
+        image
       });
       return Response.success(
         res,
@@ -111,7 +111,7 @@ module.exports = {
         price,
         quantity,
         image,
-        variationOptionList,
+        variationOptionList
       } = req.body;
       if (req.file?.filename) {
         image = req.file.filename;
@@ -123,7 +123,7 @@ module.exports = {
         price,
         quantity,
         image,
-        variationOptionList: JSON.parse(variationOptionList),
+        variationOptionList: JSON.parse(variationOptionList)
       });
       return Response.success(
         res,
@@ -167,9 +167,8 @@ module.exports = {
           StatusCode.OK
         );
       } else if (productItemID) {
-        const productItem = await productService.getProductItemByProductItemID(
-          productItemID
-        );
+        const productItem =
+          await productService.getProductItemByProductItemID(productItemID);
 
         if (!productItem || productItem.length === 0) {
           return Response.error(
@@ -205,5 +204,5 @@ module.exports = {
       console.error("Error in deleteProduct controller:", error);
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);
     }
-  },
+  }
 };

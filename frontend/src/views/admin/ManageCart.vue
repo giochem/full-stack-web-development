@@ -253,7 +253,7 @@ const fetchCarts = () => {
     searchText: searchText.value,
     sortBy: sortBy.value,
     sortOrder: sortOrder.value,
-    userID: userID.value,
+    userID: userID.value
   });
 };
 
@@ -262,7 +262,7 @@ const formatPrice = (price) => {
     style: "currency",
     currency: "VND",
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 0
   }).format(price);
 };
 

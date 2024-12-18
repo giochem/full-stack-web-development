@@ -9,7 +9,7 @@ module.exports = {
     searchText,
     sortBy,
     sortOrder,
-    filterStatus,
+    filterStatus
   }) => {
     const conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
@@ -20,7 +20,7 @@ module.exports = {
       searchText,
       sortBy,
       sortOrder,
-      filterStatus,
+      filterStatus
     });
     const data = await conn
       .request()
@@ -97,5 +97,5 @@ module.exports = {
       .input("orderID", sql.Int, orderID)
       .input("status", sql.NVarChar(255), status)
       .execute("updateOrder");
-  },
+  }
 };

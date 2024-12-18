@@ -25,7 +25,7 @@ module.exports = {
       await categoryService.upsertCategory({
         categoryID,
         parentCategoryID,
-        name,
+        name
       });
       return Response.success(
         res,
@@ -53,5 +53,5 @@ module.exports = {
       console.error("Error in deleteCategory controller:", error);
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);
     }
-  },
+  }
 };

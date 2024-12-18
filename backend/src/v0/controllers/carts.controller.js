@@ -21,7 +21,7 @@ module.exports = {
         limit: size,
         searchText,
         sortBy,
-        sortOrder,
+        sortOrder
       });
       return Response.success(
         res,
@@ -72,7 +72,7 @@ module.exports = {
       await cartService.upsertCart({
         userID,
         productItemID,
-        quantity,
+        quantity
       });
       return Response.success(
         res,
@@ -84,5 +84,5 @@ module.exports = {
       console.error("Error in updateCart controller:", error);
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);
     }
-  },
+  }
 };

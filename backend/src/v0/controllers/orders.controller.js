@@ -12,7 +12,7 @@ module.exports = {
         sortBy,
         sortOrder,
         filterStatus,
-        userID,
+        userID
       } = req.query;
       const offset = page * size;
       if (userID) {
@@ -30,7 +30,7 @@ module.exports = {
         searchText,
         sortBy,
         sortOrder,
-        filterStatus,
+        filterStatus
       });
       return Response.success(
         res,
@@ -68,7 +68,7 @@ module.exports = {
         fullName,
         phone,
         address,
-        note,
+        note
       });
       return Response.success(
         res,
@@ -99,7 +99,7 @@ module.exports = {
 
       await orderService.updateOrder({
         orderID,
-        status,
+        status
       });
       return Response.success(
         res,
@@ -111,5 +111,5 @@ module.exports = {
       console.error("Error in updateOrder controller:", error);
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);
     }
-  },
+  }
 };

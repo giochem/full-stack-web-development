@@ -35,16 +35,16 @@
       "ForgotPassword": "Forgot password?"
     },
     "Client": {
-        "Home": {
-          "Title": "Featured products",
-          "Loading": "Loading products...",
-          "Error": "An error occurred",
-          "NoProducts": "The store currently has no products."
-        },
-        "Product": {
-          "Loading": "Loading products...",
-          "AddedToCart": "Added to cart successfully!"
-        }
+      "Home": {
+        "Title": "Featured products",
+        "Loading": "Loading products...",
+        "Error": "An error occurred",
+        "NoProducts": "The store currently has no products."
+      },
+      "Product": {
+        "Loading": "Loading products...",
+        "AddedToCart": "Added to cart successfully!"
+      }
     },
     "Admin": {
       "Title": "Manage Products",

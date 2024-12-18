@@ -21,7 +21,7 @@ module.exports = {
     body("endDate")
       .optional()
       .isISO8601()
-      .withMessage("End time must be a valid date"),
+      .withMessage("End time must be a valid date")
   ],
 
   deletePromotion: [
@@ -29,6 +29,6 @@ module.exports = {
       .notEmpty()
       .withMessage("promotionID is required")
       .isInt()
-      .withMessage("promotionID must be an integer"),
-  ],
+      .withMessage("promotionID must be an integer")
+  ]
 };

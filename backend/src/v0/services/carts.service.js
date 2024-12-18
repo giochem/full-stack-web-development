@@ -7,7 +7,7 @@ module.exports = {
     limit,
     searchText,
     sortBy,
-    sortOrder,
+    sortOrder
   }) => {
     const conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
@@ -49,5 +49,5 @@ module.exports = {
       .input("productItemID", sql.Int, productItemID)
       .input("quantity", sql.Int, quantity)
       .execute("upsertCart");
-  },
+  }
 };

@@ -38,5 +38,5 @@ module.exports = {
       .request()
       .input("paymentID", sql.Int, paymentID)
       .execute("deletePayment");
-  },
+  }
 };

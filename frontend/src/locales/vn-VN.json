@@ -16,7 +16,7 @@
         "Subscribe": "Đăng ký",
         "Copyright": "Bản quyền 2024 © Thời Trang 369 - Mọi quyền đều được bảo lưu."
       },
-      "NavbarAdmin": { 
+      "NavbarAdmin": {
         "Brand": "Cửa hàng 369",
         "Dashboard": "Trang chủ",
         "Users": "Người dùng",
@@ -48,14 +48,14 @@
       "ForgotPassword": "Quên mật khẩu?"
     },
     "Client": {
-      "Home":{
+      "Home": {
         "Title": "Sản phẩm nổi bật",
         "Loading": "Đang tải sản phẩm...",
         "Error": "Đã có lỗi xảy ra",
         "NoProducts": "Cửa hàng hiện đang không có sản phẩm."
       },
       "Product": {
-        "Loading":"Đang tải sản phẩm..."
+        "Loading": "Đang tải sản phẩm..."
       }
     },
     "Admin": {
@@ -96,7 +96,7 @@
         "NumItems": "Số sản phẩm",
         "NumOrders": "Số đơn hàng"
       },
-      "AddUser":{
+      "AddUser": {
         "Title": "Thêm người dùng",
         "LabelEmail": "Email",
         "PlaceholderEmail": "Nhập email",

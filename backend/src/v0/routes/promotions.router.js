@@ -5,10 +5,7 @@ const { validate } = require("../middlewares/validate.middleware");
 const promotionValidation = require("../validations/promotions.validation");
 const promotionController = require("../controllers/promotions.controller");
 
-router.get(
-  "/",
-  promotionController.getPromotions
-);
+router.get("/", promotionController.getPromotions);
 
 router.put(
   "/",

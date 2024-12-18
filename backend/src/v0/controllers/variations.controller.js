@@ -24,7 +24,7 @@ module.exports = {
 
       const newVariation = await variationService.upsertVariation({
         variationID,
-        nameAtribute,
+        nameAtribute
       });
       return Response.success(
         res,
@@ -52,5 +52,5 @@ module.exports = {
       console.error("Error in deleteVariation controller:", error);
       return Response.serverError(res, Message.ERROR_DB_QUERY, error);
     }
-  },
+  }
 };

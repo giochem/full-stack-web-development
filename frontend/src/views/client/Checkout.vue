@@ -149,7 +149,7 @@ const shippingInfo = ref({
   fullName: "",
   phone: "",
   address: "",
-  note: "",
+  note: ""
 });
 
 const originalSubtotal = computed(() => {
@@ -194,7 +194,7 @@ async function placeOrder() {
   try {
     isProcessing.value = true;
     const orderData = {
-      ...shippingInfo.value,
+      ...shippingInfo.value
     };
 
     const result = await orderStore.createOrder(orderData);

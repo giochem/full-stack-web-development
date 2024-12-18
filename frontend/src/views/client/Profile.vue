@@ -140,14 +140,14 @@ const showEditForm = ref(false);
 const form = ref({
   username: "",
   email: "",
-  password: "",
+  password: ""
 });
 
 function formatDate(dateString) {
   return new Date(dateString).toLocaleDateString("vi-VN", {
     year: "numeric",
     month: "long",
-    day: "numeric",
+    day: "numeric"
   });
 }
 
@@ -186,7 +186,7 @@ onMounted(async () => {
     form.value = {
       username: authStore.user.username,
       email: authStore.user.email,
-      password: "",
+      password: ""
     };
   }
 

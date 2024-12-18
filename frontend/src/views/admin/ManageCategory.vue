@@ -102,7 +102,7 @@ const editingId = ref(null);
 const validationErrors = ref({});
 
 const formData = ref({
-  name: "",
+  name: ""
 });
 
 const modalTitle = computed(() =>
@@ -126,7 +126,7 @@ const validateForm = () => {
 
 const resetForm = () => {
   formData.value = {
-    name: "",
+    name: ""
   };
   validationErrors.value = {};
 };
@@ -142,7 +142,7 @@ const editCategory = (category) => {
   isEditing.value = true;
   editingId.value = category.categoryID;
   formData.value = {
-    name: category.name,
+    name: category.name
   };
   validationErrors.value = {};
   showModal.value = true;
@@ -158,7 +158,7 @@ const handleSubmit = async () => {
 
   const result = await categoryStore.upsertCategory({
     ...formData.value,
-    categoryID: isEditing.value ? editingId.value : undefined,
+    categoryID: isEditing.value ? editingId.value : undefined
   });
 
   if (result.success) {

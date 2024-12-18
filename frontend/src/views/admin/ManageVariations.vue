@@ -116,7 +116,7 @@ const inputRef = ref(null);
 const errorMessage = ref("");
 
 const form = ref({
-  nameAtribute: "",
+  nameAtribute: ""
 });
 
 function validateInput(e) {
@@ -173,7 +173,7 @@ async function handleSubmit() {
   try {
     const result = await variationStore.upsertVariation({
       variationID: selectedVariation.value?.variationID,
-      nameAtribute: form.value.nameAtribute,
+      nameAtribute: form.value.nameAtribute
     });
 
     if (result.success) {

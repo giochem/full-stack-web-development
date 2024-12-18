@@ -7,5 +7,5 @@ module.exports = {
       return Response.error(res, "User data is invalid", errors.array());
     }
     return next();
-  },
+  }
 };

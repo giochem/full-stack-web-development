@@ -8,7 +8,7 @@ module.exports = {
       .withMessage("page in query is required and >= 0"),
     query("size")
       .isInt({ min: 1 })
-      .withMessage("size in query is required and >= 1"),
+      .withMessage("size in query is required and >= 1")
   ],
 
   // Validate get single user
@@ -17,7 +17,7 @@ module.exports = {
       .notEmpty()
       .withMessage("userID is required")
       .isInt()
-      .withMessage("userID must be an integer"),
+      .withMessage("userID must be an integer")
   ],
 
   // Validate create user
@@ -43,7 +43,7 @@ module.exports = {
     body("role")
       .optional()
       .isIn(["admin", "client"])
-      .withMessage("Role must be either admin or client"),
+      .withMessage("Role must be either admin or client")
   ],
 
   // Validate update user
@@ -71,7 +71,7 @@ module.exports = {
     body("role")
       .optional()
       .isIn(["admin", "client"])
-      .withMessage("Role must be either admin or client"),
+      .withMessage("Role must be either admin or client")
   ],
 
   // Validate delete user
@@ -80,11 +80,11 @@ module.exports = {
       .notEmpty()
       .withMessage("userID is required")
       .isInt()
-      .withMessage("userID must be an integer"),
+      .withMessage("userID must be an integer")
   ],
 
   // Validate search users
   searchUsers: [
-    query("searchText").notEmpty().withMessage("searchText is required"),
-  ],
+    query("searchText").notEmpty().withMessage("searchText is required")
+  ]
 };

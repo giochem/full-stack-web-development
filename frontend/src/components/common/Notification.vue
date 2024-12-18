@@ -13,12 +13,6 @@ const isVisible = ref(false);
 const message = ref("");
 const type = ref("info"); // info, success, error, warning
 
-const h = 2;
-
-
-
-
-const y = 1;
 // Method to show notification
 const show = (msg, msgType = "info", duration = 3000) => {
   message.value = msg;

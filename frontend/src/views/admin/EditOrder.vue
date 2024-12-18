@@ -12,21 +12,12 @@
       <form class="admin-form" @submit.prevent="save">
         <div class="form-group">
           <label for="userID">User ID</label>
-          <input 
-            id="userID"
-            v-model="order.userID" 
-            type="text"
-            disabled
-          />
+          <input id="userID" v-model="order.userID" type="text" disabled />
         </div>
 
         <div class="form-group">
           <label for="status">Status</label>
-          <select 
-            id="status"
-            v-model="order.status"
-            class="form-select"
-          >
+          <select id="status" v-model="order.status" class="form-select">
             <option value="pending">Pending</option>
             <option value="processing">Processing</option>
             <option value="completed">Completed</option>
@@ -37,7 +28,11 @@
         <div class="order-details">
           <h3>Order Items</h3>
           <div class="order-items">
-            <div v-for="item in order.items" :key="item.productID" class="order-item">
+            <div
+              v-for="item in order.items"
+              :key="item.productID"
+              class="order-item"
+            >
               <div class="item-info">
                 <span class="item-name">{{ item.productName }}</span>
                 <span class="item-quantity">x{{ item.quantity }}</span>
@@ -52,9 +47,7 @@
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="primary-btn">
-            Save Changes
-          </button>
+          <button type="submit" class="primary-btn">Save Changes</button>
           <RouterLink to="/admin/manage-order" class="secondary-btn">
             Cancel
           </RouterLink>
@@ -77,7 +70,7 @@ const order = ref({
   status: "",
   items: [],
   totalAmount: 0,
-  createdAt: "",
+  createdAt: ""
 });
 
 function formatPrice(price) {
@@ -284,4 +277,3 @@ onMounted(async () => {
   }
 }
 </style>
-    

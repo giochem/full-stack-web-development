@@ -9,8 +9,8 @@ const config = {
     trustedConnection: true,
     encrypt: true,
     enableArithAbort: true,
-    trustServerCertificate: true,
-  },
+    trustServerCertificate: true
+  }
 };
 
 const pool = async (query) => {
