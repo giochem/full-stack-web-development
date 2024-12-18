@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "format": "prettier --write \"./**/*.{js,json,vue}\"",
+    "prepare": "husky",
+    "lint-staged": "lint-staged"
+  },
+  "lint-staged": {
+    "*js": [
+      "npm run format"
+    ]
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.11",
+    "prettier": "^3.4.2"
+  }
+}
