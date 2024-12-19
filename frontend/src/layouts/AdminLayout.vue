@@ -20,7 +20,5 @@ import NavbarAdmin from "@/components/layouts/NavbarAdmin.vue";
 .admin-content {
   flex: 1;
   margin-left: 250px; /* Width of sidebar */
-  padding: 2rem;
-  background-color: var(--light-bg-color);
 }
 </style>

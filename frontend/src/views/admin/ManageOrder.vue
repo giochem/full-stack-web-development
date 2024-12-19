@@ -3,7 +3,11 @@
     <header class="page-header">
       <div class="header-content">
         <h1>
-          {{ userID ? `Orders for User #${userID}` : "Manage Orders" }}
+          {{
+            userID
+              ? $t("Views.Admin.ManageOrders.OrdersForUser", { id: userID })
+              : $t("Views.Admin.ManageOrders.Title")
+          }}
         </h1>
         <div class="header-actions">
           <div class="search-box">
@@ -11,7 +15,7 @@
             <input
               type="text"
               v-model="searchText"
-              placeholder="Search orders..."
+              :placeholder="$t('Views.Admin.ManageOrders.SearchPlaceholder')"
               @input="handleSearch"
             />
           </div>
@@ -20,11 +24,21 @@
             class="status-filter"
             @change="handleFilterChange"
           >
-            <option value="">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="processing">Processing</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
+            <option value="">
+              {{ $t("Views.Admin.ManageOrders.AllStatus") }}
+            </option>
+            <option value="pending">
+              {{ $t("Views.Admin.ManageOrders.Pending") }}
+            </option>
+            <option value="processing">
+              {{ $t("Views.Admin.ManageOrders.Processing") }}
+            </option>
+            <option value="completed">
+              {{ $t("Views.Admin.ManageOrders.Completed") }}
+            </option>
+            <option value="cancelled">
+              {{ $t("Views.Admin.ManageOrders.Cancelled") }}
+            </option>
           </select>
         </div>
       </div>
@@ -107,7 +121,7 @@
     <div class="pagination">
       <div class="pagination-info">
         <div class="items-per-page">
-          <span>Show</span>
+          <span>{{ $t("Views.Admin.ManageOrders.ShowEntries") }}</span>
           <select v-model="itemsPerPage" @change="handlePageSizeChange">
             <option
               v-for="size in [20, 50, 100, 200]"
@@ -117,11 +131,13 @@
               {{ size }}
             </option>
           </select>
-          <span>items</span>
+          <span>{{ $t("Views.Admin.ManageOrders.Items") }}</span>
         </div>
         <div class="items-info">
-          Showing {{ paginationInfo.from }}-{{ paginationInfo.to }} of
-          {{ totalItems }} items
+          {{ $t("Views.Admin.ManageOrders.Showing") }}
+          {{ paginationInfo.from }}-{{ paginationInfo.to }}
+          {{ $t("Views.Admin.ManageOrders.Of") }} {{ totalItems }}
+          {{ $t("Views.Admin.ManageOrders.Items") }}
         </div>
       </div>
       <div class="pagination-buttons">
