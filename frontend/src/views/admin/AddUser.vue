@@ -17,7 +17,7 @@
             v-model="form.email"
             type="email"
             :placeholder="$t('Views.Admin.AddUser.PlaceholderEmail')"
-            :disabled="userStore.loading"
+            :disabled="loading"
             required
           />
         </div>
@@ -31,7 +31,7 @@
             v-model="form.username"
             type="text"
             :placeholder="$t('Views.Admin.AddUser.PlaceholderUsername')"
-            :disabled="userStore.loading"
+            :disabled="loading"
             required
           />
         </div>
@@ -44,8 +44,9 @@
             id="password"
             v-model="form.password"
             type="password"
+            autocomplete="on"
             :placeholder="$t('Views.Admin.AddUser.PlaceholderPassword')"
-            :disabled="userStore.loading"
+            :disabled="loading"
             required
           />
         </div>
@@ -56,7 +57,7 @@
             id="role"
             v-model="form.role"
             class="form-select"
-            :disabled="userStore.loading"
+            :disabled="loading"
           >
             <option value="client">
               {{ $t("Views.Admin.AddUser.OptionClient") }}
@@ -68,17 +69,13 @@
         </div>
 
         <div class="form-actions">
-          <button
-            type="submit"
-            class="primary-btn"
-            :disabled="userStore.loading"
-          >
+          <button type="submit" class="primary-btn" :disabled="loading">
             {{ $t("Views.Admin.AddUser.ButtonAddUser") }}
           </button>
           <RouterLink
             to="/admin/manage-user"
             class="secondary-btn"
-            :class="{ disabled: userStore.loading }"
+            :class="{ disabled: loading }"
           >
             {{ $t("Views.Admin.AddUser.ButtonCancel") }}
           </RouterLink>
@@ -91,11 +88,11 @@
 <script setup>
 import { ref, getCurrentInstance } from "vue";
 import { useRouter } from "vue-router";
-import { useUserStore } from "@/stores/user";
+import axios from "@/utils/axios";
+import { API_ENDPOINTS } from "@/utils/constants";
 
 const app = getCurrentInstance();
 const router = useRouter();
-const userStore = useUserStore();
 
 const form = ref({
   email: "",
@@ -104,18 +101,28 @@ const form = ref({
   role: "client"
 });
 
+const loading = ref(false);
+
 async function handleSave() {
   if (!form.value.email || !form.value.username || !form.value.password) {
     app?.proxy.$notify("Please fill in all required fields", "warning");
     return;
   }
 
-  const result = await userStore.createUser(form.value);
-  if (result.success) {
-    app?.proxy.$notify(result.message, "success");
+  loading.value = true;
+  try {
+    const response = await axios({
+      method: API_ENDPOINTS.USERS.CREATE.method,
+      url: API_ENDPOINTS.USERS.CREATE.url,
+      data: form.value
+    });
+    app?.proxy.$notify(response.data.message, "success");
     router.push("/admin/manage-user");
-  } else {
-    app?.proxy.$notify(result.message, "error");
+  } catch (error) {
+    console.error("Error creating user:", error);
+    app?.proxy.$notify(error.response?.data?.message || error.message, "error");
+  } finally {
+    loading.value = false;
   }
 }
 </script>
