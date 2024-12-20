@@ -118,7 +118,7 @@ const Path = {
   STATIC_DIR: "/v0/uploads"
 };
 
-module.exports = {
+export {
   Message,
   StatusCode,
   Path

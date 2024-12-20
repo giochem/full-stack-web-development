@@ -1,7 +1,8 @@
-const { body, query, param } = require("express-validator");
+import { body, param, query } from "express-validator";
 
-module.exports = {
+const cartValidation = {
   getCarts: [
+    query("offset").optional().isInt().toInt(),
     query("page")
       .isInt({ min: 0 })
       .withMessage("page in query is required and >= 0"),
@@ -15,11 +16,7 @@ module.exports = {
   ],
 
   getCart: [
-    param("userID")
-      .notEmpty()
-      .withMessage("userID is required")
-      .isInt()
-      .withMessage("userID must be an integer")
+    param("userID").isInt().toInt()
   ],
 
   upsertCart: [
@@ -33,3 +30,5 @@ module.exports = {
       .withMessage("Quantity must be at least 0")
   ]
 };
+
+export default cartValidation;

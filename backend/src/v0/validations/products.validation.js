@@ -1,7 +1,8 @@
-const { body, query, param } = require("express-validator");
+import { body, param, query } from "express-validator";
 
-module.exports = {
+const productValidation = {
   getProducts: [
+    query("offset").optional().isInt().toInt(),
     query("page")
       .isInt({ min: 0 })
       .withMessage("page in query is required and >= 0"),
@@ -31,11 +32,7 @@ module.exports = {
   ],
 
   getProduct: [
-    param("productID")
-      .notEmpty()
-      .withMessage("productID is required")
-      .isInt()
-      .withMessage("productID must be an integer")
+    param("productID").isInt().toInt()
   ],
 
   upsertProduct: [
@@ -61,6 +58,7 @@ module.exports = {
       .withMessage("Description cannot exceed 500 characters"),
     body("image").optional().isString().withMessage("image must be a string")
   ],
+
   upsertProductItem: [
     body("productID")
       .optional()
@@ -90,3 +88,5 @@ module.exports = {
       .withMessage("productItemID must be an integer")
   ]
 };
+
+export default productValidation;

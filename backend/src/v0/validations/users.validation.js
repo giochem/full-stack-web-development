@@ -1,6 +1,6 @@
-const { body, query, param } = require("express-validator");
+import { body, param, query } from "express-validator";
 
-module.exports = {
+const userValidation = {
   // Validate get users list with pagination
   getUsers: [
     query("page")
@@ -88,3 +88,5 @@ module.exports = {
     query("searchText").notEmpty().withMessage("searchText is required")
   ]
 };
+
+export default userValidation;

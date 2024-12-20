@@ -1,12 +1,10 @@
-const express = require("express");
+import express from "express";
+import { authorizeRoles } from "../middlewares/authen.middleware.js";
+import * as userController from "../controllers/users.controller.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import userValidation from "../validations/users.validation.js";
+
 const router = express.Router();
-
-const { authorizeRoles } = require("../middlewares/authen.middleware");
-
-const userController = require("../controllers/users.controller");
-
-const { validate } = require("../middlewares/validate.middleware");
-const userValidation = require("../validations/users.validation");
 
 router.get(
   "/",
@@ -38,4 +36,4 @@ router.put(
   userController.updateUser
 );
 
-module.exports = router;
+export default router;

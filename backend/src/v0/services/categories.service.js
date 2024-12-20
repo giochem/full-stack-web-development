@@ -1,7 +1,7 @@
-const { pool, config } = require("../configs/db");
-const sql = require("mssql");
+import { pool, config } from "../configs/db.js";
+import sql from "mssql";
 
-module.exports = {
+const categoriesService = {
   getCategories: async () => {
     const conn = await sql.connect(config);
     console.log("Connected to SQLServer...");
@@ -37,3 +37,5 @@ module.exports = {
       .execute("deleteCategory");
   }
 };
+
+export default categoriesService;

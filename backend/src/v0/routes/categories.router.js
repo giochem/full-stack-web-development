@@ -1,26 +1,27 @@
-const express = require("express");
-const router = express.Router();
-const { authorizeRoles } = require("../middlewares/authen.middleware");
-const { validate } = require("../middlewares/validate.middleware");
-const categoryValidation = require("../validations/categories.validation");
-const categoryController = require("../controllers/categories.controller");
+import express from "express";
+import { authorizeRoles } from "../middlewares/authen.middleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import categoryValidation from "../validations/categories.validation.js";
+import { getCategories, upsertCategory, deleteCategory } from "../controllers/categories.controller.js";
 
-router.get("/", categoryController.getCategories);
+const router = express.Router();
+
+router.get("/", getCategories);
 
 router.put(
-  "/",
-  authorizeRoles("admin"),
-  categoryValidation.upsertCategory,
-  validate,
-  categoryController.upsertCategory
+    "/",
+    authorizeRoles("admin"),
+    categoryValidation.upsertCategory,
+    validate,
+    upsertCategory
 );
 
 router.delete(
-  "/:categoryID",
-  authorizeRoles("admin"),
-  categoryValidation.deleteCategory,
-  validate,
-  categoryController.deleteCategory
+    "/:categoryID",
+    authorizeRoles("admin"),
+    categoryValidation.deleteCategory,
+    validate,
+    deleteCategory
 );
 
-module.exports = router;
+export default router;

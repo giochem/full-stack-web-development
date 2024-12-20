@@ -1,10 +1,10 @@
-const express = require("express");
-const router = express.Router();
+import express from "express";
+import { authorizeRoles } from "../middlewares/authen.middleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import orderValidation from "../validations/orders.validation.js";
+import * as orderController from "../controllers/orders.controller.js";
 
-const { authorizeRoles } = require("../middlewares/authen.middleware");
-const { validate } = require("../middlewares/validate.middleware");
-const orderValidation = require("../validations/orders.validation");
-const orderController = require("../controllers/orders.controller");
+const router = express.Router();
 
 router.get(
   "/",
@@ -34,4 +34,4 @@ router.put(
   orderController.updateOrder
 );
 
-module.exports = router;
+export default router;

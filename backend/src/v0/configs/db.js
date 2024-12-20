@@ -1,6 +1,6 @@
-const sql = require("mssql");
+import sql from 'mssql';
 
-const config = {
+export const config = {
   user: process.env.SQL_SERVER_USER,
   password: process.env.SQL_SERVER_PASSWORD,
   server: process.env.SQL_SERVER_SERVER,
@@ -13,7 +13,7 @@ const config = {
   }
 };
 
-const pool = async (query) => {
+export const pool = async (query) => {
   return await new sql.ConnectionPool(config)
     .connect()
     .then((pool) => {
@@ -25,5 +25,3 @@ const pool = async (query) => {
       console.log("Database Connection Failed! Bad Config: ", err)
     );
 };
-
-module.exports = { pool, config };

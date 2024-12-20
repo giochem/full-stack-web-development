@@ -1,9 +1,10 @@
-const express = require("express");
+import express from "express";
+import { authorizeRoles } from "../middlewares/authen.middleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import promotionValidation from "../validations/promotions.validation.js";
+import * as promotionController from "../controllers/promotions.controller.js";
+
 const router = express.Router();
-const { authorizeRoles } = require("../middlewares/authen.middleware");
-const { validate } = require("../middlewares/validate.middleware");
-const promotionValidation = require("../validations/promotions.validation");
-const promotionController = require("../controllers/promotions.controller");
 
 router.get("/", promotionController.getPromotions);
 
@@ -23,4 +24,4 @@ router.delete(
   promotionController.deletePromotion
 );
 
-module.exports = router;
+export default router;

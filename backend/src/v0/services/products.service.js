@@ -1,8 +1,8 @@
-const { pool, config } = require("../configs/db");
-const sql = require("mssql");
-const { Message } = require("../utils/constants");
+import { pool, config } from "../configs/db.js";
+import sql from "mssql";
+import { Message } from "../utils/constants.js";
 
-module.exports = {
+const productsService = {
   getProductsByOffsetBased: async (
     offset,
     limit,
@@ -136,3 +136,5 @@ module.exports = {
       .execute("deleteProductItem");
   }
 };
+
+export default productsService;

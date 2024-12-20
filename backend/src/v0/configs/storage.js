@@ -1,7 +1,7 @@
-const multer = require("multer");
-const { randomUUID } = require("crypto");
-const { Path } = require("../utils/constants");
-const Response = require("./response");
+import multer from "multer";
+import { randomUUID } from "crypto";
+import { Path } from "../utils/constants.js";
+import Response from "./response.js";
 
 // Define allowed image types
 const ALLOWED_TYPES = {
@@ -30,12 +30,10 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({
+export const upload = multer({
   storage,
   fileFilter,
   limits: {
     fileSize: 10 * 1024 * 1024 // 10MB limit
   }
 });
-
-module.exports = { upload };

@@ -1,6 +1,6 @@
-const { body } = require("express-validator");
+import { body } from "express-validator";
 
-module.exports = {
+const authValidation = {
   register: [
     body("username")
       .notEmpty()
@@ -26,3 +26,5 @@ module.exports = {
     body("password").notEmpty().withMessage("Password is required")
   ]
 };
+
+export default authValidation;

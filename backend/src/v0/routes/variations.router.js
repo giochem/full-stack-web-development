@@ -1,9 +1,10 @@
-const express = require("express");
+import express from "express";
+import { authorizeRoles } from "../middlewares/authen.middleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import variationValidation from "../validations/variations.validation.js";
+import * as variationController from "../controllers/variations.controller.js";
+
 const router = express.Router();
-const { authorizeRoles } = require("../middlewares/authen.middleware");
-const { validate } = require("../middlewares/validate.middleware");
-const variationValidation = require("../validations/variations.validation");
-const variationController = require("../controllers/variations.controller");
 
 router.get("/", variationController.getVariations);
 
@@ -23,4 +24,4 @@ router.delete(
   variationController.deleteVariation
 );
 
-module.exports = router;
+export default router;

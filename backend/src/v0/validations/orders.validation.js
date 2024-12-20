@@ -1,13 +1,14 @@
-const { body, query, param } = require("express-validator");
+import { body, param, query } from "express-validator";
 
-module.exports = {
+const orderValidation = {
   getOrders: [
     query("page")
       .isInt({ min: 0 })
       .withMessage("page in query is required and >= 0"),
     query("size")
       .isInt({ min: 1 })
-      .withMessage("size in query is required and >= 1")
+      .withMessage("size in query is required and >= 1"),
+    query("offset").optional().isInt().toInt()
   ],
 
   getOrderItem: [
@@ -39,10 +40,8 @@ module.exports = {
 
   updateOrder: [
     param("orderID")
-      .notEmpty()
-      .withMessage("orderID is required")
       .isInt()
-      .withMessage("orderID must be an integer"),
+      .toInt(),
     body("status")
       .optional()
       .isIn(["processing", "completed", "cancelled"])
@@ -57,3 +56,5 @@ module.exports = {
       .withMessage("orderID must be an integer")
   ]
 };
+
+export default orderValidation;

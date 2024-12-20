@@ -1,7 +1,7 @@
-const { pool, config } = require("../configs/db");
-const sql = require("mssql");
+import { pool, config } from "../configs/db.js";
+import sql from "mssql";
 
-module.exports = {
+const userService = {
   getUsersByOffsetBased: async ({
     offset,
     limit,
@@ -31,7 +31,7 @@ module.exports = {
 
   getUsersByKeysetBased: async (lastID, limit) => {
     if (!lastID) {
-      return await module.exports.getUsersByOffsetBased(0, limit);
+      return await userService.getUsersByOffsetBased(0, limit);
     }
 
     const conn = await sql.connect(config);
@@ -130,3 +130,5 @@ module.exports = {
     console.log("Connection closed.");
   }
 };
+
+export default userService;

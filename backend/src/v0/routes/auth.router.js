@@ -1,9 +1,10 @@
-const express = require("express");
+import express from 'express';
+import { validate } from "../middlewares/validate.middleware.js";
+import authValidation from "../validations/auth.validation.js";
+import * as authController from "../controllers/auth.controller.js";
+import { authorizeRoles } from "../middlewares/authen.middleware.js";
+
 const router = express.Router();
-const { validate } = require("../middlewares/validate.middleware");
-const authValidation = require("../validations/auth.validation");
-const authController = require("../controllers/auth.controller");
-const { authorizeRoles } = require("../middlewares/authen.middleware");
 
 router.get(
   "/profile",
@@ -18,4 +19,5 @@ router.post(
 );
 router.post("/login", authValidation.login, validate, authController.login);
 router.post("/logout", authController.logout);
-module.exports = router;
+
+export default router;

@@ -1,7 +1,7 @@
-const { pool, config } = require("../configs/db");
-const sql = require("mssql");
+import { pool, config } from "../configs/db.js";
+import sql from "mssql";
 
-module.exports = {
+const cartsService = {
   getCartsByOffsetBased: async ({
     offset,
     limit,
@@ -51,3 +51,5 @@ module.exports = {
       .execute("upsertCart");
   }
 };
+
+export default cartsService;
