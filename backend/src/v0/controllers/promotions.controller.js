@@ -8,7 +8,7 @@ import { Message, StatusCode } from "../utils/constants.js";
 
 export const handleGetPromotions = async (req, res, next) => {
   try {
-    const data = await promotionService.getPromotions();
+    const data = await getPromotions();
     return Response.success(
       res,
       Message.SUCCESS_GET_PROMOTIONS,
@@ -25,7 +25,7 @@ export const handleUpsertPromotion = async (req, res, next) => {
   try {
     const { promotionID, name, discount, startDate, endDate } = req.body;
 
-    await promotionService.upsertPromotion({
+    await upsertPromotion({
       promotionID,
       name,
       discount,
@@ -47,7 +47,7 @@ export const handleUpsertPromotion = async (req, res, next) => {
 export const handleDeletePromotion = async (req, res, next) => {
   try {
     const { promotionID } = req.params;
-    await promotionService.deletePromotion(promotionID);
+    await deletePromotion(promotionID);
     return Response.success(
       res,
       Message.SUCCESS_DELETE_PROMOTION,
