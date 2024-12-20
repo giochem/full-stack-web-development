@@ -1,12 +1,16 @@
-import userService from "../services/users.service.js";
+import {
+  getUserByEmail,
+  getUserByUserID,
+  createUser
+} from "../services/users.service.js";
 import Response from "../configs/response.js";
 import { Message, StatusCode } from "../utils/constants.js";
 import hash from "hash.js";
 
-export const login = async (req, res, next) => {
+export const handleLogin = async (req, res, next) => {
   try {
     let { email, password } = req.body;
-    const user = await userService.getUserByEmail(email);
+    const user = await getUserByEmail(email);
     password = hash.sha256().update(password).digest("hex");
     if (user.length === 0 || user[0].password !== password) {
       return Response.error(
@@ -20,14 +24,14 @@ export const login = async (req, res, next) => {
     req.session.role = user[0].role;
     return Response.success(res, Message.SUCCESS_LOGIN, user, StatusCode.OK);
   } catch (error) {
-    console.error("Error in login controller:", error);
+    console.error("Error in handleLogin controller:", error);
     return Response.serverError(res, Message.ERROR_DB_QUERY, error);
   }
 };
 
-export const getProfile = async (req, res, next) => {
+export const handleGetProfile = async (req, res, next) => {
   try {
-    const user = await userService.getUserByUserID(req.session.userID);
+    const user = await getUserByUserID(req.session.userID);
     if (!user || user.length === 0) {
       return Response.error(
         res,
@@ -38,15 +42,15 @@ export const getProfile = async (req, res, next) => {
     }
     return Response.success(res, Message.SUCCESS_LOGIN, user, StatusCode.OK);
   } catch (error) {
-    console.error("Error in getProfile controller:", error);
+    console.error("Error in handleGetProfile controller:", error);
     return Response.serverError(res, Message.ERROR_DB_QUERY, error);
   }
 };
 
-export const register = async (req, res, next) => {
+export const handleRegister = async (req, res, next) => {
   try {
     let { username, email, password } = req.body;
-    const user = await userService.getUserByEmail(email);
+    const user = await getUserByEmail(email);
 
     if (user.length !== 0) {
       return Response.error(
@@ -57,7 +61,7 @@ export const register = async (req, res, next) => {
       );
     }
     password = hash.sha256().update(password).digest("hex");
-    const newData = await userService.createUser({
+    const newData = await createUser({
       username,
       email,
       password,
@@ -74,12 +78,12 @@ export const register = async (req, res, next) => {
       StatusCode.CREATED
     );
   } catch (error) {
-    console.error("Error in register controller:", error);
+    console.error("Error in handleRegister controller:", error);
     return Response.serverError(res, Message.ERROR_DB_QUERY, error);
   }
 };
 
-export const logout = async (req, res, next) => {
+export const handleLogout = async (req, res, next) => {
   req.session.destroy();
   return Response.success(res, Message.SUCCESS_LOGOUT, null, StatusCode.OK);
 };

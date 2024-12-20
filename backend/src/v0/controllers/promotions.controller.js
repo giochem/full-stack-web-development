@@ -1,8 +1,12 @@
-import promotionService from "../services/promotions.service.js";
+import {
+  getPromotions,
+  upsertPromotion,
+  deletePromotion
+} from "../services/promotions.service.js";
 import Response from "../configs/response.js";
 import { Message, StatusCode } from "../utils/constants.js";
 
-export const getPromotions = async (req, res, next) => {
+export const handleGetPromotions = async (req, res, next) => {
   try {
     const data = await promotionService.getPromotions();
     return Response.success(
@@ -17,7 +21,7 @@ export const getPromotions = async (req, res, next) => {
   }
 };
 
-export const upsertPromotion = async (req, res, next) => {
+export const handleUpsertPromotion = async (req, res, next) => {
   try {
     const { promotionID, name, discount, startDate, endDate } = req.body;
 
@@ -40,7 +44,7 @@ export const upsertPromotion = async (req, res, next) => {
   }
 };
 
-export const deletePromotion = async (req, res, next) => {
+export const handleDeletePromotion = async (req, res, next) => {
   try {
     const { promotionID } = req.params;
     await promotionService.deletePromotion(promotionID);

@@ -1,10 +1,14 @@
-import variationService from "../services/variations.service.js";
+import {
+  getVariations,
+  upsertVariation,
+  deleteVariationByVariationID
+} from "../services/variations.service.js";
 import Response from "../configs/response.js";
 import { Message, StatusCode } from "../utils/constants.js";
 
-export const getVariations = async (req, res, next) => {
+export const handleGetVariations = async (req, res, next) => {
   try {
-    const data = await variationService.getVariations();
+    const data = await getVariations();
     return Response.success(
       res,
       Message.SUCCESS_GET_VARIATIONS,
@@ -17,11 +21,11 @@ export const getVariations = async (req, res, next) => {
   }
 };
 
-export const upsertVariation = async (req, res, next) => {
+export const handleUpsertVariation = async (req, res, next) => {
   try {
     const { variationID, nameAtribute } = req.body;
 
-    const newVariation = await variationService.upsertVariation({
+    const newVariation = await upsertVariation({
       variationID,
       nameAtribute
     });
@@ -37,10 +41,10 @@ export const upsertVariation = async (req, res, next) => {
   }
 };
 
-export const deleteVariation = async (req, res, next) => {
+export const handleDeleteVariation = async (req, res, next) => {
   try {
     const { variationID } = req.params;
-    await variationService.deleteVariationByVariationID(variationID);
+    await deleteVariationByVariationID(variationID);
     return Response.success(
       res,
       Message.SUCCESS_DELETE_VARIATION,

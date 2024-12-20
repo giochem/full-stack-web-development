@@ -1,39 +1,59 @@
 import express from "express";
 import { authorizeRoles } from "../middlewares/authen.middleware.js";
-import * as userController from "../controllers/users.controller.js";
+import {
+  handleGetUsers,
+  handleGetUser,
+  handleCreateUser,
+  handleUpdateUser,
+  handleDeleteUser
+} from "../controllers/users.controller.js";
 import { validate } from "../middlewares/validate.middleware.js";
-import userValidation from "../validations/users.validation.js";
+import {
+  validateGetUsers,
+  validateGetUser,
+  validateCreateUser,
+  validateUpdateUser,
+  validateDeleteUser,
+  validateSearchUsers
+} from "../validations/users.validation.js";
 
 const router = express.Router();
 
 router.get(
   "/",
   authorizeRoles("admin"),
-  userValidation.getUsers,
+  validateGetUsers,
   validate,
-  userController.getUsers
+  handleGetUsers
 );
 
 router.get(
   "/:userID",
   authorizeRoles("admin", "client"),
-  userValidation.getUser,
+  validateGetUser,
   validate,
-  userController.getUser
+  handleGetUser
 );
 router.post(
   "/",
   authorizeRoles("admin"),
-  userValidation.createUser,
+  validateCreateUser,
   validate,
-  userController.createUser
+  handleCreateUser
 );
 router.put(
   "/:userID",
   authorizeRoles("admin"),
-  userValidation.updateUser,
+  validateUpdateUser,
   validate,
-  userController.updateUser
+  handleUpdateUser
+);
+router.delete(
+  "/:userID",
+  authorizeRoles("admin"),
+  validateDeleteUser,
+  validate,
+  handleDeleteUser
 );
 
 export default router;

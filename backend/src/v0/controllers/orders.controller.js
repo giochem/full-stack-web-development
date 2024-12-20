@@ -1,34 +1,23 @@
-import orderService from "../services/orders.service.js";
+import {
+  getOrdersByOffsetBased,
+  getOrdersByUserID,
+  createOrder,
+  updateOrder
+} from "../services/orders.service.js";
 import Response from "../configs/response.js";
 import { Message, StatusCode } from "../utils/constants.js";
 
-export const getOrders = async (req, res, next) => {
+export const handleGetOrders = async (req, res, next) => {
   try {
-    const {
-      page,
-      size,
-      searchText,
-      sortBy,
-      sortOrder,
-      filterStatus,
-      userID
-    } = req.query;
+    const { page, size, sortBy, sortOrder, searchText, filterStatus } =
+      req.query;
     const offset = page * size;
-    if (userID) {
-      const data = await orderService.getOrdersByUserID(userID);
-      return Response.success(
-        res,
-        Message.SUCCESS_GET_ORDERS,
-        data,
-        StatusCode.OK
-      );
-    }
-    const data = await orderService.getOrdersByOffsetBased({
+    const data = await getOrdersByOffsetBased({
       offset,
       limit: size,
-      searchText,
       sortBy,
       sortOrder,
+      searchText,
       filterStatus
     });
     return Response.success(
@@ -38,15 +27,14 @@ export const getOrders = async (req, res, next) => {
       StatusCode.OK
     );
   } catch (error) {
-    console.error("Error in getOrders controller:", error);
+    console.error("Error in handleGetOrders controller:", error);
     return Response.serverError(res, Message.ERROR_DB_QUERY, error);
   }
 };
 
-export const getOwnerOrders = async (req, res, next) => {
+export const handleGetOwnerOrders = async (req, res, next) => {
   try {
-    const { userID } = req.session;
-    const data = await orderService.getOrdersByUserID(userID);
+    const data = await getOrdersByUserID(req.session.userID);
     return Response.success(
       res,
       Message.SUCCESS_GET_ORDERS,
@@ -54,16 +42,16 @@ export const getOwnerOrders = async (req, res, next) => {
       StatusCode.OK
     );
   } catch (error) {
-    console.error("Error in getOwnerOrders controller:", error);
+    console.error("Error in handleGetOwnerOrders controller:", error);
     return Response.serverError(res, Message.ERROR_DB_QUERY, error);
   }
 };
 
-export const createOrder = async (req, res, next) => {
+export const handleCreateOrder = async (req, res, next) => {
   try {
-    const { fullName, phone, address, note } = req.body;
-    await orderService.createOrder({
-      userID: req.session.userID,
+    const { userID, fullName, phone, address, note } = req.body;
+    await createOrder({
+      userID,
       fullName,
       phone,
       address,
@@ -76,27 +64,16 @@ export const createOrder = async (req, res, next) => {
       StatusCode.CREATED
     );
   } catch (error) {
-    console.error("Error in createOrder controller:", error);
+    console.error("Error in handleCreateOrder controller:", error);
     return Response.serverError(res, Message.ERROR_DB_QUERY, error);
   }
 };
 
-export const updateOrder = async (req, res, next) => {
+export const handleUpdateOrder = async (req, res, next) => {
   try {
-    const { status } = req.body;
     const { orderID } = req.params;
-
-    const order = await orderService.getOrderByOrderID(orderID);
-    if (!order || order.length === 0) {
-      return Response.error(
-        res,
-        Message.ERROR_ORDER_NOT_FOUND,
-        null,
-        StatusCode.NOT_FOUND
-      );
-    }
-
-    await orderService.updateOrder({
+    const { status } = req.body;
+    await updateOrder({
       orderID,
       status
     });
@@ -107,7 +84,7 @@ export const updateOrder = async (req, res, next) => {
       StatusCode.OK
     );
   } catch (error) {
-    console.error("Error in updateOrder controller:", error);
+    console.error("Error in handleUpdateOrder controller:", error);
     return Response.serverError(res, Message.ERROR_DB_QUERY, error);
   }
 };

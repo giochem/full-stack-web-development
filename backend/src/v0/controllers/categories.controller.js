@@ -1,10 +1,14 @@
-import categoryService from "../services/categories.service.js";
+import {
+  getCategories,
+  upsertCategory,
+  removeCategoryById
+} from "../services/categories.service.js";
 import Response from "../configs/response.js";
 import { Message, StatusCode } from "../utils/constants.js";
 
-export const getCategories = async (req, res, next) => {
+export const handleGetCategories = async (req, res, next) => {
   try {
-    const data = await categoryService.getCategories();
+    const data = await getCategories();
     return Response.success(
       res,
       Message.SUCCESS_GET_CATEGORIES,
@@ -12,16 +16,16 @@ export const getCategories = async (req, res, next) => {
       StatusCode.OK
     );
   } catch (error) {
-    console.error("Error in getCategories controller:", error);
+    console.error("Error in handleGetCategories controller:", error);
     return Response.serverError(res, Message.ERROR_DB_QUERY, error);
   }
 };
 
-export const upsertCategory = async (req, res, next) => {
+export const handleUpsertCategory = async (req, res, next) => {
   try {
     const { categoryID, parentCategoryID, name } = req.body;
 
-    await categoryService.upsertCategory({
+    await upsertCategory({
       categoryID,
       parentCategoryID,
       name
@@ -33,15 +37,15 @@ export const upsertCategory = async (req, res, next) => {
       StatusCode.OK
     );
   } catch (error) {
-    console.error("Error in upsertCategory controller:", error);
+    console.error("Error in handleUpsertCategory controller:", error);
     return Response.serverError(res, Message.ERROR_DB_QUERY, error);
   }
 };
 
-export const deleteCategory = async (req, res, next) => {
+export const handleDeleteCategory = async (req, res, next) => {
   try {
     const { categoryID } = req.params;
-    await categoryService.deleteCategory(categoryID);
+    await removeCategoryById(categoryID);
     return Response.success(
       res,
       Message.SUCCESS_DELETE_CATEGORY,
@@ -49,7 +53,7 @@ export const deleteCategory = async (req, res, next) => {
       StatusCode.OK
     );
   } catch (error) {
-    console.error("Error in deleteCategory controller:", error);
+    console.error("Error in handleDeleteCategory controller:", error);
     return Response.serverError(res, Message.ERROR_DB_QUERY, error);
   }
 };

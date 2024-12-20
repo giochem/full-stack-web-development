@@ -1,27 +1,34 @@
 import express from "express";
 import { authorizeRoles } from "../middlewares/authen.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
-import promotionValidation from "../validations/promotions.validation.js";
-import * as promotionController from "../controllers/promotions.controller.js";
+import {
+  validateUpsertPromotion,
+  validateDeletePromotion
+} from "../validations/promotions.validation.js";
+import {
+  handleGetPromotions,
+  handleUpsertPromotion,
+  handleDeletePromotion
+} from "../controllers/promotions.controller.js";
 
 const router = express.Router();
 
-router.get("/", promotionController.getPromotions);
+router.get("/", handleGetPromotions);
 
 router.put(
   "/",
   authorizeRoles("admin"),
-  promotionValidation.upsertPromotion,
+  validateUpsertPromotion,
   validate,
-  promotionController.upsertPromotion
+  handleUpsertPromotion
 );
 
 router.delete(
   "/:promotionID",
   authorizeRoles("admin"),
-  promotionValidation.deletePromotion,
+  validateDeletePromotion,
   validate,
-  promotionController.deletePromotion
+  handleDeletePromotion
 );
 
 export default router;

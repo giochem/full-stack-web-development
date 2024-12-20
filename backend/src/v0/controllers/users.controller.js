@@ -1,15 +1,21 @@
-import userService from "../services/users.service.js";
+import {
+  getUsersByOffsetBased,
+  getUserByUserID,
+  getUserByEmail,
+  createUser,
+  updateUser,
+  deleteUser
+} from "../services/users.service.js";
 import sha256 from "hash.js/lib/hash/sha/256.js";
 import Response from "../configs/response.js";
 import { Message, StatusCode } from "../utils/constants.js";
 
-export const getUsers = async (req, res, next) => {
+export const handleGetUsers = async (req, res, next) => {
   try {
-    const { page, size, sortBy, sortOrder, searchText, filterRole } =
-      req.query;
+    const { page, size, sortBy, sortOrder, searchText, filterRole } = req.query;
     // offset-based
     const offset = page * size;
-    const data = await userService.getUsersByOffsetBased({
+    const data = await getUsersByOffsetBased({
       offset,
       limit: size,
       sortBy,
@@ -26,14 +32,14 @@ export const getUsers = async (req, res, next) => {
       StatusCode.OK
     );
   } catch (error) {
-    console.error("Error in getUsers controller:", error);
+    console.error("Error in handleGetUsers controller:", error);
     return Response.serverError(res, Message.ERROR_DB_QUERY, error);
   }
 };
 
-export const getUser = async (req, res, next) => {
+export const handleGetUser = async (req, res, next) => {
   try {
-    const data = await userService.getUserByUserID(req.params.userID);
+    const data = await getUserByUserID(req.params.userID);
     if (!data || data.length === 0) {
       return Response.error(
         res,
@@ -42,22 +48,17 @@ export const getUser = async (req, res, next) => {
         StatusCode.NOT_FOUND
       );
     }
-    return Response.success(
-      res,
-      Message.SUCCESS_GET_USER,
-      data,
-      StatusCode.OK
-    );
+    return Response.success(res, Message.SUCCESS_GET_USER, data, StatusCode.OK);
   } catch (error) {
-    console.error("Error in getUser controller:", error);
+    console.error("Error in handleGetUser controller:", error);
     return Response.serverError(res, Message.ERROR_DB_QUERY, error);
   }
 };
 
-export const createUser = async (req, res, next) => {
+export const handleCreateUser = async (req, res, next) => {
   try {
     let { username, email, password, role } = req.body;
-    const user = await userService.getUserByEmail(email);
+    const user = await getUserByEmail(email);
     if (user.length !== 0) {
       return Response.error(
         res,
@@ -67,7 +68,7 @@ export const createUser = async (req, res, next) => {
       );
     }
     password = sha256().update(password).digest("hex").toString();
-    const newUser = await userService.createUser({
+    const newUser = await createUser({
       username,
       email,
       password,
@@ -80,17 +81,17 @@ export const createUser = async (req, res, next) => {
       StatusCode.CREATED
     );
   } catch (error) {
-    console.error("Error in createUser controller:", error);
+    console.error("Error in handleCreateUser controller:", error);
     return Response.serverError(res, Message.ERROR_DB_QUERY, error);
   }
 };
 
-export const updateUser = async (req, res, next) => {
+export const handleUpdateUser = async (req, res, next) => {
   try {
     let { username, email, password, role } = req.body;
     const { userID } = req.params;
     password = sha256().update(password).digest("hex").toString();
-    await userService.updateUser({
+    await updateUser({
       userID,
       username,
       email,
@@ -104,15 +105,15 @@ export const updateUser = async (req, res, next) => {
       StatusCode.OK
     );
   } catch (error) {
-    console.error("Error in updateUser controller:", error);
+    console.error("Error in handleUpdateUser controller:", error);
     return Response.serverError(res, Message.ERROR_DB_QUERY, error);
   }
 };
 
-export const deleteUser = async (req, res, next) => {
+export const handleDeleteUser = async (req, res, next) => {
   try {
     const { userID } = req.params;
-    await userService.deleteUser(userID);
+    await deleteUser(userID);
     return Response.success(
       res,
       Message.SUCCESS_DELETE_USER,
@@ -120,7 +121,7 @@ export const deleteUser = async (req, res, next) => {
       StatusCode.OK
     );
   } catch (error) {
-    console.error("Error in deleteUser controller:", error);
+    console.error("Error in handleDeleteUser controller:", error);
     return Response.serverError(res, Message.ERROR_DB_QUERY, error);
   }
 };

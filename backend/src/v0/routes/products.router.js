@@ -2,49 +2,52 @@ import express from "express";
 import { upload } from "../configs/storage.js";
 import { authorizeRoles } from "../middlewares/authen.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
-import productValidation from "../validations/products.validation.js";
-import * as productController from "../controllers/products.controller.js";
+import {
+  validateGetProducts,
+  validateGetProduct,
+  validateUpsertProduct,
+  validateUpsertProductItem,
+  validateDeleteProduct
+} from "../validations/products.validation.js";
+import {
+  handleGetProducts,
+  handleGetProductExtraInfo,
+  handleGetProduct,
+  handleUpsertProduct,
+  handleUpsertProductItem,
+  handleDeleteProduct
+} from "../controllers/products.controller.js";
 
 const router = express.Router();
 
-router.get(
-  "/",
-  productValidation.getProducts,
-  validate,
-  productController.getProducts
-);
-router.get("/extra-info", productController.getProductExtraInfo);
-router.get(
-  "/:productID",
-  productValidation.getProduct,
-  validate,
-  productController.getProduct
-);
+router.get("/", validateGetProducts, validate, handleGetProducts);
+router.get("/extra-info", handleGetProductExtraInfo);
+router.get("/:productID", validateGetProduct, validate, handleGetProduct);
 
 router.put(
   "/",
   // authorizeRoles("admin"),
   upload.single("file"),
-  productValidation.upsertProduct,
+  validateUpsertProduct,
   validate,
-  productController.upsertProduct
+  handleUpsertProduct
 );
 
 router.put(
   "/product-item",
   // authorizeRoles("admin"),
   upload.single("file"),
-  productValidation.upsertProductItem,
+  validateUpsertProductItem,
   validate,
-  productController.upsertProductItem
+  handleUpsertProductItem
 );
 
 router.delete(
   "",
   // authorizeRoles("admin"),
-  productValidation.deleteProduct,
+  validateDeleteProduct,
   validate,
-  productController.deleteProduct
+  handleDeleteProduct
 );
 
 export default router;

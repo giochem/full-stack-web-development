@@ -1,23 +1,22 @@
-import express from 'express';
+import express from "express";
 import { validate } from "../middlewares/validate.middleware.js";
-import authValidation from "../validations/auth.validation.js";
-import * as authController from "../controllers/auth.controller.js";
+import {
+  validateRegister,
+  validateLogin
+} from "../validations/auth.validation.js";
+import {
+  handleGetProfile,
+  handleRegister,
+  handleLogin,
+  handleLogout
+} from "../controllers/auth.controller.js";
 import { authorizeRoles } from "../middlewares/authen.middleware.js";
 
 const router = express.Router();
 
-router.get(
-  "/profile",
-  authorizeRoles("client", "admin"),
-  authController.getProfile
-);
-router.post(
-  "/register",
-  authValidation.register,
-  validate,
-  authController.register
-);
-router.post("/login", authValidation.login, validate, authController.login);
-router.post("/logout", authController.logout);
+router.get("/profile", authorizeRoles("client", "admin"), handleGetProfile);
+router.post("/register", validateRegister, validate, handleRegister);
+router.post("/login", validateLogin, validate, handleLogin);
+router.post("/logout", handleLogout);
 
 export default router;

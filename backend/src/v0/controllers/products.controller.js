@@ -1,11 +1,19 @@
-import productService from "../services/products.service.js";
+import {
+  getProductsByOffsetBased,
+  getProductExtraInfo,
+  getProductByProductID,
+  upsertProduct,
+  upsertProductItem,
+  getProductItemByProductItemID,
+  deleteProduct,
+  deleteProductItem
+} from "../services/products.service.js";
 import Response from "../configs/response.js";
 import { Message, StatusCode, Path } from "../utils/constants.js";
 import fs from "fs";
 
-export const getProducts = async (req, res, next) => {
+export const handleGetProducts = async (req, res, next) => {
   try {
-    // ->promotion, category,number in cart, order
     const {
       page,
       size,
@@ -16,14 +24,14 @@ export const getProducts = async (req, res, next) => {
       filterCategory
     } = req.query;
     const offset = page * size;
-    const data = await productService.getProductsByOffsetBased(
+    const data = await getProductsByOffsetBased(
       offset,
       size,
       sortBy,
       sortOrder,
       searchText,
-      filterPromotion, // promotionID
-      filterCategory // categoryID
+      filterPromotion,
+      filterCategory
     );
     return Response.success(
       res,
@@ -37,9 +45,9 @@ export const getProducts = async (req, res, next) => {
   }
 };
 
-export const getProductExtraInfo = async (req, res, next) => {
+export const handleGetProductExtraInfo = async (req, res, next) => {
   try {
-    const data = await productService.getProductExtraInfo();
+    const data = await getProductExtraInfo();
     return Response.success(
       res,
       Message.SUCCESS_GET_PRODUCT_EXTRA_INFO,
@@ -52,10 +60,10 @@ export const getProductExtraInfo = async (req, res, next) => {
   }
 };
 
-export const getProduct = async (req, res, next) => {
+export const handleGetProduct = async (req, res, next) => {
   try {
     const { productID } = req.params;
-    const data = await productService.getProductByProductID(productID);
+    const data = await getProductByProductID(productID);
     if (!data || data.length === 0) {
       return Response.error(
         res,
@@ -76,14 +84,14 @@ export const getProduct = async (req, res, next) => {
   }
 };
 
-export const upsertProduct = async (req, res, next) => {
+export const handleUpsertProduct = async (req, res, next) => {
   try {
     let { productID, promotionID, categoryID, name, description, image } =
       req.body;
     if (req.file?.filename) {
       image = req.file.filename;
     }
-    await productService.upsertProduct({
+    await upsertProduct({
       productID,
       promotionID,
       categoryID,
@@ -103,7 +111,7 @@ export const upsertProduct = async (req, res, next) => {
   }
 };
 
-export const upsertProductItem = async (req, res, next) => {
+export const handleUpsertProductItem = async (req, res, next) => {
   try {
     let {
       productID,
@@ -117,7 +125,7 @@ export const upsertProductItem = async (req, res, next) => {
     if (req.file?.filename) {
       image = req.file.filename;
     }
-    await productService.upsertProductItem({
+    await upsertProductItem({
       productID,
       productItemID,
       sku,
@@ -138,11 +146,11 @@ export const upsertProductItem = async (req, res, next) => {
   }
 };
 
-export const deleteProduct = async (req, res, next) => {
+export const handleDeleteProduct = async (req, res, next) => {
   try {
     const { productID, productItemID } = req.query;
     if (productID) {
-      const product = await productService.getProductByProductID(productID);
+      const product = await getProductByProductID(productID);
 
       if (!product || product.length === 0) {
         return Response.error(
@@ -160,7 +168,7 @@ export const deleteProduct = async (req, res, next) => {
         fs.unlinkSync(`${Path.UPLOAD_DIR}/${product[0].linkImage}`);
       }
 
-      await productService.deleteProduct(productID);
+      await deleteProduct(productID);
       return Response.success(
         res,
         Message.SUCCESS_DELETE_PRODUCT,
@@ -168,8 +176,7 @@ export const deleteProduct = async (req, res, next) => {
         StatusCode.OK
       );
     } else if (productItemID) {
-      const productItem =
-        await productService.getProductItemByProductItemID(productItemID);
+      const productItem = await getProductItemByProductItemID(productItemID);
 
       if (!productItem || productItem.length === 0) {
         return Response.error(
@@ -186,7 +193,7 @@ export const deleteProduct = async (req, res, next) => {
         fs.unlinkSync(`${Path.UPLOAD_DIR}/${productItem[0].linkImage}`);
       }
 
-      await productService.deleteProductItem(productItemID);
+      await deleteProductItem(productItemID);
       return Response.success(
         res,
         Message.SUCCESS_DELETE_PRODUCT_ITEM,

@@ -1,37 +1,34 @@
 import express from "express";
 import { authorizeRoles } from "../middlewares/authen.middleware.js";
 import { validate } from "../middlewares/validate.middleware.js";
-import cartValidation from "../validations/carts.validation.js";
-import * as cartController from "../controllers/carts.controller.js";
+import {
+  validateGetCarts,
+  validateUpsertCart
+} from "../validations/carts.validation.js";
+import {
+  handleGetCarts,
+  handleGetOwnerCart,
+  handleUpsertCart
+} from "../controllers/carts.controller.js";
 
 const router = express.Router();
 
 router.get(
   "/",
   // authorizeRoles("admin", "client"),
-  cartValidation.getCarts,
+  validateGetCarts,
   validate,
-  cartController.getCarts
+  handleGetCarts
 );
-// router.get(
-//   "/:userID",
-//   // authorizeRoles("admin"),
-//   cartValidation.getCart,
-//   validate,
-//   cartController.getCart
-// );
-router.get(
-  "/owner",
-  authorizeRoles("admin", "client"),
-  cartController.getOwnerCart
-);
+
+router.get("/owner", authorizeRoles("admin", "client"), handleGetOwnerCart);
 
 router.put(
   "/",
   authorizeRoles("client", "admin"),
-  cartValidation.upsertCart,
+  validateUpsertCart,
   validate,
-  cartController.upsertCart
+  handleUpsertCart
 );
 
 export default router;
