@@ -1,6 +1,6 @@
 INSERT INTO payments (name, price) VALUES
-('Cash', 50),
-('Credit Card', 30),
-('PayPal', 13),
-('Bank Transfer', 48),
-('Digital Wallet', 32);
+('Cash', 46),
+('Credit Card', 21),
+('PayPal', 29),
+('Bank Transfer', 50),
+('Digital Wallet', 18);

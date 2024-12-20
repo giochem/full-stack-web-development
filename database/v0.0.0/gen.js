@@ -1,6 +1,6 @@
-const fs = require("fs");
-const path = require("path");
-var sha256 = require("hash.js/lib/hash/sha/256");
+import { existsSync, mkdirSync, writeFileSync } from "fs";
+import { join } from "path";
+import { createHash } from "crypto";
 // Utility functions for generating random data
 const getRandomInt = (min, max) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
@@ -32,7 +32,7 @@ const generateUsers = () => {
   let content = "INSERT INTO users (username, email, password, role) VALUES\n";
   const roles = ["client", "admin"];
 
-  const hashedPassword = sha256().update("1").digest("hex");
+  const hashedPassword = createHash("sha256").update("1").digest("hex");
   content += `('admin', 'admin@example.com', '${hashedPassword}', 'admin'),\n`;
   for (let i = 2; i <= ROWS_USERS; i++) {
     content += `('client_${i - 1}', 'client${
@@ -343,20 +343,20 @@ const generateAllData = () => {
   };
 
   // Create the 'sql' directory if it doesn't exist
-  const dir = path.join(__dirname, "sql");
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir);
+  const dir = join(process.cwd(), "sql");
+  if (!existsSync(dir)) {
+    mkdirSync(dir);
   }
 
   // Write each table's data to a separate file in the 'sql' directory
   for (const [tableName, content] of Object.entries(data)) {
-    fs.writeFileSync(path.join(dir, `${tableName}_data.sql`), content);
+    writeFileSync(join(dir, `${tableName}_data.sql`), content);
     console.log(`Generated ${tableName}_data.sql in the 'sql' directory`);
   }
 
   // Create a combined SQL file with all insert statements
   const combinedContent = Object.values(data).join("\n");
-  fs.writeFileSync("combined_data.sql", combinedContent);
+  writeFileSync("combined_data.sql", combinedContent);
   console.log(`Generated 0_combined_data.sql in the 'sql' directory`);
 };
 

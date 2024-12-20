@@ -2,7 +2,6 @@ import express from "express";
 import sessions from "express-session";
 import cookieParser from "cookie-parser";
 import Response from "./v0/configs/response.js";
-import { Path } from "./v0/utils/constants.js";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
