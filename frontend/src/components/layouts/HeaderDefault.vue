@@ -53,6 +53,10 @@
             </RouterLink>
           </template>
 
+          <RouterLink to="/search" class="search-button">
+            <i class="ri-search-line"></i>
+          </RouterLink>
+
           <div class="lang-selector">
             <button
               class="lang-btn"
@@ -374,5 +378,16 @@ watch(isLoggedIn, async (newValue) => {
   .action-button {
     margin-left: 1rem;
   }
+}
+
+.search-button {
+  padding: 0.5rem;
+  color: var(--secondary-dark-color);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.search-button:hover {
+  color: var(--primary-color);
 }
 </style>

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import DefaultLayout from "../layouts/DefaultLayout.vue";
 import ClientHome from "../views/client/Home.vue";
+import Search from "../views/client/Search.vue";
 // admin
 import AdminLayout from "../layouts/AdminLayout.vue";
 //import Dashboard from "@/views/admin/Dashboard.vue";
@@ -52,6 +53,11 @@ const router = createRouter({
           path: "/category",
           name: "category",
           component: () => import("../views/client/Category.vue")
+        },
+        {
+          path: "/search",
+          name: "search",
+          component: Search
         }
       ]
     },
