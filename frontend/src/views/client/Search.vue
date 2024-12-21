@@ -54,6 +54,7 @@ import { parseISO, isAfter, isBefore } from "date-fns";
 const searchText = ref("");
 const results = ref([]);
 const loading = ref(false);
+const cacheType = ref("cached-query"); // Variable to choose cache type: "none", "cached-query"
 
 const debouncedSearch = debounce(async () => {
   console.log("Searching for:", searchText.value);
@@ -62,60 +63,98 @@ const debouncedSearch = debounce(async () => {
 
 async function search() {
   loading.value = true;
-  const db = await openIndexedDB();
+  if (cacheType.value === "cached-query") {
+    console.log("Cache type:", cacheType.value);
+    const db = await openIndexedDB();
+    await searchWithSimpleCache(db);
+    await cleanUpOldData(db);
+  } else {
+    await fetchAndSetResults();
+  }
 
-  const transaction = db.transaction("queries", "readonly");
-  const store = transaction.objectStore("queries");
+  loading.value = false;
+}
+
+async function searchWithSimpleCache(db) {
+  const transaction = db.transaction("queryCache", "readonly");
+  const queryCacheStore = transaction.objectStore("queryCache");
   const cachedResults = await new Promise((resolve, reject) => {
-    const request = store.get(searchText.value);
+    const request = queryCacheStore.get(searchText.value);
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
-
   if (cachedResults) {
     results.value = cachedResults.data;
   } else {
-    try {
-      const response = await axiosInstance.get(
-        API_ENDPOINTS.PRODUCTS.LIST.url(0, 12, { searchText: searchText.value })
-      );
-      const data = response.data.data.map((product) => ({
-        productID: product.productID,
-        name: product.name,
-        description: product.description,
-        categoryName: product.categoryName,
-        promotionName: product.promotionName,
-        discount: product.discount,
-        startDate: product.startDate,
-        endDate: product.endDate,
-        totalQuantityInStock: product.totalQuantityInStock
-      }));
-      results.value = data;
+    await fetchAndCacheResults(db);
+  }
+}
 
-      const transaction = db.transaction("queries", "readwrite");
-      const store = transaction.objectStore("queries");
+async function fetchAndCacheResults(db) {
+  try {
+    console.log("Fetching products from API...");
+    const response = await axiosInstance.get(
+      API_ENDPOINTS.PRODUCTS.LIST.url(0, 12, { searchText: searchText.value })
+    );
+    const data = response.data.data.map((product) => ({
+      productID: product.productID,
+      name: product.name,
+      description: product.description,
+      categoryName: product.categoryName,
+      promotionName: product.promotionName,
+      discount: product.discount,
+      startDate: product.startDate,
+      endDate: product.endDate,
+      totalQuantityInStock: product.totalQuantityInStock
+    }));
+    results.value = data;
+
+    if (cacheType.value === "cached-query") {
+      const transaction = db.transaction("queryCache", "readwrite");
+      const queryCacheStore = transaction.objectStore("queryCache");
       await new Promise((resolve, reject) => {
-        const request = store.put(
+        const request = queryCacheStore.put(
           { data, timestamp: Date.now() },
           searchText.value
         );
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
       });
-    } catch (error) {
-      console.error("Error fetching products:", error);
     }
+  } catch (error) {
+    console.error("Error fetching products:", error);
   }
-  loading.value = false;
-  await cleanUpOldData(db);
+}
+
+async function fetchAndSetResults() {
+  try {
+    const response = await axiosInstance.get(
+      API_ENDPOINTS.PRODUCTS.LIST.url(0, 12, { searchText: searchText.value })
+    );
+    results.value = response.data.data.map((product) => ({
+      productID: product.productID,
+      name: product.name,
+      description: product.description,
+      categoryName: product.categoryName,
+      promotionName: product.promotionName,
+      discount: product.discount,
+      startDate: product.startDate,
+      endDate: product.endDate,
+      totalQuantityInStock: product.totalQuantityInStock
+    }));
+  } catch (error) {
+    console.error("Error fetching products:", error);
+  }
 }
 
 function openIndexedDB() {
+  console.log("Opening IndexedDB...");
   return new Promise((resolve, reject) => {
     const request = indexedDB.open("searchCache", 1);
     request.onupgradeneeded = (event) => {
       const db = event.target.result;
-      db.createObjectStore("queries");
+      db.createObjectStore("queryCache");
+      console.log("Created IndexedDB:", db);
     };
     request.onsuccess = (event) => resolve(event.target.result);
     request.onerror = (event) => reject(event.target.error);
@@ -125,10 +164,8 @@ function openIndexedDB() {
 function debounce(func, wait) {
   let timeout;
   return function (...args) {
-    if (timeout) {
-      clearTimeout(timeout);
-    }
     const context = this;
+    clearTimeout(timeout);
     timeout = setTimeout(() => func.apply(context, args), wait);
   };
 }
@@ -155,27 +192,27 @@ function getPromotionClass(result) {
 }
 
 async function cleanUpOldData(db) {
-  const transaction = db.transaction("queries", "readwrite");
-  const store = transaction.objectStore("queries");
+  const transaction = db.transaction("queryCache", "readwrite");
+  const queryCacheStore = transaction.objectStore("queryCache");
   const now = Date.now();
-  const oneHour = 30 * 1000;
+  const oneHour = 60 * 60 * 1000;
 
   const keys = await new Promise((resolve, reject) => {
-    const request = store.getAllKeys();
+    const request = queryCacheStore.getAllKeys();
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
 
   for (const key of keys) {
     const entry = await new Promise((resolve, reject) => {
-      const request = store.get(key);
+      const request = queryCacheStore.get(key);
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
     });
 
     if (now - entry.timestamp > oneHour) {
       await new Promise((resolve, reject) => {
-        const request = store.delete(key);
+        const request = queryCacheStore.delete(key);
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
       });
