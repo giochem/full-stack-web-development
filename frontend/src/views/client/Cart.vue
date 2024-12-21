@@ -2,7 +2,7 @@
   <div class="cart-page">
     <div class="cart-container">
       <div class="cart-header">
-        <h1>Shopping Cart</h1>
+        <h1>{{ $t("Views.Client.Cart.ShoppingCart") }}</h1>
       </div>
 
       <div v-if="cartItems.length > 0" class="cart-content">
@@ -36,8 +36,12 @@
               </div>
 
               <div class="item-options">
-                <span class="item-color">Color: {{ item.color }}</span>
-                <span class="item-size">Size: {{ item.size }}</span>
+                <span class="item-color"
+                  >{{ $t("Views.Client.Cart.Color") }}: {{ item.color }}</span
+                >
+                <span class="item-size"
+                  >{{ $t("Views.Client.Cart.Size") }}: {{ item.size }}</span
+                >
               </div>
 
               <div class="item-actions">
@@ -71,32 +75,32 @@
 
         <div class="cart-summary">
           <div class="summary-row">
-            <span>Subtotal</span>
+            <span>{{ $t("Views.Client.Cart.Subtotal") }}</span>
             <span>{{ formatPrice(originalSubtotal) }} đ</span>
           </div>
           <div v-if="totalSavings > 0" class="summary-row savings">
-            <span>Discount Savings</span>
+            <span>{{ $t("Views.Client.Cart.DiscountSavings") }}</span>
             <span>-{{ formatPrice(totalSavings) }} đ</span>
           </div>
           <div class="summary-row">
-            <span>Shipping</span>
+            <span>{{ $t("Views.Client.Cart.Shipping") }}</span>
             <span>{{ formatPrice(shippingFee) }} đ</span>
           </div>
           <div class="summary-total">
-            <span>Total</span>
+            <span>{{ $t("Views.Client.Cart.Total") }}</span>
             <span>{{ formatPrice(total) }} đ</span>
           </div>
           <button @click="checkout" class="checkout-btn">
-            Proceed to Checkout
+            {{ $t("Views.Client.Cart.ProceedCheckout") }}
           </button>
         </div>
       </div>
 
       <div v-else class="empty-cart">
         <i class="ri-shopping-cart-line"></i>
-        <p>Your cart is empty</p>
+        <p>{{ $t("Views.Client.Cart.EmptyCart") }}</p>
         <RouterLink to="/" class="continue-shopping">
-          Continue Shopping
+          {{ $t("Views.Client.Cart.ContinueShopping") }}
         </RouterLink>
       </div>
     </div>

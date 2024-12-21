@@ -38,7 +38,9 @@
             >
               <i class="ri-logout-box-line"></i>
               <span class="button-text">{{
-                isLoggingOut ? "Logging out..." : "Logout"
+                isLoggingOut
+                  ? $t("Components.Layouts.HeaderDefault.LoggingOut")
+                  : $t("Components.Layouts.HeaderDefault.Logout")
               }}</span>
             </button>
           </template>

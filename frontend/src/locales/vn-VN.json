@@ -5,6 +5,8 @@
         "NameStore": "Cửa hàng 369",
         "Home": "Trang chủ",
         "Auth": "Xác thực",
+        "Logout": "Đăng xuất",
+        "LoggingOut": "Đang đăng xuất...",
         "Category": "Danh mục"
       },
       "FooterDefault": {
@@ -56,6 +58,66 @@
       },
       "Product": {
         "Loading": "Đang tải sản phẩm..."
+      },
+      "Cart": {
+        "ShoppingCart": "Giỏ hàng",
+        "Subtotal": "Tổng giá trị đơn hàng",
+        "DiscountSavings": "Tổng tiền được giảm",
+        "Shipping": "Phí giao hàng",
+        "Total": "Tổng hóa đơn",
+        "ProceedCheckout": "Thực hiện thanh toán",
+        "EmptyCart": "Giỏ hàng hiện không có sản phẩm",
+        "ContinueShopping": "Tiếp tục mua sắm",
+        "Color": "Màu sắc",
+        "Size": "Kích thước"
+      },
+      "Profile": {
+        "MyProfile": "Hồ sơ của tôi",
+        "AccountInformation": "Thông tin tài khoản",
+        "Username": "Tên người dùng",
+        "Email": "Email",
+        "Role": "Vai trò",
+        "EditProfile": "Chỉnh sửa hồ sơ",
+        "OrderHistory": "Lịch sử đơn hàng",
+        "Order": "Đơn hàng",
+        "ViewDetails": "Xem chi tiết",
+        "NoOrdersYet": "Chưa có đơn hàng nào",
+        "EnterUsername": "Nhập tên người dùng",
+        "EnterEmail": "Nhập email",
+        "NewPasswordOptional": "Mật khẩu mới (tùy chọn)",
+        "EnterNewPassword": "Nhập mật khẩu mới",
+        "SaveChanges": "Lưu thay đổi",
+        "Cancel": "Hủy"
+      },
+      "OrderSuccess": {
+        "OrderPlacedSuccessfully": "Đặt hàng thành công!",
+        "ThankYouForPurchase": "Cảm ơn bạn đã mua hàng. Đơn hàng của bạn đã được nhận.",
+        "OrderDate": "Ngày đặt hàng",
+        "WhatsNext": "Tiếp theo là gì?",
+        "OrderConfirmationEmail": "Bạn sẽ nhận được email xác nhận đơn hàng",
+        "ProcessOrderSoon": "Chúng tôi sẽ xử lý đơn hàng của bạn sớm",
+        "TrackOrderInProfile": "Bạn có thể theo dõi đơn hàng trong hồ sơ của mình",
+        "ViewOrder": "Xem đơn hàng",
+        "ContinueShopping": "Tiếp tục mua sắm"
+      },
+      "Checkout": {
+        "Title": "Thanh toán",
+        "ShippingInformation": "Thông tin giao hàng",
+        "LabelFullName": "Họ và tên",
+        "PlaceholderFullName": "Nhập họ và tên",
+        "LabelPhoneNumber": "Số điện thoại",
+        "PlaceholderPhoneNumber": "Nhập số điện thoại",
+        "LabelDeliveryAddress": "Địa chỉ giao hàng",
+        "PlaceholderDeliveryAddress": "Nhập địa chỉ giao hàng",
+        "LabelNote": "Ghi chú",
+        "PlaceholderNote": "Nhập ghi chú",
+        "OrderSummary": "Tóm tắt đơn hàng",
+        "Subtotal": "Tổng giá trị đơn hàng",
+        "DiscountSavings": "Tổng tiền được giảm",
+        "Shipping": "Phí giao hàng",
+        "Total": "Tổng hóa đơn",
+        "Processing": "Đang xử lý",
+        "PlaceOrder": "Đặt hàng"
       }
     },
     "Admin": {
