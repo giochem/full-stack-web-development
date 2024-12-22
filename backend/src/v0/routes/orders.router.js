@@ -17,7 +17,7 @@ const router = express.Router();
 
 router.get(
   "/",
-  // authorizeRoles("admin", "client"),
+  authorizeRoles("admin", "client"),
   validateGetOrders,
   validate,
   handleGetOrders

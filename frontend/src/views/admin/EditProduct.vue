@@ -412,6 +412,7 @@ const { currentProductItems, loading, variations } = storeToRefs(productStore);
 
 function getImageUrl(image) {
   if (!image) return APP_CONSTANTS.UPLOAD.DEFAULT_IMAGE;
+  if (image.startsWith("blob:http:")) return image;
   return `${APP_CONSTANTS.UPLOAD.UPLOAD_URL}/${image}`;
 }
 

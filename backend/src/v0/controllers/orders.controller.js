@@ -49,9 +49,9 @@ export const handleGetOwnerOrders = async (req, res, next) => {
 
 export const handleCreateOrder = async (req, res, next) => {
   try {
-    const { userID, fullName, phone, address, note } = req.body;
+    const { fullName, phone, address, note } = req.body;
     await createOrder({
-      userID,
+      userID: req.session.userID,
       fullName,
       phone,
       address,

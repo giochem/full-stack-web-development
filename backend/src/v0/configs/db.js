@@ -1,4 +1,4 @@
-import sql from 'mssql';
+import sql from "mssql";
 
 export const config = {
   user: process.env.SQL_SERVER_USER,
@@ -7,10 +7,19 @@ export const config = {
   database: process.env.SQL_SERVER_DATABASE,
   options: {
     trustedConnection: true,
-    encrypt: true,
     enableArithAbort: true,
-    trustServerCertificate: true
-  }
+    trustServerCertificate: true,
+    instanceName: "SQLEXPRESS"
+  },
+  pool: {
+    max: 1000,
+    min: 0,
+    idleTimeoutMillis: 30000
+  },
+  connectionTimeout: 30000,
+  requestTimeout: 30000,
+  stream: false,
+  parseJSON: true
 };
 
 export const pool = async (query) => {

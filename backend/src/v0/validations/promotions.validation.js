@@ -3,7 +3,7 @@ import { body, param } from "express-validator";
 export const validateUpsertPromotion = [
   body("name").notEmpty().withMessage("Promotion name is required"),
   body("description").optional(),
-  body("discountRate")
+  body("discount")
     .isFloat({ min: 0, max: 100 })
     .withMessage("Discount rate must be between 0 and 100"),
   body("startDate").isISO8601().withMessage("Invalid start date format"),

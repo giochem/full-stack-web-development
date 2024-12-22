@@ -1,7 +1,7 @@
 import { body, param } from "express-validator";
 
 export const validateUpsertVariation = [
-  body("name").notEmpty().withMessage("Variation name is required")
+  body("nameAtribute").notEmpty().withMessage("Variation name is required")
 ];
 
 export const validateDeleteVariation = [

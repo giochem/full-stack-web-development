@@ -189,18 +189,17 @@ function formatDate(dateString) {
 
 // Fetch dashboard data
 async function fetchDashboardData() {
-  try {
-    const response = await axios.get(
-      `http://localhost:5000/api/dashboard?period=${selectedPeriod.value}`
-    );
-    stats.value = response.data.stats;
-    recentOrders.value = response.data.recentOrders;
-
-    // Update charts with new data
-    updateCharts(response.data.chartData);
-  } catch (error) {
-    console.error("Error fetching dashboard data:", error);
-  }
+  // try {
+  //   const response = await axios.get(
+  //     `http://localhost:5000/api/dashboard?period=${selectedPeriod.value}`
+  //   );
+  //   stats.value = response.data.stats;
+  //   recentOrders.value = response.data.recentOrders;
+  //   // Update charts with new data
+  //   updateCharts(response.data.chartData);
+  // } catch (error) {
+  //   console.error("Error fetching dashboard data:", error);
+  // }
 }
 
 // Initialize and update charts

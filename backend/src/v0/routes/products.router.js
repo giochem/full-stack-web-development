@@ -26,7 +26,7 @@ router.get("/:productID", validateGetProduct, validate, handleGetProduct);
 
 router.put(
   "/",
-  // authorizeRoles("admin"),
+  authorizeRoles("admin"),
   upload.single("file"),
   validateUpsertProduct,
   validate,
@@ -35,7 +35,7 @@ router.put(
 
 router.put(
   "/product-item",
-  // authorizeRoles("admin"),
+  authorizeRoles("admin"),
   upload.single("file"),
   validateUpsertProductItem,
   validate,
@@ -44,7 +44,7 @@ router.put(
 
 router.delete(
   "",
-  // authorizeRoles("admin"),
+  authorizeRoles("admin"),
   validateDeleteProduct,
   validate,
   handleDeleteProduct

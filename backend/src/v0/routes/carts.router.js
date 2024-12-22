@@ -15,7 +15,7 @@ const router = express.Router();
 
 router.get(
   "/",
-  // authorizeRoles("admin", "client"),
+  authorizeRoles("admin", "client"),
   validateGetCarts,
   validate,
   handleGetCarts
