@@ -1,17 +1,10 @@
 {
   "scripts": {
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "dev": "concurrently \"cd frontend && npm run dev\" \"cd backend && npm run dev\"",
     "format": "prettier --write \"./**/*.{js,json,vue}\"",
     "prepare": "husky",
-    "lint-staged": "lint-staged",
-    "test": "npx playwright test --headless",
-    "test:ui": "npx playwright test --ui",
-    "test:debug": "npx playwright test --debug  --headed --project=chromium",
-    "test:headed": "npx playwright test --headed",
-    "test:chrome": "npx playwright test --project=chromium",
-    "test:firefox": "npx playwright test --project=firefox",
-    "test:safari": "npx playwright test --project=webkit",
-    "test:report": "npx playwright show-report",
-    "test:codegen": "npx playwright codegen"
+    "lint-staged": "lint-staged"
   },
   "lint-staged": {
     "*.{js,json,vue}": [
@@ -19,10 +12,9 @@
     ]
   },
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "@commitlint/cli": "^19.6.1",
     "@commitlint/config-conventional": "^19.6.0",
-    "@playwright/test": "^1.49.1",
-    "@types/node": "^22.10.2",
     "husky": "^9.1.7",
     "lint-staged": "^15.2.11",
     "prettier": "^3.4.2"

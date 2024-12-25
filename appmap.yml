@@ -1,6 +1,6 @@
 name: backend
 language: javascript
-appmap_dir: tmp/appmap
+appmap_dir: document/tmp/appmap
 packages:
   - path: .
     exclude:
