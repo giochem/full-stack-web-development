@@ -8,8 +8,8 @@ export const config = {
   options: {
     trustedConnection: true,
     enableArithAbort: true,
-    trustServerCertificate: true,
-    instanceName: "SQLEXPRESS"
+    trustServerCertificate: true
+    // instanceName: "SQLEXPRESS"
   },
   pool: {
     max: 1000,
