@@ -60,7 +60,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import axios from "axios";
+import axios from "@/utils/axios";
 
 const route = useRoute();
 const router = useRouter();
@@ -80,7 +80,7 @@ function formatPrice(price) {
 async function save() {
   try {
     await axios.put(
-      `http://localhost:5000/api/orders/${route.params.orderID}`,
+      `/orders/${route.params.orderID}`,
       {
         status: order.value.status
       },
@@ -94,10 +94,9 @@ async function save() {
 
 onMounted(async () => {
   try {
-    const response = await axios.get(
-      `http://localhost:5000/api/orders/${route.params.orderID}`,
-      { withCredentials: true }
-    );
+    const response = await axios.get(`/orders/${route.params.orderID}`, {
+      withCredentials: true
+    });
     order.value = response.data.data[0];
   } catch (error) {
     console.error("Error fetching order:", error);

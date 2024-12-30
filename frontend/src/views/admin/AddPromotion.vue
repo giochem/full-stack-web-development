@@ -76,7 +76,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import axios from "@/utils/axios";
 
 const router = useRouter();
 
@@ -102,7 +102,7 @@ async function save() {
       endTime: promotion.value.endTime.replace("T", " ")
     };
 
-    await axios.post("http://localhost:5000/api/promotions", data, {
+    await axios.post("/promotions", data, {
       withCredentials: true
     });
 

@@ -76,7 +76,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import axios from "axios";
+import axios from "@/utils/axios";
 
 const route = useRoute();
 const router = useRouter();
@@ -101,11 +101,9 @@ async function save() {
       reduce: parseInt(promotion.value.reduce)
     };
 
-    await axios.put(
-      `http://localhost:5000/api/promotions/${route.params.promotionID}`,
-      data,
-      { withCredentials: true }
-    );
+    await axios.put(`/promotions/${route.params.promotionID}`, data, {
+      withCredentials: true
+    });
     router.push("/admin/manage-promotion");
   } catch (error) {
     console.error("Error updating promotion:", error);
@@ -115,7 +113,7 @@ async function save() {
 onMounted(async () => {
   try {
     const response = await axios.get(
-      `http://localhost:5000/api/promotions/${route.params.promotionID}`,
+      `/promotions/${route.params.promotionID}`,
       { withCredentials: true }
     );
     const data = response.data.data[0];

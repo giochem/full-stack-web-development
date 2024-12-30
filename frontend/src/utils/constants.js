@@ -152,9 +152,10 @@ export const API_ENDPOINTS = {
 
 // App Constants
 export const APP_CONSTANTS = {
-  API_URL: "http://localhost:5000",
-  API_BASE_URL: "http://localhost:5000/api",
-  API_TIMEOUT: 5000,
+  API_URL: import.meta.env.VITE_API_URL || "http://localhost:5000",
+  API_BASE_URL:
+    import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api",
+  API_TIMEOUT: parseInt(import.meta.env.VITE_API_TIMEOUT) || 15000,
   STORAGE_KEYS: {
     AUTH_TOKEN: "token",
     IS_LOGGED_IN: "logined"
@@ -172,6 +173,7 @@ export const APP_CONSTANTS = {
   },
   UPLOAD: {
     DEFAULT_IMAGE: "https://via.placeholder.com/200",
-    UPLOAD_URL: "http://localhost:5000/uploads/v0/"
+    UPLOAD_URL:
+      import.meta.env.VITE_API_UPLOAD_URL || "http://localhost:5000/uploads/v0/"
   }
 };

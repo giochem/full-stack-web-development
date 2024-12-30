@@ -150,7 +150,7 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import Chart from "chart.js/auto";
-import axios from "axios";
+import axios from "@/utils/axios";
 import { useI18n } from "vue-i18n";
 const { t } = useI18n({ useScope: "global" });
 
@@ -191,7 +191,7 @@ function formatDate(dateString) {
 async function fetchDashboardData() {
   // try {
   //   const response = await axios.get(
-  //     `http://localhost:5000/api/dashboard?period=${selectedPeriod.value}`
+  //     `/dashboard?period=${selectedPeriod.value}`
   //   );
   //   stats.value = response.data.stats;
   //   recentOrders.value = response.data.recentOrders;

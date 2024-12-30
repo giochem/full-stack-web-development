@@ -128,7 +128,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import axios from "axios";
+import axios from "@/utils/axios";
 
 const route = useRoute();
 const router = useRouter();
@@ -139,7 +139,7 @@ async function handleLogout() {
   try {
     isLoggingOut.value = true;
     await axios.post(
-      "http://localhost:5000/api/auth/logout",
+      "/auth/logout",
       {},
       {
         withCredentials: true

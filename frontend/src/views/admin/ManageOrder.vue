@@ -174,7 +174,7 @@
 
 <script setup>
 import { onMounted, ref, computed } from "vue";
-import axios from "axios";
+import axios from "@/utils/axios";
 import { useRouter, useRoute } from "vue-router";
 
 const router = useRouter();
@@ -310,12 +310,9 @@ async function fetchOrders(isLoadMore = false) {
       params.append("userID", userID.value);
     }
 
-    const response = await axios.get(
-      `http://localhost:5000/api/orders?${params}`,
-      {
-        withCredentials: true
-      }
-    );
+    const response = await axios.get(`/orders?${params}`, {
+      withCredentials: true
+    });
 
     if (isLoadMore) {
       orders.value = [...orders.value, ...response.data.data];
