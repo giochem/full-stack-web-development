@@ -10,7 +10,7 @@
           <div v-for="item in cartItems" :key="item.cartID" class="cart-item">
             <div class="item-image">
               <img
-                :src="`http://localhost:5000/uploads/${item.linkImage}`"
+                :src="`${APP_CONSTANTS.UPLOAD.UPLOAD_URL + item.image}`"
                 :alt="item.name"
               />
             </div>
@@ -113,7 +113,6 @@ import { useRouter } from "vue-router";
 import { useCartStore } from "@/stores/cart";
 import { APP_CONSTANTS } from "@/utils/constants";
 import { parseISO, isAfter, isBefore } from "date-fns";
-
 const router = useRouter();
 const cartStore = useCartStore();
 const cartItems = ref([]);

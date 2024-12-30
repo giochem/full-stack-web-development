@@ -1,3 +1,4 @@
+import { configEnv } from "../../configEnv.js";
 class Response {
   constructor(success, message, data = null) {
     this.success = success;
@@ -33,9 +34,9 @@ class Response {
 
   static serverError(res, message = "Internal Server Error", error = null) {
     const response = new Response(false, message);
-    if (process.env.NODE_ENV !== "production" && error) {
-      response.stack = error.stack;
-    }
+    // if (configEnv.name !== "production" && error) {
+    //   response.stack = error.stack;
+    // }
     return res.status(error.status || 500).json(response);
   }
 }

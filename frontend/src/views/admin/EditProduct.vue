@@ -389,7 +389,7 @@ import { useProductStore } from "@/stores/product";
 import { useVariationStore } from "@/stores/variation";
 import { getCurrentInstance } from "vue";
 import { APP_CONSTANTS } from "@/utils/constants";
-import axios from "axios";
+import axios from "@/utils/axios";
 import { storeToRefs } from "pinia";
 
 const app = getCurrentInstance();

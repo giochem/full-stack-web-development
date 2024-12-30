@@ -84,8 +84,7 @@ import { RouterLink, useRouter } from "vue-router";
 import { onMounted, watch, computed, ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useCartStore } from "@/stores/cart";
-import axios from "axios";
-
+import axios from "@/utils/axios";
 const router = useRouter();
 const cartStore = useCartStore();
 const { itemCount: cartItemCount } = storeToRefs(cartStore);
@@ -99,7 +98,7 @@ async function handleLogout() {
   try {
     isLoggingOut.value = true;
     await axios.post(
-      "http://localhost:5000/api/auth/logout",
+      "/auth/logout",
       {},
       {
         withCredentials: true

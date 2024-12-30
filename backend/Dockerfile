@@ -12,6 +12,9 @@ RUN npm install
 # Copy the rest of the application code to the working directory
 COPY . .
 
+# Rename upload directory to for static file
+RUN mv ./src/v0/uploads.dev ./src/v0/uploads
+
 # Expose the port the app will run on
 EXPOSE 3000
 
