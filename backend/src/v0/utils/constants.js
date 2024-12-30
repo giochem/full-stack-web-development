@@ -114,12 +114,7 @@ const StatusCode = {
 };
 
 const Path = {
-  UPLOAD_DIR: "./src/v0/uploads",
-  STATIC_DIR: "/v0/uploads"
+  UPLOAD_DIR: "./src/v0/uploads"
 };
 
-export {
-  Message,
-  StatusCode,
-  Path
-};
+export { Message, StatusCode, Path };
