@@ -1,15 +1,9 @@
-const { body, query, param } = require("express-validator");
+import { body, param } from "express-validator";
 
-module.exports = {
-  upsertVariation: [
-    body("variationID")
-      .optional()
-      .isInt()
-      .withMessage("variationID must be an integer"),
-    body("nameAtribute").optional(),
-  ],
+export const validateUpsertVariation = [
+  body("nameAtribute").notEmpty().withMessage("Variation name is required")
+];
 
-  deleteVariation: [
-    param("variationID").isInt().withMessage("variationID must be an integer"),
-  ],
-};
+export const validateDeleteVariation = [
+  param("variationID").isInt().withMessage("Variation ID must be an integer")
+];

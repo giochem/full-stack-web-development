@@ -1,21 +1,22 @@
-const express = require("express");
-const router = express.Router();
-const { validate } = require("../middlewares/validate.middleware");
-const authValidation = require("../validations/auth.validation");
-const authController = require("../controllers/auth.controller");
-const { authorizeRoles } = require("../middlewares/authen.middleware");
+import express from "express";
+import { validate } from "../middlewares/validate.middleware.js";
+import {
+  validateRegister,
+  validateLogin
+} from "../validations/auth.validation.js";
+import {
+  handleGetProfile,
+  handleRegister,
+  handleLogin,
+  handleLogout
+} from "../controllers/auth.controller.js";
+import { authorizeRoles } from "../middlewares/authen.middleware.js";
 
-router.get(
-  "/profile",
-  authorizeRoles("client", "admin"),
-  authController.getProfile
-);
-router.post(
-  "/register",
-  authValidation.register,
-  validate,
-  authController.register
-);
-router.post("/login", authValidation.login, validate, authController.login);
-router.post("/logout", authController.logout);
-module.exports = router;
+const router = express.Router();
+
+router.get("/profile", authorizeRoles("client", "admin"), handleGetProfile);
+router.post("/register", validateRegister, validate, handleRegister);
+router.post("/login", validateLogin, validate, handleLogin);
+router.post("/logout", handleLogout);
+
+export default router;

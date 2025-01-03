@@ -1,14 +1,16 @@
 <template>
   <div class="manage-promotion">
     <div class="header">
-      <h2>Manage Promotions</h2>
+      <h2>{{ $t("Views.Admin.ManagePromotions.Title") }}</h2>
       <button class="btn-primary" @click="openAddModal">
-        <i class="ri-add-line"></i> Add Promotion
+        <i class="ri-add-line"></i>
+        {{ $t("Views.Admin.ManagePromotions.AddPromotion") }}
       </button>
     </div>
 
     <div v-if="promotionStore.loading" class="loading">
-      <i class="ri-loader-4-line spin"></i> Loading...
+      <i class="ri-loader-4-line spin"></i>
+      {{ $t("Views.Admin.ManagePromotions.Loading") }}
     </div>
 
     <div v-else-if="promotionStore.error" class="error">
@@ -17,19 +19,19 @@
 
     <div v-else-if="!promotionStore.promotions.length" class="empty-state">
       <i class="ri-inbox-line"></i>
-      <p>No promotions found. Create your first promotion!</p>
+      <p>{{ $t("Views.Admin.ManagePromotions.NoPromotions") }}</p>
     </div>
 
     <div v-else class="promotions-list">
       <table>
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Discount</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Status</th>
-            <th>Actions</th>
+            <th>{{ $t("Views.Admin.ManagePromotions.PromotionName") }}</th>
+            <th>{{ $t("Views.Admin.ManagePromotions.Discount") }}</th>
+            <th>{{ $t("Views.Admin.ManagePromotions.StartDate") }}</th>
+            <th>{{ $t("Views.Admin.ManagePromotions.EndDate") }}</th>
+            <th>{{ $t("Views.Admin.ManagePromotions.Status") }}</th>
+            <th>{{ $t("Views.Admin.ManagePromotions.Actions") }}</th>
           </tr>
         </thead>
         <tbody>
@@ -70,13 +72,17 @@
     <Modal v-model="showModal" :title="modalTitle">
       <form @submit.prevent="handleSubmit" class="promotion-form">
         <div class="form-group">
-          <label for="name">Promotion Name</label>
+          <label for="name">{{
+            $t("Views.Admin.ManagePromotions.PromotionName")
+          }}</label>
           <input
             id="name"
             v-model="formData.name"
             type="text"
             required
-            placeholder="Enter promotion name"
+            :placeholder="
+              $t('Views.Admin.ManagePromotions.PlaceholderPromotionName')
+            "
             :class="{ error: validationErrors.name }"
           />
           <span v-if="validationErrors.name" class="error-message">
@@ -85,7 +91,9 @@
         </div>
 
         <div class="form-group">
-          <label for="discount">Discount (%)</label>
+          <label for="discount">{{
+            $t("Views.Admin.ManagePromotions.Discount")
+          }}</label>
           <input
             id="discount"
             v-model.number="formData.discount"
@@ -93,7 +101,9 @@
             required
             min="0"
             max="100"
-            placeholder="Enter discount percentage"
+            :placeholder="
+              $t('Views.Admin.ManagePromotions.PlaceholderDiscount')
+            "
             :class="{ error: validationErrors.discount }"
           />
           <span v-if="validationErrors.discount" class="error-message">
@@ -102,7 +112,9 @@
         </div>
 
         <div class="form-group">
-          <label for="startDate">Start Date</label>
+          <label for="startDate">{{
+            $t("Views.Admin.ManagePromotions.StartDate")
+          }}</label>
           <input
             id="startDate"
             v-model="formData.startDate"
@@ -118,7 +130,9 @@
         </div>
 
         <div class="form-group">
-          <label for="endDate">End Date</label>
+          <label for="endDate">{{
+            $t("Views.Admin.ManagePromotions.EndDate")
+          }}</label>
           <input
             id="endDate"
             v-model="formData.endDate"
@@ -134,7 +148,7 @@
 
         <div class="form-actions">
           <button type="button" class="btn-secondary" @click="closeModal">
-            Cancel
+            {{ $t("Views.Admin.ManagePromotions.Cancel") }}
           </button>
           <button
             type="submit"
@@ -142,7 +156,11 @@
             :disabled="promotionStore.loading"
           >
             <i v-if="promotionStore.loading" class="ri-loader-4-line spin"></i>
-            {{ isEditing ? "Update" : "Create" }}
+            {{
+              isEditing
+                ? $t("Views.Admin.ManagePromotions.Update")
+                : $t("Views.Admin.ManagePromotions.Create")
+            }}
           </button>
         </div>
       </form>
@@ -151,10 +169,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, getCurrentInstance } from "vue";
 import { usePromotionStore } from "@/stores/promotion";
 import Modal from "@/components/common/Modal.vue";
+import { useI18n } from "vue-i18n";
 
+const { t } = useI18n();
+const app = getCurrentInstance();
 const promotionStore = usePromotionStore();
 const showModal = ref(false);
 const isEditing = ref(false);
@@ -165,11 +186,13 @@ const formData = ref({
   name: "",
   discount: 0,
   startDate: "",
-  endDate: "",
+  endDate: ""
 });
 
 const modalTitle = computed(() =>
-  isEditing.value ? "Edit Promotion" : "Add Promotion"
+  isEditing.value
+    ? t("Views.Admin.ManagePromotions.EditPromotion")
+    : t("Views.Admin.ManagePromotions.AddPromotion")
 );
 
 onMounted(async () => {
@@ -180,7 +203,7 @@ const validateForm = () => {
   const errors = {};
 
   if (!formData.value.name?.trim()) {
-    errors.name = "Promotion name is required";
+    errors.name = t("Views.Admin.ManagePromotions.ValidationNameRequired");
   }
 
   if (
@@ -188,22 +211,28 @@ const validateForm = () => {
     formData.value.discount < 0 ||
     formData.value.discount > 100
   ) {
-    errors.discount = "Discount must be between 0 and 100";
+    errors.discount = t("Views.Admin.ManagePromotions.ValidationDiscountRange");
   }
 
   if (!formData.value.startDate) {
-    errors.startDate = "Start date is required";
+    errors.startDate = t(
+      "Views.Admin.ManagePromotions.ValidationStartDateRequired"
+    );
   }
 
   if (!formData.value.endDate) {
-    errors.endDate = "End date is required";
+    errors.endDate = t(
+      "Views.Admin.ManagePromotions.ValidationEndDateRequired"
+    );
   }
 
   if (formData.value.startDate && formData.value.endDate) {
     const start = new Date(formData.value.startDate);
     const end = new Date(formData.value.endDate);
     if (start >= end) {
-      errors.endDate = "End date must be after start date";
+      errors.endDate = t(
+        "Views.Admin.ManagePromotions.ValidationEndDateAfterStart"
+      );
     }
   }
 
@@ -245,7 +274,7 @@ const resetForm = () => {
     startDate: formatDateForInput(new Date()),
     endDate: formatDateForInput(
       new Date(new Date().setDate(new Date().getDate() + 30))
-    ),
+    )
   };
   validationErrors.value = {};
 };
@@ -264,7 +293,7 @@ const editPromotion = (promotion) => {
     name: promotion.name,
     discount: promotion.discount,
     startDate: formatDateForInput(promotion.startDate),
-    endDate: formatDateForInput(promotion.endDate),
+    endDate: formatDateForInput(promotion.endDate)
   };
   validationErrors.value = {};
   showModal.value = true;
@@ -280,7 +309,7 @@ const handleSubmit = async () => {
 
   const result = await promotionStore.upsertPromotion({
     ...formData.value,
-    promotionID: isEditing.value ? editingId.value : undefined,
+    promotionID: isEditing.value ? editingId.value : undefined
   });
 
   if (result.success) {
@@ -293,10 +322,12 @@ const handleSubmit = async () => {
 
 const confirmDelete = async (promotion) => {
   if (
-    confirm(`Are you sure you want to delete promotion "${promotion.name}"?`)
+    confirm(
+      t("Views.Admin.ManagePromotions.DeleteConfirm", { name: promotion.name })
+    )
   ) {
     const result = await promotionStore.deletePromotion(promotion.promotionID);
-    alert(result.message);
+    app?.proxy.$notify(result.message, result.success ? "success" : "error");
   }
 };
 </script>

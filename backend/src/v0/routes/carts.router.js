@@ -1,36 +1,34 @@
-const express = require("express");
+import express from "express";
+import { authorizeRoles } from "../middlewares/authen.middleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import {
+  validateGetCarts,
+  validateUpsertCart
+} from "../validations/carts.validation.js";
+import {
+  handleGetCarts,
+  handleGetOwnerCart,
+  handleUpsertCart
+} from "../controllers/carts.controller.js";
+
 const router = express.Router();
-const { authorizeRoles } = require("../middlewares/authen.middleware");
-const { validate } = require("../middlewares/validate.middleware");
-const cartValidation = require("../validations/carts.validation");
-const cartController = require("../controllers/carts.controller");
 
 router.get(
   "/",
-  // authorizeRoles("admin", "client"),
-  cartValidation.getCarts,
-  validate,
-  cartController.getCarts
-);
-// router.get(
-//   "/:userID",
-//   // authorizeRoles("admin"),
-//   cartValidation.getCart,
-//   validate,
-//   cartController.getCart
-// );
-router.get(
-  "/owner",
   authorizeRoles("admin", "client"),
-  cartController.getOwnerCart
+  validateGetCarts,
+  validate,
+  handleGetCarts
 );
+
+router.get("/owner", authorizeRoles("admin", "client"), handleGetOwnerCart);
 
 router.put(
   "/",
   authorizeRoles("client", "admin"),
-  cartValidation.upsertCart,
+  validateUpsertCart,
   validate,
-  cartController.upsertCart
+  handleUpsertCart
 );
 
-module.exports = router;
+export default router;

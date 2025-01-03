@@ -1,10 +1,10 @@
 <template>
   <div class="dashboard">
     <div class="header">
-      <h1>Dashboard</h1>
+      <h1>{{ $t("Views.Admin.Dashboard.Title") }}</h1>
       <div class="period-selector">
-        <button 
-          v-for="period in periods" 
+        <button
+          v-for="period in periods"
           :key="period.value"
           :class="['period-btn', { active: selectedPeriod === period.value }]"
           @click="selectedPeriod = period.value"
@@ -21,10 +21,17 @@
           <i class="ri-shopping-bag-line"></i>
         </div>
         <div class="card-content">
-          <h3>Total Orders</h3>
+          <h3>{{ $t("Views.Admin.Dashboard.TotalOrders") }}</h3>
           <p class="number">{{ stats.totalOrders }}</p>
-          <p class="trend" :class="{ up: stats.orderTrend > 0, down: stats.orderTrend < 0 }">
-            <i :class="stats.orderTrend > 0 ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"></i>
+          <p
+            class="trend"
+            :class="{ up: stats.orderTrend > 0, down: stats.orderTrend < 0 }"
+          >
+            <i
+              :class="
+                stats.orderTrend > 0 ? 'ri-arrow-up-line' : 'ri-arrow-down-line'
+              "
+            ></i>
             {{ Math.abs(stats.orderTrend) }}% from last period
           </p>
         </div>
@@ -35,10 +42,22 @@
           <i class="ri-money-dollar-circle-line"></i>
         </div>
         <div class="card-content">
-          <h3>Revenue</h3>
+          <h3>{{ $t("Views.Admin.Dashboard.Revenue") }}</h3>
           <p class="number">{{ formatPrice(stats.totalRevenue) }}</p>
-          <p class="trend" :class="{ up: stats.revenueTrend > 0, down: stats.revenueTrend < 0 }">
-            <i :class="stats.revenueTrend > 0 ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"></i>
+          <p
+            class="trend"
+            :class="{
+              up: stats.revenueTrend > 0,
+              down: stats.revenueTrend < 0
+            }"
+          >
+            <i
+              :class="
+                stats.revenueTrend > 0
+                  ? 'ri-arrow-up-line'
+                  : 'ri-arrow-down-line'
+              "
+            ></i>
             {{ Math.abs(stats.revenueTrend) }}% from last period
           </p>
         </div>
@@ -49,10 +68,17 @@
           <i class="ri-user-line"></i>
         </div>
         <div class="card-content">
-          <h3>Active Users</h3>
+          <h3>{{ $t("Views.Admin.Dashboard.ActiveUsers") }}</h3>
           <p class="number">{{ stats.activeUsers }}</p>
-          <p class="trend" :class="{ up: stats.userTrend > 0, down: stats.userTrend < 0 }">
-            <i :class="stats.userTrend > 0 ? 'ri-arrow-up-line' : 'ri-arrow-down-line'"></i>
+          <p
+            class="trend"
+            :class="{ up: stats.userTrend > 0, down: stats.userTrend < 0 }"
+          >
+            <i
+              :class="
+                stats.userTrend > 0 ? 'ri-arrow-up-line' : 'ri-arrow-down-line'
+              "
+            ></i>
             {{ Math.abs(stats.userTrend) }}% from last period
           </p>
         </div>
@@ -63,7 +89,7 @@
           <i class="ri-store-2-line"></i>
         </div>
         <div class="card-content">
-          <h3>Products</h3>
+          <h3>{{ $t("Views.Admin.Dashboard.Products") }}</h3>
           <p class="number">{{ stats.totalProducts }}</p>
           <p class="sub-text">{{ stats.lowStockProducts }} low in stock</p>
         </div>
@@ -73,12 +99,12 @@
     <!-- Charts Section -->
     <div class="charts-section">
       <div class="chart-container">
-        <h2>Revenue Trend</h2>
+        <h2>{{ $t("Views.Admin.Dashboard.RevenueChart") }}</h2>
         <canvas ref="revenueChart"></canvas>
       </div>
-      
+
       <div class="chart-container">
-        <h2>Orders by Status</h2>
+        <h2>{{ $t("Views.Admin.Dashboard.OrdersByStatus") }}</h2>
         <canvas ref="orderStatusChart"></canvas>
       </div>
     </div>
@@ -86,18 +112,20 @@
     <!-- Recent Orders -->
     <div class="recent-section">
       <div class="section-header">
-        <h2>Recent Orders</h2>
-        <RouterLink to="/admin/orders" class="view-all">View All</RouterLink>
+        <h2>{{ $t("Views.Admin.Dashboard.RecentOrders") }}</h2>
+        <RouterLink to="/admin/manage-order" class="view-all">{{
+          $t("Views.Admin.Dashboard.ViewAll")
+        }}</RouterLink>
       </div>
       <div class="table-container">
         <table>
           <thead>
             <tr>
-              <th>Order ID</th>
-              <th>Customer</th>
-              <th>Status</th>
-              <th>Amount</th>
-              <th>Date</th>
+              <th>{{ $t("Views.Admin.Dashboard.OrderID") }}</th>
+              <th>{{ $t("Views.Admin.Dashboard.Customer") }}</th>
+              <th>{{ $t("Views.Admin.Dashboard.Status") }}</th>
+              <th>{{ $t("Views.Admin.Dashboard.Amount") }}</th>
+              <th>{{ $t("Views.Admin.Dashboard.Date") }}</th>
             </tr>
           </thead>
           <tbody>
@@ -120,11 +148,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import Chart from 'chart.js/auto';
-import axios from 'axios';
+import { ref, onMounted, watch } from "vue";
+import Chart from "chart.js/auto";
+import axios from "@/utils/axios";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n({ useScope: "global" });
 
-const selectedPeriod = ref('week');
+const selectedPeriod = ref("week");
 const revenueChart = ref(null);
 const orderStatusChart = ref(null);
 const recentOrders = ref([]);
@@ -140,35 +170,36 @@ const stats = ref({
 });
 
 const periods = [
-  { label: 'Week', value: 'week' },
-  { label: 'Month', value: 'month' },
-  { label: 'Year', value: 'year' }
+  { label: t("Views.Admin.Dashboard.Week"), value: "week" },
+  { label: t("Views.Admin.Dashboard.Month"), value: "month" },
+  { label: t("Views.Admin.Dashboard.Year"), value: "year" }
 ];
 
 // Format helpers
 function formatPrice(price) {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND'
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND"
   }).format(price);
 }
 
 function formatDate(dateString) {
-  return new Date(dateString).toLocaleDateString('vi-VN');
+  return new Date(dateString).toLocaleDateString("vi-VN");
 }
 
 // Fetch dashboard data
 async function fetchDashboardData() {
-  try {
-    const response = await axios.get(`http://localhost:5000/api/dashboard?period=${selectedPeriod.value}`);
-    stats.value = response.data.stats;
-    recentOrders.value = response.data.recentOrders;
-    
-    // Update charts with new data
-    updateCharts(response.data.chartData);
-  } catch (error) {
-    console.error('Error fetching dashboard data:', error);
-  }
+  // try {
+  //   const response = await axios.get(
+  //     `/dashboard?period=${selectedPeriod.value}`
+  //   );
+  //   stats.value = response.data.stats;
+  //   recentOrders.value = response.data.recentOrders;
+  //   // Update charts with new data
+  //   updateCharts(response.data.chartData);
+  // } catch (error) {
+  //   console.error("Error fetching dashboard data:", error);
+  // }
 }
 
 // Initialize and update charts
@@ -181,9 +212,9 @@ function updateCharts(chartData) {
   }
 
   // Revenue Chart
-  const revenueCtx = document.querySelector('#revenueChart').getContext('2d');
+  const revenueCtx = document.querySelector("#revenueChart").getContext("2d");
   revenueChart.value = new Chart(revenueCtx, {
-    type: 'line',
+    type: "line",
     data: chartData.revenue,
     options: {
       responsive: true,
@@ -192,9 +223,11 @@ function updateCharts(chartData) {
   });
 
   // Order Status Chart
-  const statusCtx = document.querySelector('#orderStatusChart').getContext('2d');
+  const statusCtx = document
+    .querySelector("#orderStatusChart")
+    .getContext("2d");
   orderStatusChart.value = new Chart(statusCtx, {
-    type: 'doughnut',
+    type: "doughnut",
     data: chartData.orderStatus,
     options: {
       responsive: true,
@@ -279,10 +312,22 @@ onMounted(() => {
   font-size: 1.5rem;
 }
 
-.card-icon.orders { background: rgba(121, 74, 250, 0.1); color: var(--primary-color); }
-.card-icon.revenue { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-.card-icon.users { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-.card-icon.products { background: rgba(249, 115, 22, 0.1); color: #f97316; }
+.card-icon.orders {
+  background: rgba(121, 74, 250, 0.1);
+  color: var(--primary-color);
+}
+.card-icon.revenue {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+.card-icon.users {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+.card-icon.products {
+  background: rgba(249, 115, 22, 0.1);
+  color: #f97316;
+}
 
 .card-content h3 {
   color: var(--light-text-color);
@@ -304,8 +349,12 @@ onMounted(() => {
   gap: 0.25rem;
 }
 
-.trend.up { color: #10b981; }
-.trend.down { color: #ef4444; }
+.trend.up {
+  color: #10b981;
+}
+.trend.down {
+  color: #ef4444;
+}
 
 .sub-text {
   font-size: 0.875rem;
@@ -367,7 +416,8 @@ table {
   border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
   padding: 1rem;
   text-align: left;
   border-bottom: 1px solid var(--border-color);
@@ -384,22 +434,34 @@ th {
   font-size: 0.875rem;
 }
 
-.status-badge.pending { background: #fef3c7; color: #92400e; }
-.status-badge.processing { background: #dbeafe; color: #1e40af; }
-.status-badge.completed { background: #d1fae5; color: #065f46; }
-.status-badge.cancelled { background: #fee2e2; color: #991b1b; }
+.status-badge.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+.status-badge.processing {
+  background: #dbeafe;
+  color: #1e40af;
+}
+.status-badge.completed {
+  background: #d1fae5;
+  color: #065f46;
+}
+.status-badge.cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
 
 @media (max-width: 768px) {
   .dashboard {
     padding: 1rem;
   }
-  
+
   .header {
     flex-direction: column;
     gap: 1rem;
     align-items: flex-start;
   }
-  
+
   .charts-section {
     grid-template-columns: 1fr;
   }

@@ -1,49 +1,53 @@
-const express = require("express");
-const router = express.Router();
-const { upload } = require("../configs/storage");
-const { authorizeRoles } = require("../middlewares/authen.middleware");
-const { validate } = require("../middlewares/validate.middleware");
-const productValidation = require("../validations/products.validation");
-const productController = require("../controllers/products.controller");
+import express from "express";
+import { upload } from "../configs/storage.js";
+import { authorizeRoles } from "../middlewares/authen.middleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import {
+  validateGetProducts,
+  validateGetProduct,
+  validateUpsertProduct,
+  validateUpsertProductItem,
+  validateDeleteProduct
+} from "../validations/products.validation.js";
+import {
+  handleGetProducts,
+  handleGetProductExtraInfo,
+  handleGetProduct,
+  handleUpsertProduct,
+  handleUpsertProductItem,
+  handleDeleteProduct
+} from "../controllers/products.controller.js";
 
-router.get(
-  "/",
-  productValidation.getProducts,
-  validate,
-  productController.getProducts
-);
-router.get("/extra-info", productController.getProductExtraInfo);
-router.get(
-  "/:productID",
-  productValidation.getProduct,
-  validate,
-  productController.getProduct
-);
+const router = express.Router();
+
+router.get("/", validateGetProducts, validate, handleGetProducts);
+router.get("/extra-info", handleGetProductExtraInfo);
+router.get("/:productID", validateGetProduct, validate, handleGetProduct);
 
 router.put(
   "/",
-  // authorizeRoles("admin"),
+  authorizeRoles("admin"),
   upload.single("file"),
-  productValidation.upsertProduct,
+  validateUpsertProduct,
   validate,
-  productController.upsertProduct
+  handleUpsertProduct
 );
 
 router.put(
   "/product-item",
-  // authorizeRoles("admin"),
+  authorizeRoles("admin"),
   upload.single("file"),
-  productValidation.upsertProductItem,
+  validateUpsertProductItem,
   validate,
-  productController.upsertProductItem
+  handleUpsertProductItem
 );
 
 router.delete(
   "",
-  // authorizeRoles("admin"),
-  productValidation.deleteProduct,
+  authorizeRoles("admin"),
+  validateDeleteProduct,
   validate,
-  productController.deleteProduct
+  handleDeleteProduct
 );
 
-module.exports = router;
+export default router;

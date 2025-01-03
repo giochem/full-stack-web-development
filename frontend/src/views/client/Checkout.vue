@@ -2,54 +2,66 @@
   <div class="checkout-page">
     <div class="checkout-container">
       <div class="checkout-header">
-        <h1>Checkout</h1>
+        <h1>{{ $t("Views.Client.Checkout.Title") }}</h1>
       </div>
 
       <div class="checkout-content">
         <!-- Shipping Information -->
         <div class="checkout-section">
-          <h2>Shipping Information</h2>
+          <h2>{{ $t("Views.Client.Checkout.ShippingInformation") }}</h2>
           <form class="shipping-form" @submit.prevent="placeOrder">
             <div class="form-group">
-              <label for="fullName">Full Name</label>
+              <label for="fullName">{{
+                $t("Views.Client.Checkout.LabelFullName")
+              }}</label>
               <input
                 id="fullName"
                 v-model="shippingInfo.fullName"
                 type="text"
                 required
-                placeholder="Enter your full name"
+                :placeholder="$t('Views.Client.Checkout.PlaceholderFullName')"
               />
             </div>
 
             <div class="form-group">
-              <label for="phone">Phone Number</label>
+              <label for="phone">{{
+                $t("Views.Client.Checkout.LabelPhoneNumber")
+              }}</label>
               <input
                 id="phone"
                 v-model="shippingInfo.phone"
                 type="tel"
                 required
-                placeholder="Enter your phone number"
+                :placeholder="
+                  $t('Views.Client.Checkout.PlaceholderPhoneNumber')
+                "
               />
             </div>
 
             <div class="form-group">
-              <label for="address">Delivery Address</label>
+              <label for="address">{{
+                $t("Views.Client.Checkout.LabelDeliveryAddress")
+              }}</label>
               <textarea
                 id="address"
                 v-model="shippingInfo.address"
                 required
                 rows="3"
-                placeholder="Enter your delivery address"
+                :placeholder="
+                  $t('Views.Client.Checkout.PlaceholderDeliveryAddress')
+                "
               ></textarea>
             </div>
 
             <div class="form-group">
-              <label for="note">Order Notes (Optional)</label>
+              <label for="note">{{
+                $t("Views.Client.Checkout.LabelNote")
+              }}</label>
               <textarea
                 id="note"
                 v-model="shippingInfo.note"
                 rows="2"
-                placeholder="Any special instructions for delivery"
+                :placeholder="$t('Views.Client.Checkout.PlaceholderNote')"
               ></textarea>
             </div>
           </form>
@@ -57,7 +69,7 @@
 
         <!-- Order Summary -->
         <div class="checkout-section order-summary">
-          <h2>Order Summary</h2>
+          <h2>{{ $t("Views.Client.Checkout.OrderSummary") }}</h2>
           <div class="order-items">
             <div
               v-for="item in cartItems"
@@ -98,19 +110,19 @@
 
           <div class="price-summary">
             <div class="summary-row">
-              <span>Subtotal</span>
+              <span>{{ $t("Views.Client.Checkout.Subtotal") }}</span>
               <span>{{ formatPrice(originalSubtotal) }} đ</span>
             </div>
             <div v-if="totalSavings > 0" class="summary-row savings">
-              <span>Discount Savings</span>
+              <span>{{ $t("Views.Client.Checkout.DiscountSavings") }}</span>
               <span>-{{ formatPrice(totalSavings) }} đ</span>
             </div>
             <div class="summary-row">
-              <span>Shipping Fee</span>
+              <span>{{ $t("Views.Client.Checkout.Shipping") }}</span>
               <span>{{ formatPrice(shippingFee) }} đ</span>
             </div>
             <div class="summary-total">
-              <span>Total</span>
+              <span>{{ $t("Views.Client.Checkout.Total") }}</span>
               <span>{{ formatPrice(total) }} đ</span>
             </div>
           </div>
@@ -120,7 +132,11 @@
             class="place-order-btn"
             :disabled="isProcessing"
           >
-            {{ isProcessing ? "Processing..." : "Place Order" }}
+            {{
+              isProcessing
+                ? $t("Views.Client.Checkout.Processing")
+                : $t("Views.Client.Checkout.PlaceOrder")
+            }}
           </button>
         </div>
       </div>
@@ -149,7 +165,7 @@ const shippingInfo = ref({
   fullName: "",
   phone: "",
   address: "",
-  note: "",
+  note: ""
 });
 
 const originalSubtotal = computed(() => {
@@ -194,7 +210,7 @@ async function placeOrder() {
   try {
     isProcessing.value = true;
     const orderData = {
-      ...shippingInfo.value,
+      ...shippingInfo.value
     };
 
     const result = await orderStore.createOrder(orderData);

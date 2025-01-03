@@ -2,7 +2,7 @@
   <div class="cart-page">
     <div class="cart-container">
       <div class="cart-header">
-        <h1>Shopping Cart</h1>
+        <h1>{{ $t("Views.Client.Cart.ShoppingCart") }}</h1>
       </div>
 
       <div v-if="cartItems.length > 0" class="cart-content">
@@ -10,7 +10,7 @@
           <div v-for="item in cartItems" :key="item.cartID" class="cart-item">
             <div class="item-image">
               <img
-                :src="`http://localhost:5000/uploads/${item.linkImage}`"
+                :src="`${APP_CONSTANTS.UPLOAD.UPLOAD_URL + item.image}`"
                 :alt="item.name"
               />
             </div>
@@ -18,20 +18,30 @@
             <div class="item-details">
               <h3 class="item-name">{{ item.name }}</h3>
               <div class="item-price">
-                <span v-if="item.discount && isDiscountActive(item)" class="original-price">
+                <span
+                  v-if="item.discount && isDiscountActive(item)"
+                  class="original-price"
+                >
                   {{ formatPrice(item.price) }} đ
                 </span>
                 <span :class="{ 'discounted-price': isDiscountActive(item) }">
                   {{ formatPrice(calculateFinalPrice(item)) }} đ
                 </span>
-                <span v-if="item.discount && isDiscountActive(item)" class="discount-badge">
+                <span
+                  v-if="item.discount && isDiscountActive(item)"
+                  class="discount-badge"
+                >
                   -{{ item.discount }}%
                 </span>
               </div>
 
               <div class="item-options">
-                <span class="item-color">Color: {{ item.color }}</span>
-                <span class="item-size">Size: {{ item.size }}</span>
+                <span class="item-color"
+                  >{{ $t("Views.Client.Cart.Color") }}: {{ item.color }}</span
+                >
+                <span class="item-size"
+                  >{{ $t("Views.Client.Cart.Size") }}: {{ item.size }}</span
+                >
               </div>
 
               <div class="item-actions">
@@ -65,32 +75,32 @@
 
         <div class="cart-summary">
           <div class="summary-row">
-            <span>Subtotal</span>
+            <span>{{ $t("Views.Client.Cart.Subtotal") }}</span>
             <span>{{ formatPrice(originalSubtotal) }} đ</span>
           </div>
           <div v-if="totalSavings > 0" class="summary-row savings">
-            <span>Discount Savings</span>
+            <span>{{ $t("Views.Client.Cart.DiscountSavings") }}</span>
             <span>-{{ formatPrice(totalSavings) }} đ</span>
           </div>
           <div class="summary-row">
-            <span>Shipping</span>
+            <span>{{ $t("Views.Client.Cart.Shipping") }}</span>
             <span>{{ formatPrice(shippingFee) }} đ</span>
           </div>
           <div class="summary-total">
-            <span>Total</span>
+            <span>{{ $t("Views.Client.Cart.Total") }}</span>
             <span>{{ formatPrice(total) }} đ</span>
           </div>
           <button @click="checkout" class="checkout-btn">
-            Proceed to Checkout
+            {{ $t("Views.Client.Cart.ProceedCheckout") }}
           </button>
         </div>
       </div>
 
       <div v-else class="empty-cart">
         <i class="ri-shopping-cart-line"></i>
-        <p>Your cart is empty</p>
+        <p>{{ $t("Views.Client.Cart.EmptyCart") }}</p>
         <RouterLink to="/" class="continue-shopping">
-          Continue Shopping
+          {{ $t("Views.Client.Cart.ContinueShopping") }}
         </RouterLink>
       </div>
     </div>
@@ -103,7 +113,6 @@ import { useRouter } from "vue-router";
 import { useCartStore } from "@/stores/cart";
 import { APP_CONSTANTS } from "@/utils/constants";
 import { parseISO, isAfter, isBefore } from "date-fns";
-
 const router = useRouter();
 const cartStore = useCartStore();
 const cartItems = ref([]);
@@ -111,7 +120,7 @@ const shippingFee = APP_CONSTANTS.ORDER.SHIPPING_FEE;
 
 const originalSubtotal = computed(() => {
   return cartItems.value.reduce(
-    (sum, item) => sum + (item.price * item.quantity),
+    (sum, item) => sum + item.price * item.quantity,
     0
   );
 });
@@ -119,7 +128,7 @@ const originalSubtotal = computed(() => {
 const totalSavings = computed(() => {
   return cartItems.value.reduce((sum, item) => {
     if (!isDiscountActive(item)) return sum;
-    const savings = (item.price * item.discount / 100) * item.quantity;
+    const savings = ((item.price * item.discount) / 100) * item.quantity;
     return sum + savings;
   }, 0);
 });
@@ -145,7 +154,7 @@ async function updateQuantity(item, change) {
 
   const result = await cartStore.addToCart({
     quantity: newQuantity,
-    productItemId: item.productItemID,
+    productItemId: item.productItemID
   });
   if (result.success) {
     await fetchCartItems();
@@ -155,7 +164,7 @@ async function updateQuantity(item, change) {
 async function removeItem(item) {
   const result = await cartStore.addToCart({
     quantity: 0,
-    productItemId: item.productItemID,
+    productItemId: item.productItemID
   });
   if (result.success) {
     await fetchCartItems();
@@ -172,11 +181,11 @@ onMounted(() => {
 
 function isDiscountActive(item) {
   if (!item.startDate || !item.endDate || !item.discount) return false;
-  
+
   const now = new Date();
   const startDate = parseISO(item.startDate);
   const endDate = parseISO(item.endDate);
-  
+
   return isAfter(now, startDate) && isBefore(now, endDate);
 }
 

@@ -9,7 +9,7 @@ export const useCartStore = defineStore("cart", {
     error: null,
     totalItems: 0,
     totalPages: 0,
-    itemCount: 0,
+    itemCount: 0
   }),
 
   actions: {
@@ -29,7 +29,7 @@ export const useCartStore = defineStore("cart", {
       searchText = "",
       sortBy = "userID",
       sortOrder = "asc",
-      userID = null,
+      userID = null
     } = {}) {
       try {
         this.loading = true;
@@ -95,7 +95,7 @@ export const useCartStore = defineStore("cart", {
           this.carts = response.data.data.map((item) => ({
             ...item,
             // Add any additional transformations needed for cart items
-            finalPrice: this.calculateFinalPrice(item.price, item.discount),
+            finalPrice: this.calculateFinalPrice(item.price, item.discount)
           }));
 
           // Update total count of items in cart
@@ -106,19 +106,19 @@ export const useCartStore = defineStore("cart", {
 
           return {
             success: true,
-            data: this.carts,
+            data: this.carts
           };
         }
 
         return {
           success: false,
-          error: "Failed to fetch cart items",
+          error: "Failed to fetch cart items"
         };
       } catch (error) {
         console.error("Error updating cart count:", error);
         return {
           success: false,
-          error: this.getErrorMessage(error),
+          error: this.getErrorMessage(error)
         };
       }
     },
@@ -130,7 +130,7 @@ export const useCartStore = defineStore("cart", {
           API_ENDPOINTS.CART.UPSERT.method.toLowerCase()
         ](API_ENDPOINTS.CART.UPSERT.url, {
           productItemID: productItemId,
-          quantity: quantity,
+          quantity: quantity
         });
 
         // Update cart count after successful addition
@@ -140,17 +140,17 @@ export const useCartStore = defineStore("cart", {
 
         return {
           success: response.data.success,
-          message: "Added to cart successfully",
+          message: "Added to cart successfully"
         };
       } catch (error) {
         console.error("Error adding to cart:", error);
         return {
           success: false,
-          error: error.response?.data?.message || "Failed to add to cart",
+          error: error.response?.data?.message || "Failed to add to cart"
         };
       } finally {
         this.loading = false;
       }
-    },
-  },
+    }
+  }
 });

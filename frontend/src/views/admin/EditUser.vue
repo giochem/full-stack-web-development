@@ -3,7 +3,7 @@
     <header class="page-header">
       <div class="header-content">
         <div class="header-title">
-          <h1>Edit User</h1>
+          <h1>{{ $t("Views.Admin.EditUser.Title") }}</h1>
         </div>
       </div>
     </header>
@@ -11,65 +11,70 @@
     <div class="form-container">
       <form class="admin-form" @submit.prevent="handleSave">
         <div class="form-group">
-          <label for="email">Email</label>
+          <label for="email">{{ $t("Views.Admin.EditUser.LabelEmail") }}</label>
           <input
             id="email"
             v-model="form.email"
             type="email"
-            placeholder="Enter email"
-            :disabled="userStore.loading"
+            :placeholder="$t('Views.Admin.EditUser.PlaceholderEmail')"
+            :disabled="loading"
           />
         </div>
 
         <div class="form-group">
-          <label for="username">Username</label>
+          <label for="username">{{
+            $t("Views.Admin.EditUser.LabelUsername")
+          }}</label>
           <input
             id="username"
             v-model="form.username"
             type="text"
-            placeholder="Enter username"
-            :disabled="userStore.loading"
+            :placeholder="$t('Views.Admin.EditUser.PlaceholderUsername')"
+            :disabled="loading"
           />
         </div>
 
         <div class="form-group">
-          <label for="password">Password</label>
+          <label for="password">{{
+            $t("Views.Admin.EditUser.LabelPassword")
+          }}</label>
           <input
             id="password"
             v-model="form.password"
             type="password"
-            placeholder="Enter password"
-            :disabled="userStore.loading"
+            autocomplete="on"
+            :placeholder="$t('Views.Admin.EditUser.PlaceholderPassword')"
+            :disabled="loading"
           />
         </div>
 
         <div class="form-group">
-          <label for="role">Role</label>
+          <label for="role">{{ $t("Views.Admin.EditUser.LabelRole") }}</label>
           <select
             id="role"
             v-model="form.role"
             class="form-select"
-            :disabled="userStore.loading"
+            :disabled="loading"
           >
-            <option value="client">Client</option>
-            <option value="admin">Admin</option>
+            <option value="client">
+              {{ $t("Views.Admin.EditUser.OptionClient") }}
+            </option>
+            <option value="admin">
+              {{ $t("Views.Admin.EditUser.OptionAdmin") }}
+            </option>
           </select>
         </div>
 
         <div class="form-actions">
-          <button
-            type="submit"
-            class="primary-btn"
-            :disabled="userStore.loading"
-          >
-            Save Changes
+          <button type="submit" class="primary-btn" :disabled="loading">
+            {{ $t("Views.Admin.EditUser.ButtonSaveChanges") }}
           </button>
           <RouterLink
             to="/admin/manage-user"
             class="secondary-btn"
-            :class="{ disabled: userStore.loading }"
+            :class="{ disabled: loading }"
           >
-            Cancel
+            {{ $t("Views.Admin.EditUser.ButtonCancel") }}
           </RouterLink>
         </div>
       </form>
@@ -80,46 +85,60 @@
 <script setup>
 import { ref, getCurrentInstance, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { useUserStore } from "@/stores/user";
-import axios from "axios";
+import axios from "@/utils/axios";
+import { API_ENDPOINTS } from "@/utils/constants";
 
 const app = getCurrentInstance();
 const route = useRoute();
 const router = useRouter();
-const userStore = useUserStore();
 
 const form = ref({
   email: "",
   username: "",
   password: "",
-  role: "client",
+  role: "client"
 });
 
+const loading = ref(false);
+
 async function handleSave() {
+  loading.value = true;
   try {
-    await axios.put(
-      `http://localhost:5000/api/users/${route.params.userID}`,
-      form.value,
-      { withCredentials: true }
-    );
+    const response = await axios({
+      method: API_ENDPOINTS.USERS.UPDATE.method,
+      url: API_ENDPOINTS.USERS.UPDATE.url(route.params.userID),
+      data: form.value
+    });
+    app?.proxy.$notify(response.data.message, "success");
     router.push("/admin/manage-user");
   } catch (error) {
     console.error("Error updating user:", error);
+    app?.proxy.$notify(error.response?.data?.message || error.message, "error");
+  } finally {
+    loading.value = false;
   }
 }
 
 onMounted(async () => {
-  const result = await userStore.getUserByUserID(route.params.userID);
-  if (result.success) {
+  loading.value = true;
+  try {
+    const response = await axios({
+      method: API_ENDPOINTS.USERS.GET_BY_ID.method,
+      url: API_ENDPOINTS.USERS.GET_BY_ID.url(route.params.userID)
+    });
+    const user = response.data.data[0];
     form.value = {
-      email: result.data.email,
-      username: result.data.username,
+      email: user.email,
+      username: user.username,
       password: "",
-      role: result.data.role,
+      role: user.role
     };
-  } else {
-    app?.proxy.$notify(result.message, "error");
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    app?.proxy.$notify(error.response?.data?.message || error.message, "error");
     router.push("/admin/manage-user");
+  } finally {
+    loading.value = false;
   }
 });
 </script>

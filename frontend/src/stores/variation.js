@@ -9,14 +9,14 @@ const MESSAGE = {
   SUCCESS_DELETE_VARIATION: "Successfully deleted variation",
   ERROR_GET_VARIATIONS: "Failed to fetch variations",
   ERROR_SAVE_VARIATION: "Failed to save variation",
-  ERROR_DELETE_VARIATION: "Failed to delete variation",
+  ERROR_DELETE_VARIATION: "Failed to delete variation"
 };
 
 export const useVariationStore = defineStore("variation", {
   state: () => ({
     variations: [],
     loading: false,
-    error: null,
+    error: null
   }),
 
   getters: {
@@ -26,7 +26,7 @@ export const useVariationStore = defineStore("variation", {
 
     getVariationByName: (state) => (name) => {
       return state.variations.find((v) => v.name === name);
-    },
+    }
   },
 
   actions: {
@@ -42,21 +42,21 @@ export const useVariationStore = defineStore("variation", {
         if (response.data.success) {
           this.variations = response.data.data.map((variation) => ({
             variationID: variation.variationID,
-            name: variation.nameAtribute,
+            name: variation.nameAtribute
           }));
         }
 
         return {
           success: true,
           message: MESSAGE.SUCCESS_GET_VARIATIONS,
-          data: this.variations,
+          data: this.variations
         };
       } catch (error) {
         console.error("Error fetching variations:", error);
         this.error = this.getErrorMessage(error);
         return {
           success: false,
-          message: this.error || MESSAGE.ERROR_GET_VARIATIONS,
+          message: this.error || MESSAGE.ERROR_GET_VARIATIONS
         };
       } finally {
         this.loading = false;
@@ -76,7 +76,7 @@ export const useVariationStore = defineStore("variation", {
           API_ENDPOINTS.VARIATIONS.UPSERT.method.toLowerCase()
         ](API_ENDPOINTS.VARIATIONS.UPSERT.url, {
           variationID: data.variationID,
-          nameAtribute: data.nameAtribute.trim(),
+          nameAtribute: data.nameAtribute.trim()
         });
 
         if (response.data.success) {
@@ -84,7 +84,7 @@ export const useVariationStore = defineStore("variation", {
           return {
             success: true,
             message: MESSAGE.SUCCESS_SAVE_VARIATION,
-            data: response.data.data,
+            data: response.data.data
           };
         }
 
@@ -93,7 +93,7 @@ export const useVariationStore = defineStore("variation", {
         console.error("Error saving variation:", error);
         return {
           success: false,
-          message: this.getErrorMessage(error) || MESSAGE.ERROR_SAVE_VARIATION,
+          message: this.getErrorMessage(error) || MESSAGE.ERROR_SAVE_VARIATION
         };
       } finally {
         this.loading = false;
@@ -117,7 +117,7 @@ export const useVariationStore = defineStore("variation", {
           await this.fetchVariations();
           return {
             success: true,
-            message: MESSAGE.SUCCESS_DELETE_VARIATION,
+            message: MESSAGE.SUCCESS_DELETE_VARIATION
           };
         }
 
@@ -126,8 +126,7 @@ export const useVariationStore = defineStore("variation", {
         console.error("Error deleting variation:", error);
         return {
           success: false,
-          message:
-            this.getErrorMessage(error) || MESSAGE.ERROR_DELETE_VARIATION,
+          message: this.getErrorMessage(error) || MESSAGE.ERROR_DELETE_VARIATION
         };
       } finally {
         this.loading = false;
@@ -152,6 +151,6 @@ export const useVariationStore = defineStore("variation", {
       this.variations = [];
       this.loading = false;
       this.error = null;
-    },
-  },
+    }
+  }
 });

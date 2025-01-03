@@ -3,12 +3,12 @@
     <header class="page-header">
       <div class="header-content">
         <div class="header-title">
-          <h1>Edit Product</h1>
+          <h1>{{ $t("Views.Admin.EditProduct.Title") }}</h1>
         </div>
         <div class="header-actions">
           <RouterLink to="/admin/manage-variations" class="variation-btn">
             <i class="ri-list-settings-line"></i>
-            Manage Variations
+            {{ $t("Views.Admin.EditProduct.ManageVariations") }}
           </RouterLink>
         </div>
       </div>
@@ -16,29 +16,38 @@
 
     <div class="form-container">
       <div v-if="productStore.loading" class="loading-state">
-        <i class="ri-loader-4-line spinning"></i> Loading...
+        <i class="ri-loader-4-line spinning"></i>
+        {{ $t("Views.Admin.EditProduct.Loading") }}
       </div>
       <form v-else class="admin-form">
         <!-- Top: Basic Information -->
         <div class="form-section">
-          <h2 class="section-title">Basic Information</h2>
+          <h2 class="section-title">
+            {{ $t("Views.Admin.EditProduct.BasicInformation") }}
+          </h2>
 
           <!-- Three columns in one row -->
           <div class="form-row three-columns">
             <div class="form-group">
-              <label for="name">Product Name</label>
+              <label for="name">{{
+                $t("Views.Admin.EditProduct.LabelProductName")
+              }}</label>
               <input
                 id="name"
                 v-model="product.name"
                 type="text"
-                placeholder="Enter product name"
+                :placeholder="
+                  $t('Views.Admin.EditProduct.PlaceholderProductName')
+                "
                 :disabled="productStore.loading"
                 required
               />
             </div>
 
             <div class="form-group">
-              <label for="category">Category</label>
+              <label for="category">{{
+                $t("Views.Admin.EditProduct.LabelCategory")
+              }}</label>
               <div class="select-wrapper">
                 <select
                   id="category"
@@ -46,7 +55,9 @@
                   required
                   :disabled="productStore.loading"
                 >
-                  <option value="">Select Category</option>
+                  <option value="">
+                    {{ $t("Views.Admin.EditProduct.PlaceholderCategory") }}
+                  </option>
                   <option
                     v-for="category in productStore.categories"
                     :key="category.categoryID"
@@ -60,14 +71,18 @@
             </div>
 
             <div class="form-group">
-              <label for="promotion">Promotion (Optional)</label>
+              <label for="promotion">{{
+                $t("Views.Admin.EditProduct.LabelPromotion")
+              }}</label>
               <div class="select-wrapper">
                 <select
                   id="promotion"
                   v-model="product.promotionID"
                   :disabled="productStore.loading"
                 >
-                  <option value="">No Promotion</option>
+                  <option value="">
+                    {{ $t("Views.Admin.EditProduct.PlaceholderPromotion") }}
+                  </option>
                   <option
                     v-for="promotion in productStore.promotions"
                     :key="promotion.promotionID"
@@ -88,7 +103,7 @@
                 <span
                   :class="[
                     'status-badge',
-                    getPromotionStatusClass(selectedPromotion),
+                    getPromotionStatusClass(selectedPromotion)
                   ]"
                 >
                   {{ getPromotionStatus(selectedPromotion) }}
@@ -99,19 +114,23 @@
 
           <!-- Description in its own row -->
           <div class="form-group">
-            <label for="description">Description</label>
+            <label for="description">{{
+              $t("Views.Admin.EditProduct.LabelDescription")
+            }}</label>
             <textarea
               id="description"
               v-model="product.description"
               rows="3"
-              placeholder="Enter product description"
+              :placeholder="
+                $t('Views.Admin.EditProduct.PlaceholderDescription')
+              "
               :disabled="productStore.loading"
               required
             ></textarea>
           </div>
 
           <div class="form-group">
-            <label>Main Product Image</label>
+            <label>{{ $t("Views.Admin.EditProduct.LabelMainImage") }}</label>
             <div class="image-upload">
               <input
                 type="file"
@@ -136,10 +155,12 @@
               :disabled="productStore.loading"
               @click.prevent="handleSave"
             >
-              <i class="ri-save-line"></i> Save Basic Info
+              <i class="ri-save-line"></i>
+              {{ $t("Views.Admin.EditProduct.ButtonSaveChanges") }}
             </button>
             <RouterLink to="/admin/manage-product" class="secondary-btn">
-              <i class="ri-arrow-left-line"></i> Cancel
+              <i class="ri-arrow-left-line"></i>
+              {{ $t("Views.Admin.EditProduct.ButtonCancel") }}
             </RouterLink>
           </div>
         </div>
@@ -147,10 +168,12 @@
         <!-- Bottom: Product Items -->
         <div class="form-section product-items-section">
           <div class="section-header">
-            <h2 class="section-title">Product Items</h2>
-            <small class="section-hint">
-              Each product item can have multiple attributes
-            </small>
+            <h2 class="section-title">
+              {{ $t("Views.Admin.EditProduct.ProductItems") }}
+            </h2>
+            <small class="section-hint">{{
+              $t("Views.Admin.EditProduct.ProductItemsHint")
+            }}</small>
           </div>
 
           <div class="product-items-grid">
@@ -160,7 +183,11 @@
               class="product-item"
             >
               <div class="item-header">
-                <h3>Product Item #{{ index + 1 }}</h3>
+                <h3>
+                  {{ $t("Views.Admin.EditProduct.ProductItem") }} #{{
+                    index + 1
+                  }}
+                </h3>
                 <div class="item-actions">
                   <button
                     type="button"
@@ -168,7 +195,8 @@
                     @click="saveProductItem(index)"
                     :disabled="!productStore.isItemModified(index)"
                   >
-                    <i class="ri-save-line"></i> Save Item
+                    <i class="ri-save-line"></i>
+                    {{ $t("Views.Admin.EditProduct.SaveItem") }}
                   </button>
                   <button
                     type="button"
@@ -183,37 +211,47 @@
               <!-- Basic item info -->
               <div class="form-row">
                 <div class="form-group">
-                  <label :for="'sku-' + index">SKU</label>
+                  <label :for="'sku-' + index">{{
+                    $t("Views.Admin.EditProduct.LabelSKU")
+                  }}</label>
                   <input
                     :id="'sku-' + index"
                     v-model="item.sku"
                     type="text"
-                    placeholder="Enter SKU"
+                    :placeholder="$t('Views.Admin.EditProduct.PlaceholderSKU')"
                     required
                   />
                 </div>
 
                 <div class="form-group">
-                  <label :for="'price-' + index">Price</label>
+                  <label :for="'price-' + index">{{
+                    $t("Views.Admin.EditProduct.LabelPrice")
+                  }}</label>
                   <input
                     :id="'price-' + index"
                     v-model.number="item.price"
                     type="number"
                     min="0"
-                    placeholder="Enter price"
+                    :placeholder="
+                      $t('Views.Admin.EditProduct.PlaceholderPrice')
+                    "
                     required
                   />
                 </div>
               </div>
 
               <div class="form-group">
-                <label :for="'quantity-' + index">Quantity</label>
+                <label :for="'quantity-' + index">{{
+                  $t("Views.Admin.EditProduct.LabelQuantity")
+                }}</label>
                 <input
                   :id="'quantity-' + index"
                   v-model.number="item.quantity"
                   type="number"
                   min="0"
-                  placeholder="Enter quantity"
+                  :placeholder="
+                    $t('Views.Admin.EditProduct.PlaceholderQuantity')
+                  "
                   required
                 />
               </div>
@@ -221,14 +259,15 @@
               <!-- Attributes section -->
               <div class="attributes-section">
                 <div class="attributes-header">
-                  <h4>Attributes</h4>
+                  <h4>{{ $t("Views.Admin.EditProduct.Attributes") }}</h4>
                   <button
                     type="button"
                     class="add-attribute-btn"
                     @click="productStore.addAttribute(index)"
                     :disabled="!productStore.hasAvailableVariations(index)"
                   >
-                    <i class="ri-add-line"></i> Add Attribute
+                    <i class="ri-add-line"></i>
+                    {{ $t("Views.Admin.EditProduct.AddAttribute") }}
                   </button>
                 </div>
 
@@ -239,9 +278,9 @@
                 >
                   <div class="form-row">
                     <div class="form-group">
-                      <label :for="'attr-name-' + index + '-' + attrIndex"
-                        >Attribute Name</label
-                      >
+                      <label :for="'attr-name-' + index + '-' + attrIndex">{{
+                        $t("Views.Admin.EditProduct.AttributeName")
+                      }}</label>
                       <select
                         :id="'attr-name-' + index + '-' + attrIndex"
                         v-model="attr.variationID"
@@ -255,7 +294,9 @@
                           )
                         "
                       >
-                        <option value="" disabled>Select Attribute</option>
+                        <option value="" disabled>
+                          {{ $t("Views.Admin.EditProduct.SelectAttribute") }}
+                        </option>
                         <option
                           v-for="variation in productStore.availableVariations(
                             index,
@@ -270,16 +311,19 @@
                     </div>
 
                     <div class="form-group">
-                      <label :for="'attr-value-' + index + '-' + attrIndex"
-                        >Value</label
-                      >
+                      <label :for="'attr-value-' + index + '-' + attrIndex">{{
+                        $t("Views.Admin.EditProduct.AttributeValue")
+                      }}</label>
                       <input
                         :id="'attr-value-' + index + '-' + attrIndex"
                         v-model="attr.value"
                         type="text"
-                        :placeholder="`Enter ${
-                          attr.nameAtribute || 'attribute'
-                        } value`"
+                        :placeholder="
+                          $t(
+                            'Views.Admin.EditProduct.PlaceholderAttributeValue',
+                            { attribute: attr.nameAtribute || 'attribute' }
+                          )
+                        "
                         required
                       />
                     </div>
@@ -297,13 +341,15 @@
                   v-if="!productStore.hasAvailableVariations(index)"
                   class="no-variations-hint"
                 >
-                  All available attributes have been added
+                  {{ $t("Views.Admin.EditProduct.NoAvailableAttributes") }}
                 </div>
               </div>
 
               <!-- Item image -->
               <div class="form-group">
-                <label>Product Item Image</label>
+                <label>{{
+                  $t("Views.Admin.EditProduct.LabelItemImage")
+                }}</label>
                 <div class="image-upload">
                   <input
                     type="file"
@@ -326,7 +372,8 @@
               class="add-item-btn"
               @click="productStore.addProductItem"
             >
-              <i class="ri-add-line"></i> Add Product Item
+              <i class="ri-add-line"></i>
+              {{ $t("Views.Admin.EditProduct.AddProductItem") }}
             </button>
           </div>
         </div>
@@ -342,7 +389,7 @@ import { useProductStore } from "@/stores/product";
 import { useVariationStore } from "@/stores/variation";
 import { getCurrentInstance } from "vue";
 import { APP_CONSTANTS } from "@/utils/constants";
-import axios from "axios";
+import axios from "@/utils/axios";
 import { storeToRefs } from "pinia";
 
 const app = getCurrentInstance();
@@ -357,7 +404,7 @@ const product = ref({
   description: "",
   categoryID: null,
   promotionID: null,
-  image: "",
+  image: ""
 });
 
 // Get reactive refs from store
@@ -365,6 +412,7 @@ const { currentProductItems, loading, variations } = storeToRefs(productStore);
 
 function getImageUrl(image) {
   if (!image) return APP_CONSTANTS.UPLOAD.DEFAULT_IMAGE;
+  if (image.startsWith("blob:http:")) return image;
   return `${APP_CONSTANTS.UPLOAD.UPLOAD_URL}/${image}`;
 }
 
@@ -424,7 +472,7 @@ async function handleSave() {
 onMounted(async () => {
   await Promise.all([
     productStore.fetchExtraInfo(),
-    variationStore.fetchVariations(),
+    variationStore.fetchVariations()
   ]);
 
   const result = await productStore.fetchProductById(route.params.productID);
@@ -432,7 +480,7 @@ onMounted(async () => {
     const [productData, productItemsData] = result.data;
     product.value = {
       ...productData,
-      promotionID: productData.promotionID || null,
+      promotionID: productData.promotionID || null
     };
 
     // Restructure product items data
@@ -445,13 +493,13 @@ onMounted(async () => {
           quantity: item.quantity,
           price: item.price,
           image: item.image,
-          attributes: [],
+          attributes: []
         };
       }
       groupedItems[item.productItemID].attributes.push({
         variationID: item.variationID,
         nameAtribute: item.nameAtribute,
-        value: item.value,
+        value: item.value
       });
     });
 
@@ -472,7 +520,7 @@ function formatDate(dateString) {
   return new Date(dateString).toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
-    day: "numeric",
+    day: "numeric"
   });
 }
 
@@ -488,7 +536,7 @@ async function saveProductItem(index) {
 
   const result = await productStore.updateProductItem({
     ...item,
-    productID: product.value.productID,
+    productID: product.value.productID
   });
 
   if (result.success) {
@@ -533,7 +581,7 @@ function getPromotionStatusClass(promotion) {
   return {
     "status-expired": status === "Expired",
     "status-active": status === "Active",
-    "status-coming": status === "Coming Soon",
+    "status-coming": status === "Coming Soon"
   };
 }
 </script>

@@ -1,0 +1,51 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - CORS_ORIGIN=http://localhost:8080
+      - SQL_SERVER_USER=sa
+      - SQL_SERVER_PASSWORD=Abc@123123#1010
+      - SQL_SERVER_SERVER=db
+      - SQL_SERVER_DATABASE=clothes369
+    depends_on:
+      - db
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - same_network
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    environment:
+      - VITE_API_URL=http://backend:3000/
+      - VITE_API_BASE_URL=http://backend:3000/api
+      - VITE_API_TIMEOUT=10000
+      - VITE_API_UPLOAD_URL=http://backend:3000/api/upload
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - same_network
+  db:
+    build:
+      context: ./database/v0.0.0/docker
+      dockerfile: Dockerfile
+    ports:
+      - "1435:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - same_network
+volumes:
+  sqlserver_data:
+networks:
+  same_network:
+    driver: bridge

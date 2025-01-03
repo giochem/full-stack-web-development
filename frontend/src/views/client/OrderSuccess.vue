@@ -6,33 +6,37 @@
           <i class="ri-checkbox-circle-line"></i>
         </div>
 
-        <h1>Order Placed Successfully!</h1>
+        <h1>{{ $t("Views.Client.OrderSuccess.OrderPlacedSuccessfully") }}</h1>
         <p class="message">
-          Thank you for your purchase. Your order has been received.
+          {{ $t("Views.Client.OrderSuccess.ThankYouForPurchase") }}
         </p>
 
         <div class="order-info">
           <div class="info-row">
-            <span class="label">Order Date:</span>
+            <span class="label"
+              >{{ $t("Views.Client.OrderSuccess.OrderDate") }}:</span
+            >
             <span class="value">{{ formatDate(new Date()) }}</span>
           </div>
         </div>
 
         <div class="next-steps">
-          <p>What's next?</p>
+          <p>{{ $t("Views.Client.OrderSuccess.WhatsNext") }}</p>
           <ul>
-            <li>You will receive an order confirmation email</li>
-            <li>We will process your order soon</li>
-            <li>You can track your order in your profile</li>
+            <li>
+              {{ $t("Views.Client.OrderSuccess.OrderConfirmationEmail") }}
+            </li>
+            <li>{{ $t("Views.Client.OrderSuccess.ProcessOrderSoon") }}</li>
+            <li>{{ $t("Views.Client.OrderSuccess.TrackOrderInProfile") }}</li>
           </ul>
         </div>
 
         <div class="action-buttons">
           <RouterLink to="/profile" class="view-order-btn">
-            View Order
+            {{ $t("Views.Client.OrderSuccess.ViewOrder") }}
           </RouterLink>
           <RouterLink to="/" class="continue-shopping-btn">
-            Continue Shopping
+            {{ $t("Views.Client.OrderSuccess.ContinueShopping") }}
           </RouterLink>
         </div>
       </div>
@@ -55,7 +59,7 @@ function formatDate(date) {
     month: "long",
     day: "numeric",
     hour: "2-digit",
-    minute: "2-digit",
+    minute: "2-digit"
   });
 }
 

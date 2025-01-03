@@ -1,19 +1,28 @@
-const sql = require("mssql");
-
-const config = {
-  user: process.env.SQL_SERVER_USER,
-  password: process.env.SQL_SERVER_PASSWORD,
-  server: process.env.SQL_SERVER_SERVER,
-  database: process.env.SQL_SERVER_DATABASE,
+import sql from "mssql";
+import { configEnv } from "../../configEnv.js";
+export const config = {
+  user: configEnv.sqlServer.user,
+  password: configEnv.sqlServer.password,
+  server: configEnv.sqlServer.server,
+  database: configEnv.sqlServer.database,
   options: {
     trustedConnection: true,
-    encrypt: true,
     enableArithAbort: true,
-    trustServerCertificate: true,
+    trustServerCertificate: true
+    // instanceName: "SQLEXPRESS"
   },
+  pool: {
+    max: 1000,
+    min: 0,
+    idleTimeoutMillis: 30000
+  },
+  connectionTimeout: 30000,
+  requestTimeout: 30000,
+  stream: false,
+  parseJSON: true
 };
 
-const pool = async (query) => {
+export const pool = async (query) => {
   return await new sql.ConnectionPool(config)
     .connect()
     .then((pool) => {
@@ -25,5 +34,3 @@ const pool = async (query) => {
       console.log("Database Connection Failed! Bad Config: ", err)
     );
 };
-
-module.exports = { pool, config };

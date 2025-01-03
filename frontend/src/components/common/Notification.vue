@@ -1,25 +1,20 @@
 <template>
   <Transition name="fade">
-    <div 
-      v-if="isVisible"
-      class="notification" 
-      :class="type"
-      role="alert"
-    >
+    <div v-if="isVisible" class="notification" :class="type" role="alert">
       {{ message }}
     </div>
   </Transition>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 
 const isVisible = ref(false);
-const message = ref('');
-const type = ref('info'); // info, success, error, warning
+const message = ref("");
+const type = ref("info"); // info, success, error, warning
 
 // Method to show notification
-const show = (msg, msgType = 'info', duration = 3000) => {
+const show = (msg, msgType = "info", duration = 3000) => {
   message.value = msg;
   type.value = msgType;
   isVisible.value = true;
@@ -79,4 +74,4 @@ defineExpose({
 .fade-leave-to {
   opacity: 0;
 }
-</style> 
+</style>

@@ -20,12 +20,12 @@
 defineProps({
   modelValue: {
     type: Boolean,
-    required: true,
+    required: true
   },
   title: {
     type: String,
-    default: "",
-  },
+    default: ""
+  }
 });
 
 const emit = defineEmits(["update:modelValue"]);

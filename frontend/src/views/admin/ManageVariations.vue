@@ -3,12 +3,12 @@
     <header class="page-header">
       <div class="header-content">
         <div class="header-title">
-          <h1>Manage Variations</h1>
+          <h1>{{ $t("Views.Admin.ManageVariations.Title") }}</h1>
         </div>
         <div class="header-actions">
           <button class="add-btn" @click="handleAdd">
             <i class="ri-add-line"></i>
-            Add Variation
+            {{ $t("Views.Admin.ManageVariations.AddVariation") }}
           </button>
         </div>
       </div>
@@ -17,11 +17,12 @@
     <!-- Variations list -->
     <div class="variations-list">
       <div v-if="loading" class="loading-state">
-        <i class="ri-loader-4-line spinning"></i> Loading variations...
+        <i class="ri-loader-4-line spinning"></i>
+        {{ $t("Views.Admin.ManageVariations.Loading") }}
       </div>
       <div v-else-if="variations.length === 0" class="empty-state">
         <i class="ri-file-list-3-line"></i>
-        <p>No variations found</p>
+        <p>{{ $t("Views.Admin.ManageVariations.NoVariations") }}</p>
       </div>
       <div v-else class="variations-grid">
         <div
@@ -35,14 +36,14 @@
           <div class="variation-actions">
             <button class="edit-btn" @click="handleEdit(variation)">
               <i class="ri-edit-line"></i>
-              Edit
+              {{ $t("Views.Admin.ManageVariations.Edit") }}
             </button>
             <button
               class="delete-btn"
               @click="handleDelete(variation.variationID)"
             >
               <i class="ri-delete-bin-line"></i>
-              Delete
+              {{ $t("Views.Admin.ManageVariations.Delete") }}
             </button>
           </div>
         </div>
@@ -52,25 +53,32 @@
     <!-- Add/Edit Modal -->
     <Modal
       v-model="showModal"
-      :title="isEditing ? 'Edit Variation' : 'Add Variation'"
+      :title="
+        isEditing
+          ? $t('Views.Admin.ManageVariations.EditVariation')
+          : $t('Views.Admin.ManageVariations.AddVariation')
+      "
     >
       <form @submit.prevent="handleSubmit" class="variation-form">
         <div class="form-group">
-          <label for="nameAtribute">Variation Name</label>
+          <label for="nameAtribute">{{
+            $t("Views.Admin.ManageVariations.VariationName")
+          }}</label>
           <input
             id="nameAtribute"
             v-model="form.nameAtribute"
             type="text"
-            placeholder="e.g. Size, Color, Material"
+            :placeholder="
+              $t('Views.Admin.ManageVariations.PlaceholderVariationName')
+            "
             required
             :disabled="loading"
             ref="inputRef"
             @input="validateInput"
           />
-          <small
-            >Enter a name for the variation attribute (e.g. Size, Color,
-            Material)</small
-          >
+          <small>{{
+            $t("Views.Admin.ManageVariations.VariationNameHint")
+          }}</small>
           <span v-if="errorMessage" class="error-message">{{
             errorMessage
           }}</span>
@@ -83,7 +91,11 @@
             :disabled="loading || !!errorMessage"
           >
             <i class="ri-save-line"></i>
-            {{ isEditing ? "Update" : "Create" }}
+            {{
+              isEditing
+                ? $t("Views.Admin.ManageVariations.Update")
+                : $t("Views.Admin.ManageVariations.Create")
+            }}
           </button>
           <button
             type="button"
@@ -91,7 +103,7 @@
             @click="closeModal"
             :disabled="loading"
           >
-            Cancel
+            {{ $t("Views.Admin.ManageVariations.Cancel") }}
           </button>
         </div>
       </form>
@@ -116,7 +128,7 @@ const inputRef = ref(null);
 const errorMessage = ref("");
 
 const form = ref({
-  nameAtribute: "",
+  nameAtribute: ""
 });
 
 function validateInput(e) {
@@ -173,7 +185,7 @@ async function handleSubmit() {
   try {
     const result = await variationStore.upsertVariation({
       variationID: selectedVariation.value?.variationID,
-      nameAtribute: form.value.nameAtribute,
+      nameAtribute: form.value.nameAtribute
     });
 
     if (result.success) {

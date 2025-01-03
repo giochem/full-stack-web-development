@@ -2,36 +2,36 @@
   <div class="profile-page">
     <div class="profile-container">
       <div class="profile-header">
-        <h1>My Profile</h1>
+        <h1>{{ $t("Views.Client.Profile.MyProfile") }}</h1>
       </div>
 
       <div class="profile-content">
         <!-- User Info Section -->
         <div class="profile-section">
-          <h2>Account Information</h2>
+          <h2>{{ $t("Views.Client.Profile.AccountInformation") }}</h2>
           <div class="info-grid">
             <div class="info-item">
-              <label>Username</label>
+              <label>{{ $t("Views.Client.Profile.Username") }}</label>
               <p>{{ authStore.user?.username }}</p>
             </div>
             <div class="info-item">
-              <label>Email</label>
+              <label>{{ $t("Views.Client.Profile.Email") }}</label>
               <p>{{ authStore.user?.email }}</p>
             </div>
             <div class="info-item">
-              <label>Role</label>
+              <label>{{ $t("Views.Client.Profile.Role") }}</label>
               <p>{{ authStore.user?.role }}</p>
             </div>
           </div>
           <button @click="showEditForm = true" class="edit-btn">
             <i class="ri-edit-line"></i>
-            Edit Profile
+            {{ $t("Views.Client.Profile.EditProfile") }}
           </button>
         </div>
 
         <!-- Order History Section -->
         <div class="profile-section">
-          <h2>Order History</h2>
+          <h2>{{ $t("Views.Client.Profile.OrderHistory") }}</h2>
           <div class="orders-list" v-if="orderStore.orders.length > 0">
             <div
               v-for="order in orderStore.orders"
@@ -39,7 +39,11 @@
               class="order-card"
             >
               <div class="order-header">
-                <span class="order-id">Order #{{ order.orderID }}</span>
+                <span class="order-id"
+                  >{{ $t("Views.Client.Profile.Order") }} #{{
+                    order.orderID
+                  }}</span
+                >
                 <span :class="['order-status', order.status]">{{
                   order.status
                 }}</span>
@@ -60,14 +64,14 @@
                   @click="viewOrderDetails(order.orderID)"
                   class="view-btn"
                 >
-                  View Details
+                  {{ $t("Views.Client.Profile.ViewDetails") }}
                 </button>
               </div>
             </div>
           </div>
           <div v-else class="empty-orders">
             <i class="ri-shopping-bag-line"></i>
-            <p>No orders yet</p>
+            <p>{{ $t("Views.Client.Profile.NoOrdersYet") }}</p>
           </div>
         </div>
       </div>
@@ -76,46 +80,52 @@
       <div v-if="showEditForm" class="modal-overlay">
         <div class="modal-content">
           <form @submit.prevent="handleUpdateProfile" class="edit-form">
-            <h2>Edit Profile</h2>
+            <h2>{{ $t("Views.Client.Profile.EditProfile") }}</h2>
 
             <div class="form-group">
-              <label for="username">Username</label>
+              <label for="username">{{
+                $t("Views.Client.Profile.Username")
+              }}</label>
               <input
                 id="username"
                 v-model="form.username"
                 type="text"
-                placeholder="Enter username"
+                :placeholder="$t('Views.Client.Profile.EnterUsername')"
               />
             </div>
 
             <div class="form-group">
-              <label for="email">Email</label>
+              <label for="email">{{ $t("Views.Client.Profile.Email") }}</label>
               <input
                 id="email"
                 v-model="form.email"
                 type="email"
-                placeholder="Enter email"
+                :placeholder="$t('Views.Client.Profile.EnterEmail')"
               />
             </div>
 
             <div class="form-group">
-              <label for="password">New Password (optional)</label>
+              <label for="password">{{
+                $t("Views.Client.Profile.NewPasswordOptional")
+              }}</label>
               <input
                 id="password"
                 v-model="form.password"
                 type="password"
-                placeholder="Enter new password"
+                :placeholder="$t('Views.Client.Profile.EnterNewPassword')"
               />
             </div>
 
             <div class="form-actions">
-              <button type="submit" class="save-btn">Save Changes</button>
+              <button type="submit" class="save-btn">
+                {{ $t("Views.Client.Profile.SaveChanges") }}
+              </button>
               <button
                 type="button"
                 @click="showEditForm = false"
                 class="cancel-btn"
               >
-                Cancel
+                {{ $t("Views.Client.Profile.Cancel") }}
               </button>
             </div>
           </form>
@@ -140,14 +150,14 @@ const showEditForm = ref(false);
 const form = ref({
   username: "",
   email: "",
-  password: "",
+  password: ""
 });
 
 function formatDate(dateString) {
   return new Date(dateString).toLocaleDateString("vi-VN", {
     year: "numeric",
     month: "long",
-    day: "numeric",
+    day: "numeric"
   });
 }
 
@@ -186,7 +196,7 @@ onMounted(async () => {
     form.value = {
       username: authStore.user.username,
       email: authStore.user.email,
-      password: "",
+      password: ""
     };
   }
 

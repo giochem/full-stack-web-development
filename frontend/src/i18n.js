@@ -16,5 +16,5 @@ export default createI18n({
   legacy: false,
   locale: "vn",
   fallbackLocale: "en",
-  messages: loadLocaleMessages(),
+  messages: loadLocaleMessages()
 });

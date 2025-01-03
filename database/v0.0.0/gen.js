@@ -1,6 +1,6 @@
-const fs = require("fs");
-const path = require("path");
-
+import { existsSync, mkdirSync, writeFileSync } from "fs";
+import { join } from "path";
+import { createHash } from "crypto";
 // Utility functions for generating random data
 const getRandomInt = (min, max) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
@@ -11,32 +11,34 @@ const getRandomDate = (start, end) => {
     .toISOString()
     .split("T")[0];
 };
-
 // Constants for number of rows
 const ROWS_COUNT = {
   users: 100,
-  categories: 20,
-  promotions: 10,
-  variations: 10,
-  products: 50,
-  productItem: 100,
+  categories: 5,
+  promotions: 4,
+  variations: 2,
+  products: 5,
+  productItem: 20,
   variationOption: 100,
   carts: 50,
   payments: 5,
   orders: 100,
-  orderItem: 200,
+  orderItem: 200
 };
 
 // Generate Users data
 const generateUsers = () => {
+  const ROWS_USERS = 1000;
   let content = "INSERT INTO users (username, email, password, role) VALUES\n";
   const roles = ["client", "admin"];
 
-  for (let i = 1; i <= ROWS_COUNT.users; i++) {
-    content += `('fashionista${i}', 'fashionista${i}@example.com', 'password${i}', '${
-      roles[i % 2]
-    }')`;
-    content += i === ROWS_COUNT.users ? ";\n" : ",\n";
+  const hashedPassword = createHash("sha256").update("1").digest("hex");
+  content += `('admin', 'admin@example.com', '${hashedPassword}', 'admin'),\n`;
+  for (let i = 2; i <= ROWS_USERS; i++) {
+    content += `('client_${i - 1}', 'client${
+      i - 1
+    }@example.com', '${hashedPassword}', 'client')`;
+    content += i === ROWS_USERS ? ";\n" : ",\n";
   }
   return content;
 };
@@ -44,68 +46,61 @@ const generateUsers = () => {
 // Generate Categories data
 const generateCategories = () => {
   let content = "INSERT INTO categories (parentCategoryID, name) VALUES\n";
-  const categoryNames = ["Men", "Women", "Kids", "Accessories", "Footwear"];
+  const categoryNames = ["polo", "sweatshirt", "jeans", "kaki", "hat"];
 
-  for (let i = 1; i <= ROWS_COUNT.categories; i++) {
-    const parentId =
-      i <= categoryNames.length
-        ? "NULL"
-        : getRandomInt(1, categoryNames.length);
-    const categoryName =
-      i <= categoryNames.length ? categoryNames[i - 1] : `Subcategory ${i}`;
-    content += `(${parentId}, '${categoryName}')`;
-    content += i === ROWS_COUNT.categories ? ";\n" : ",\n";
+  for (let i = 1; i <= categoryNames.length; i++) {
+    content += `(null, '${categoryNames[i - 1]}')`;
+    content += i === categoryNames.length ? ";\n" : ",\n";
   }
   return content;
 };
 
 // Generate Promotions data
 const generatePromotions = () => {
+  const ROWS_PROMOTIONS = {
+    "Exprired Sale": 10,
+    "Normal Sale": 20,
+    "Special Sale": 65,
+    "Comming Soon Sale": 50
+  };
   let content =
     "INSERT INTO promotions (name, discount, startDate, endDate) VALUES\n";
-  const promotionNames = [
-    "Summer Sale",
-    "Winter Clearance",
-    "Black Friday",
-    "Cyber Monday",
-    "New Year Sale",
-  ];
 
-  for (let i = 1; i <= ROWS_COUNT.promotions; i++) {
-    const startDate = getRandomDate(
-      new Date(2023, 0, 1),
-      new Date(2023, 11, 31)
-    );
-    const endDate = getRandomDate(new Date(2024, 0, 1), new Date(2024, 11, 31));
-    const promotionName = promotionNames[i % promotionNames.length];
-    content += `('${promotionName}', ${getRandomInt(
-      5,
-      50
-    )}, '${startDate}', '${endDate}')`;
-    content += i === ROWS_COUNT.promotions ? ";\n" : ",\n";
-  }
-  return content;
-};
+  const currentTime = new Date().getTime();
+  for (const [promotionName, discount] of Object.entries(ROWS_PROMOTIONS)) {
+    if (promotionName === "Exprired Sale") {
+      const startDate = new Date(currentTime - 30 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0];
 
-// Generate Variations data
-const generateVariations = () => {
-  let content = "INSERT INTO variations (nameAtribute, type) VALUES\n";
-  const variations = [
-    "Color",
-    "Size",
-    "Material",
-    "Style",
-    "Pattern",
-    "Fit",
-    "Length",
-    "Width",
-    "Height",
-    "Fabric",
-  ];
+      const endDate = new Date(currentTime - 1 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0];
 
-  for (let i = 1; i <= ROWS_COUNT.variations; i++) {
-    content += `('${variations[i - 1]}', 'Type${i}')`;
-    content += i === ROWS_COUNT.variations ? ";\n" : ",\n";
+      content += `('${promotionName}', ${discount}, '${startDate}', '${endDate}')`;
+    } else if (
+      promotionName === "Normal Sale" ||
+      promotionName === "Special Sale"
+    ) {
+      const startDate = new Date(currentTime - 7 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0];
+      const endDate = new Date(currentTime + 7 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0];
+
+      content += `('${promotionName}', ${discount}, '${startDate}', '${endDate}')`;
+    } else if (promotionName === "Comming Soon Sale") {
+      const startDate = new Date(currentTime + 7 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0];
+      const endDate = new Date(currentTime + 14 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0];
+
+      content += `('${promotionName}', ${discount}, '${startDate}', '${endDate}')`;
+    }
+    content += promotionName === "Comming Soon Sale" ? ";\n" : ",\n";
   }
   return content;
 };
@@ -114,26 +109,24 @@ const generateVariations = () => {
 const generateProducts = () => {
   let content =
     "INSERT INTO products (categoryID, promotionID, name, description, image) VALUES\n";
-  const productNames = [
-    "T-Shirt",
-    "Jeans",
-    "Dress",
-    "Jacket",
-    "Sneakers",
-    "Hat",
-    "Scarf",
-    "Belt",
-    "Sunglasses",
-    "Watch",
-  ];
 
-  for (let i = 1; i <= ROWS_COUNT.products; i++) {
-    const categoryId = getRandomInt(1, ROWS_COUNT.categories);
-    const promotionId = getRandomInt(1, ROWS_COUNT.promotions);
-    const productName = productNames[i % productNames.length];
-    content += `(${categoryId}, ${promotionId}, '${productName} ${i}', 'Description for ${productName.toLowerCase()} ${i}', 'default.png')`;
-    content += i === ROWS_COUNT.products ? ";\n" : ",\n";
-  }
+  const categoryNames = ["polo", "sweatshirt", "jeans", "kaki", "hat"];
+  const ROWS_PROMOTIONS = {
+    "Exprired Sale": 10,
+    "Normal Sale": 20,
+    "Special Sale": 65,
+    "Comming Soon Sale": 50
+  };
+  // polo
+  content += `(1, 1,'polo nam','Description for polo','polo-black.jpg'),\n`;
+  // sweatshirt
+  content += `(2, 2,'sweatshirt nam','Description for sweatshirt','sweatshirt-black.jpg'),\n`;
+  // jeans
+  content += `(3, 3,'jeans nam','Description for jeans','jeans-light-green.jpg'),\n`;
+  // kaki
+  content += `(4, 4,'kaki nam','Description for kaki','kaki-white.jpg'),\n`;
+  // hat
+  content += `(5, Null,'hat nam','Description for hat','hat-black.jpg');\n`;
   return content;
 };
 
@@ -141,45 +134,131 @@ const generateProducts = () => {
 const generateProductItems = () => {
   let content =
     "INSERT INTO productItem (productID, sku, quantity, price, image) VALUES\n";
+  const categoryNames = ["polo", "sweatshirt", "jeans", "kaki", "hat"];
 
-  for (let i = 1; i <= ROWS_COUNT.productItem; i++) {
-    const productId = getRandomInt(1, ROWS_COUNT.products);
-    content += `(${productId}, 'SKU${i}', ${getRandomInt(
-      0,
-      100
-    )}, ${getRandomInt(10, 1000)}, 'defaultitem.png')`;
-    content += i === ROWS_COUNT.productItem ? ";\n" : ",\n";
+  content += `(1, 'polo-black-s', 10, 100000, 'polo-black.jpg'),\n`;
+  content += `(1, 'polo-black-m', 10, 100000, 'polo-black.jpg'),\n`;
+  content += `(1, 'polo-black-l', 10, 100000, 'polo-black.jpg'),\n`;
+  content += `(1, 'polo-black-xl', 10, 100000, 'polo-black.jpg'),\n`;
+  content += `(1, 'polo-light-grey-s', 10, 100000, 'polo-light-grey.jpg'),\n`;
+  content += `(1, 'polo-light-grey-m', 10, 100000, 'polo-light-grey.jpg'),\n`;
+  content += `(1, 'polo-light-grey-l', 10, 100000, 'polo-light-grey.jpg'),\n`;
+  content += `(1, 'polo-light-grey-xl', 10, 100000, 'polo-light-grey.jpg'),\n`;
+
+  content += `(2, 'sweatshirt-black-s', 10, 100000, 'sweatshirt-black.jpg'),\n`;
+  content += `(2, 'sweatshirt-black-m', 10, 100000, 'sweatshirt-black.jpg'),\n`;
+  content += `(2, 'sweatshirt-black-l', 10, 100000, 'sweatshirt-black.jpg'),\n`;
+  content += `(2, 'sweatshirt-black-xl', 10, 100000, 'sweatshirt-black.jpg'),\n`;
+  content += `(2, 'sweatshirt-green-s', 10, 100000, 'sweatshirt-green.jpg'),\n`;
+  content += `(2, 'sweatshirt-green-m', 10, 100000, 'sweatshirt-green.jpg'),\n`;
+  content += `(2, 'sweatshirt-green-l', 10, 100000, 'sweatshirt-green.jpg'),\n`;
+  content += `(2, 'sweatshirt-green-xl', 10, 100000, 'sweatshirt-green.jpg'),\n`;
+
+  content += `(3, 'jeans-light-green-29', 10, 100000, 'jeans-light-green.jpg'),\n`;
+  content += `(3, 'jeans-light-green-30', 10, 100000, 'jeans-light-green.jpg'),\n`;
+  content += `(3, 'jeans-light-green-31', 10, 100000, 'jeans-light-green.jpg'),\n`;
+  content += `(3, 'jeans-light-green-32', 10, 100000, 'jeans-light-green.jpg'),\n`;
+  content += `(3, 'jeans-light-green-34', 10, 100000, 'jeans-light-green.jpg'),\n`;
+
+  content += `(4, 'kaki-white-29', 10, 100000, 'kaki-white.jpg'),\n`;
+  content += `(4, 'kaki-white-30', 10, 100000, 'kaki-white.jpg'),\n`;
+  content += `(4, 'kaki-white-31', 10, 100000, 'kaki-white.jpg'),\n`;
+  content += `(4, 'kaki-white-32', 10, 100000, 'kaki-white.jpg'),\n`;
+  content += `(4, 'kaki-white-34', 10, 100000, 'kaki-white.jpg'),\n`;
+  content += `(4, 'kaki-grey-29', 10, 100000, 'kaki-grey.jpg'),\n`;
+  content += `(4, 'kaki-grey-30', 10, 100000, 'kaki-grey.jpg'),\n`;
+  content += `(4, 'kaki-grey-31', 10, 100000, 'kaki-grey.jpg'),\n`;
+  content += `(4, 'kaki-grey-32', 10, 100000, 'kaki-grey.jpg'),\n`;
+  content += `(4, 'kaki-grey-34', 10, 100000, 'kaki-grey.jpg'),\n`;
+
+  content += `(5, 'hat-black', 10, 100000, 'hat-black.jpg');\n`;
+  return content;
+};
+// Generate Variations data
+const generateVariations = () => {
+  let content = "INSERT INTO variations (nameAtribute, type) VALUES\n";
+  const variations = ["Color", "Size"];
+
+  for (let i = 1; i <= variations.length; i++) {
+    content += `('${variations[i - 1]}', Null)`;
+    content += i === variations.length ? ";\n" : ",\n";
   }
   return content;
 };
-
 // Generate VariationOption data
 const generateVariationOptions = () => {
   let content =
     "INSERT INTO variationOption (productItemID, variationID, value) VALUES\n";
-  const variationValues = [
-    "Red",
-    "Blue",
-    "Green",
-    "Small",
-    "Medium",
-    "Large",
-    "Cotton",
-    "Leather",
-    "Silk",
-    "Denim",
-  ];
 
-  for (let i = 1; i <= ROWS_COUNT.variationOption; i++) {
-    const productItemId = getRandomInt(1, ROWS_COUNT.productItem);
-    const variationId = getRandomInt(1, ROWS_COUNT.variations);
-    const value = variationValues[i % variationValues.length];
-    content += `(${productItemId}, ${variationId}, '${value}')`;
-    content += i === ROWS_COUNT.variationOption ? ";\n" : ",\n";
-  }
+  content += `(1, 1, 'black'),\n`;
+  content += `(2, 1, 'black'),\n`;
+  content += `(3, 1, 'black'),\n`;
+  content += `(4, 1, 'black'),\n`;
+  content += `(1, 2, 's'),\n`;
+  content += `(2, 2, 'm'),\n`;
+  content += `(3, 2, 'l'),\n`;
+  content += `(4, 2, 'xl'),\n`;
+  content += `(5, 1, 'light grey'),\n`;
+  content += `(6, 1, 'light grey'),\n`;
+  content += `(7, 1, 'light grey'),\n`;
+  content += `(8, 1, 'light grey'),\n`;
+  content += `(5, 2, 's'),\n`;
+  content += `(6, 2, 'm'),\n`;
+  content += `(7, 2, 'l'),\n`;
+  content += `(8, 2, 'xl'),\n`;
+
+  content += `(9, 1, 'black'),\n`;
+  content += `(10, 1, 'black'),\n`;
+  content += `(11, 1, 'black'),\n`;
+  content += `(12, 1, 'black'),\n`;
+  content += `(9, 2, 's'),\n`;
+  content += `(10, 2, 'm'),\n`;
+  content += `(11, 2, 'l'),\n`;
+  content += `(12, 2, 'xl'),\n`;
+  content += `(13, 1, 'green'),\n`;
+  content += `(14, 1, 'green'),\n`;
+  content += `(15, 1, 'green'),\n`;
+  content += `(16, 1, 'green'),\n`;
+  content += `(13, 2, 's'),\n`;
+  content += `(14, 2, 'm'),\n`;
+  content += `(15, 2, 'l'),\n`;
+  content += `(16, 2, 'xl'),\n`;
+
+  content += `(17, 1, 'green'),\n`;
+  content += `(18, 1, 'green'),\n`;
+  content += `(19, 1, 'green'),\n`;
+  content += `(20, 1, 'green'),\n`;
+  content += `(21, 1, 'green'),\n`;
+  content += `(17, 2, '29'),\n`;
+  content += `(18, 2, '30'),\n`;
+  content += `(19, 2, '31'),\n`;
+  content += `(20, 2, '32'),\n`;
+  content += `(21, 2, '34'),\n`;
+
+  content += `(22, 1, 'white'),\n`;
+  content += `(23, 1, 'white'),\n`;
+  content += `(24, 1, 'white'),\n`;
+  content += `(25, 1, 'white'),\n`;
+  content += `(26, 1, 'white'),\n`;
+  content += `(22, 2, '29'),\n`;
+  content += `(23, 2, '30'),\n`;
+  content += `(24, 2, '31'),\n`;
+  content += `(25, 2, '32'),\n`;
+  content += `(26, 2, '34'),\n`;
+  content += `(27, 1, 'grey'),\n`;
+  content += `(28, 1, 'grey'),\n`;
+  content += `(29, 1, 'grey'),\n`;
+  content += `(30, 1, 'grey'),\n`;
+  content += `(31, 1, 'grey'),\n`;
+  content += `(27, 2, '29'),\n`;
+  content += `(28, 2, '30'),\n`;
+  content += `(29, 2, '31'),\n`;
+  content += `(30, 2, '32'),\n`;
+  content += `(31, 2, '34'),\n`;
+
+  content += `(32, 1, 'black');\n`;
   return content;
 };
-
 // Generate Carts data
 const generateCarts = () => {
   let content = "INSERT INTO carts (userID, productItemID, quantity) VALUES\n";
@@ -201,7 +280,7 @@ const generatePayments = () => {
     "Credit Card",
     "PayPal",
     "Bank Transfer",
-    "Digital Wallet",
+    "Digital Wallet"
   ];
 
   for (let i = 1; i <= ROWS_COUNT.payments; i++) {
@@ -260,20 +339,25 @@ const generateAllData = () => {
     "8_carts": generateCarts(),
     "9_payments": generatePayments(),
     "10_orders": generateOrders(),
-    "11_orderItem": generateOrderItems(),
+    "11_orderItem": generateOrderItems()
   };
 
   // Create the 'sql' directory if it doesn't exist
-  const dir = path.join(__dirname, "sql");
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir);
+  const dir = join(process.cwd(), "sql");
+  if (!existsSync(dir)) {
+    mkdirSync(dir);
   }
 
   // Write each table's data to a separate file in the 'sql' directory
   for (const [tableName, content] of Object.entries(data)) {
-    fs.writeFileSync(path.join(dir, `${tableName}_data.sql`), content);
+    writeFileSync(join(dir, `${tableName}_data.sql`), content);
     console.log(`Generated ${tableName}_data.sql in the 'sql' directory`);
   }
+
+  // Create a combined SQL file with all insert statements
+  const combinedContent = Object.values(data).join("\n");
+  writeFileSync("combined_data.sql", combinedContent);
+  console.log(`Generated 0_combined_data.sql in the 'sql' directory`);
 };
 
 // Execute the generation

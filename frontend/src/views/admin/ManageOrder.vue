@@ -3,7 +3,11 @@
     <header class="page-header">
       <div class="header-content">
         <h1>
-          {{ userID ? `Orders for User #${userID}` : "Manage Orders" }}
+          {{
+            userID
+              ? $t("Views.Admin.ManageOrders.OrdersForUser", { id: userID })
+              : $t("Views.Admin.ManageOrders.Title")
+          }}
         </h1>
         <div class="header-actions">
           <div class="search-box">
@@ -11,7 +15,7 @@
             <input
               type="text"
               v-model="searchText"
-              placeholder="Search orders..."
+              :placeholder="$t('Views.Admin.ManageOrders.SearchPlaceholder')"
               @input="handleSearch"
             />
           </div>
@@ -20,11 +24,21 @@
             class="status-filter"
             @change="handleFilterChange"
           >
-            <option value="">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="processing">Processing</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
+            <option value="">
+              {{ $t("Views.Admin.ManageOrders.AllStatus") }}
+            </option>
+            <option value="pending">
+              {{ $t("Views.Admin.ManageOrders.Pending") }}
+            </option>
+            <option value="processing">
+              {{ $t("Views.Admin.ManageOrders.Processing") }}
+            </option>
+            <option value="completed">
+              {{ $t("Views.Admin.ManageOrders.Completed") }}
+            </option>
+            <option value="cancelled">
+              {{ $t("Views.Admin.ManageOrders.Cancelled") }}
+            </option>
           </select>
         </div>
       </div>
@@ -107,21 +121,28 @@
     <div class="pagination">
       <div class="pagination-info">
         <div class="items-per-page">
-          <span>Show</span>
+          <span>{{ $t("Views.Admin.ManageOrders.ShowEntries") }}</span>
           <select v-model="itemsPerPage" @change="handlePageSizeChange">
-            <option v-for="size in [20, 50, 100, 200]" :key="size" :value="size">
+            <option
+              v-for="size in [20, 50, 100, 200]"
+              :key="size"
+              :value="size"
+            >
               {{ size }}
             </option>
           </select>
-          <span>items</span>
+          <span>{{ $t("Views.Admin.ManageOrders.Items") }}</span>
         </div>
         <div class="items-info">
-          Showing {{ paginationInfo.from }}-{{ paginationInfo.to }} of {{ totalItems }} items
+          {{ $t("Views.Admin.ManageOrders.Showing") }}
+          {{ paginationInfo.from }}-{{ paginationInfo.to }}
+          {{ $t("Views.Admin.ManageOrders.Of") }} {{ totalItems }}
+          {{ $t("Views.Admin.ManageOrders.Items") }}
         </div>
       </div>
       <div class="pagination-buttons">
-        <button 
-          class="page-btn" 
+        <button
+          class="page-btn"
           :disabled="currentPage === 0"
           @click="changePage(currentPage - 1)"
         >
@@ -139,8 +160,8 @@
           </button>
         </div>
 
-        <button 
-          class="page-btn" 
+        <button
+          class="page-btn"
           :disabled="currentPage >= totalPages - 1"
           @click="changePage(currentPage + 1)"
         >
@@ -153,7 +174,7 @@
 
 <script setup>
 import { onMounted, ref, computed } from "vue";
-import axios from "axios";
+import axios from "@/utils/axios";
 import { useRouter, useRoute } from "vue-router";
 
 const router = useRouter();
@@ -182,11 +203,17 @@ const hasMoreItems = computed(() => {
   return orders.value.length < totalItems.value;
 });
 
-const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
+const totalPages = computed(() =>
+  Math.ceil(totalItems.value / itemsPerPage.value)
+);
 
 const paginationInfo = computed(() => {
-  const from = totalItems.value === 0 ? 0 : currentPage.value * itemsPerPage.value + 1;
-  const to = Math.min((currentPage.value + 1) * itemsPerPage.value, totalItems.value);
+  const from =
+    totalItems.value === 0 ? 0 : currentPage.value * itemsPerPage.value + 1;
+  const to = Math.min(
+    (currentPage.value + 1) * itemsPerPage.value,
+    totalItems.value
+  );
   return { from, to };
 });
 
@@ -268,7 +295,7 @@ async function fetchOrders(isLoadMore = false) {
       page: currentPage.value,
       size: itemsPerPage.value,
       sortBy: sortBy.value,
-      sortOrder: sortOrder.value,
+      sortOrder: sortOrder.value
     });
 
     if (searchText.value) {
@@ -283,19 +310,16 @@ async function fetchOrders(isLoadMore = false) {
       params.append("userID", userID.value);
     }
 
-    const response = await axios.get(
-      `http://localhost:5000/api/orders?${params}`,
-      {
-        withCredentials: true,
-      }
-    );
+    const response = await axios.get(`/orders?${params}`, {
+      withCredentials: true
+    });
 
     if (isLoadMore) {
       orders.value = [...orders.value, ...response.data.data];
     } else {
       orders.value = response.data.data;
     }
-    
+
     totalItems.value = response.data.total;
   } catch (error) {
     console.error("Error fetching orders:", error);

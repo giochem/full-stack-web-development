@@ -6,14 +6,14 @@ const MESSAGE = {
   SUCCESS_SAVE_PROMOTION: "Promotion saved successfully",
   ERROR_SAVE_PROMOTION: "Failed to save promotion",
   SUCCESS_DELETE_PROMOTION: "Promotion deleted successfully",
-  ERROR_DELETE_PROMOTION: "Failed to delete promotion",
+  ERROR_DELETE_PROMOTION: "Failed to delete promotion"
 };
 
 export const usePromotionStore = defineStore("promotion", {
   state: () => ({
     promotions: [],
     loading: false,
-    error: null,
+    error: null
   }),
 
   actions: {
@@ -53,7 +53,7 @@ export const usePromotionStore = defineStore("promotion", {
           name: data.name.trim(),
           discount: data.discount,
           startDate: data.startDate,
-          endDate: data.endDate,
+          endDate: data.endDate
         });
 
         if (response.data.success) {
@@ -61,7 +61,7 @@ export const usePromotionStore = defineStore("promotion", {
           return {
             success: true,
             message: MESSAGE.SUCCESS_SAVE_PROMOTION,
-            data: response.data.data,
+            data: response.data.data
           };
         }
 
@@ -70,7 +70,7 @@ export const usePromotionStore = defineStore("promotion", {
         console.error("Error saving promotion:", error);
         return {
           success: false,
-          message: this.getErrorMessage(error) || MESSAGE.ERROR_SAVE_PROMOTION,
+          message: this.getErrorMessage(error) || MESSAGE.ERROR_SAVE_PROMOTION
         };
       } finally {
         this.loading = false;
@@ -91,7 +91,7 @@ export const usePromotionStore = defineStore("promotion", {
           );
           return {
             success: true,
-            message: MESSAGE.SUCCESS_DELETE_PROMOTION,
+            message: MESSAGE.SUCCESS_DELETE_PROMOTION
           };
         }
 
@@ -100,12 +100,11 @@ export const usePromotionStore = defineStore("promotion", {
         console.error("Error deleting promotion:", error);
         return {
           success: false,
-          message:
-            this.getErrorMessage(error) || MESSAGE.ERROR_DELETE_PROMOTION,
+          message: this.getErrorMessage(error) || MESSAGE.ERROR_DELETE_PROMOTION
         };
       } finally {
         this.loading = false;
       }
-    },
-  },
+    }
+  }
 });

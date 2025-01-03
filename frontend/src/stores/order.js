@@ -8,7 +8,7 @@ export const useOrderStore = defineStore("order", {
     orders: [],
     loading: false,
     error: null,
-    successOrder: null,
+    successOrder: null
   }),
 
   actions: {
@@ -22,19 +22,19 @@ export const useOrderStore = defineStore("order", {
           this.successOrder = true;
           return {
             success: true,
-            message: response.data.message || "Order created successfully",
+            message: response.data.message || "Order created successfully"
           };
         }
 
         return {
           success: false,
-          error: "Failed to create order",
+          error: "Failed to create order"
         };
       } catch (error) {
         console.error("Error creating order:", error);
         return {
           success: false,
-          error: error.response?.data?.message || "Error creating order",
+          error: error.response?.data?.message || "Error creating order"
         };
       } finally {
         this.loading = false;
@@ -57,7 +57,7 @@ export const useOrderStore = defineStore("order", {
         console.error("Error fetching owner orders:", error);
         return {
           success: false,
-          error: error.response?.data?.message || "Error fetching owner orders",
+          error: error.response?.data?.message || "Error fetching owner orders"
         };
       } finally {
         this.loading = false;
@@ -76,11 +76,11 @@ export const useOrderStore = defineStore("order", {
         console.error("Error fetching orders:", error);
         return {
           success: false,
-          error: error.response?.data?.message || "Error fetching orders",
+          error: error.response?.data?.message || "Error fetching orders"
         };
       } finally {
         this.loading = false;
       }
-    },
-  },
+    }
+  }
 });

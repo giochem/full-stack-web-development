@@ -1,29 +1,34 @@
-const express = require("express");
-const router = express.Router();
-const { authorizeRoles } = require("../middlewares/authen.middleware");
-const { validate } = require("../middlewares/validate.middleware");
-const promotionValidation = require("../validations/promotions.validation");
-const promotionController = require("../controllers/promotions.controller");
+import express from "express";
+import { authorizeRoles } from "../middlewares/authen.middleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import {
+  validateUpsertPromotion,
+  validateDeletePromotion
+} from "../validations/promotions.validation.js";
+import {
+  handleGetPromotions,
+  handleUpsertPromotion,
+  handleDeletePromotion
+} from "../controllers/promotions.controller.js";
 
-router.get(
-  "/",
-  promotionController.getPromotions
-);
+const router = express.Router();
+
+router.get("/", handleGetPromotions);
 
 router.put(
   "/",
   authorizeRoles("admin"),
-  promotionValidation.upsertPromotion,
+  validateUpsertPromotion,
   validate,
-  promotionController.upsertPromotion
+  handleUpsertPromotion
 );
 
 router.delete(
   "/:promotionID",
   authorizeRoles("admin"),
-  promotionValidation.deletePromotion,
+  validateDeletePromotion,
   validate,
-  promotionController.deletePromotion
+  handleDeletePromotion
 );
 
-module.exports = router;
+export default router;

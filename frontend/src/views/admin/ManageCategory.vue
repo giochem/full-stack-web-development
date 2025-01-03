@@ -1,14 +1,16 @@
 <template>
   <div class="manage-category">
     <div class="header">
-      <h2>Manage Categories</h2>
+      <h2>{{ $t("Views.Admin.ManageCategories.Title") }}</h2>
       <button class="btn-primary" @click="openAddModal">
-        <i class="ri-add-line"></i> Add Category
+        <i class="ri-add-line"></i>
+        {{ $t("Views.Admin.ManageCategories.AddCategory") }}
       </button>
     </div>
 
     <div v-if="categoryStore.loading" class="loading">
-      <i class="ri-loader-4-line spin"></i> Loading...
+      <i class="ri-loader-4-line spin"></i>
+      {{ $t("Views.Admin.ManageCategories.Loading") }}
     </div>
 
     <div v-else-if="categoryStore.error" class="error">
@@ -17,15 +19,15 @@
 
     <div v-else-if="!categoryStore.categories.length" class="empty-state">
       <i class="ri-inbox-line"></i>
-      <p>No categories found. Create your first category!</p>
+      <p>{{ $t("Views.Admin.ManageCategories.NoCategories") }}</p>
     </div>
 
     <div v-else class="categories-list">
       <table>
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Actions</th>
+            <th>{{ $t("Views.Admin.ManageCategories.CategoryName") }}</th>
+            <th>{{ $t("Views.Admin.ManageCategories.Actions") }}</th>
           </tr>
         </thead>
         <tbody>
@@ -58,13 +60,17 @@
     <Modal v-model="showModal" :title="modalTitle">
       <form @submit.prevent="handleSubmit" class="category-form">
         <div class="form-group">
-          <label for="name">Category Name</label>
+          <label for="name">{{
+            $t("Views.Admin.ManageCategories.CategoryName")
+          }}</label>
           <input
             id="name"
             v-model="formData.name"
             type="text"
             required
-            placeholder="Enter category name"
+            :placeholder="
+              $t('Views.Admin.ManageCategories.PlaceholderCategoryName')
+            "
             :class="{ error: validationErrors.name }"
           />
           <span v-if="validationErrors.name" class="error-message">
@@ -74,7 +80,7 @@
 
         <div class="form-actions">
           <button type="button" class="btn-secondary" @click="closeModal">
-            Cancel
+            {{ $t("Views.Admin.ManageCategories.Cancel") }}
           </button>
           <button
             type="submit"
@@ -82,7 +88,11 @@
             :disabled="categoryStore.loading"
           >
             <i v-if="categoryStore.loading" class="ri-loader-4-line spin"></i>
-            {{ isEditing ? "Update" : "Create" }}
+            {{
+              isEditing
+                ? $t("Views.Admin.ManageCategories.Update")
+                : $t("Views.Admin.ManageCategories.Create")
+            }}
           </button>
         </div>
       </form>
@@ -91,9 +101,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, getCurrentInstance } from "vue";
 import { useCategoryStore } from "@/stores/category";
 import Modal from "@/components/common/Modal.vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
+const app = getCurrentInstance();
 
 const categoryStore = useCategoryStore();
 const showModal = ref(false);
@@ -102,11 +116,13 @@ const editingId = ref(null);
 const validationErrors = ref({});
 
 const formData = ref({
-  name: "",
+  name: ""
 });
 
 const modalTitle = computed(() =>
-  isEditing.value ? "Edit Category" : "Add Category"
+  isEditing.value
+    ? t("Views.Admin.ManageCategories.EditCategory")
+    : t("Views.Admin.ManageCategories.AddCategory")
 );
 
 onMounted(async () => {
@@ -117,7 +133,7 @@ const validateForm = () => {
   const errors = {};
 
   if (!formData.value.name?.trim()) {
-    errors.name = "Category name is required";
+    errors.name = t("Views.Admin.ManageCategories.ValidationNameRequired");
   }
 
   validationErrors.value = errors;
@@ -126,7 +142,7 @@ const validateForm = () => {
 
 const resetForm = () => {
   formData.value = {
-    name: "",
+    name: ""
   };
   validationErrors.value = {};
 };
@@ -142,7 +158,7 @@ const editCategory = (category) => {
   isEditing.value = true;
   editingId.value = category.categoryID;
   formData.value = {
-    name: category.name,
+    name: category.name
   };
   validationErrors.value = {};
   showModal.value = true;
@@ -158,7 +174,7 @@ const handleSubmit = async () => {
 
   const result = await categoryStore.upsertCategory({
     ...formData.value,
-    categoryID: isEditing.value ? editingId.value : undefined,
+    categoryID: isEditing.value ? editingId.value : undefined
   });
 
   if (result.success) {
@@ -170,9 +186,13 @@ const handleSubmit = async () => {
 };
 
 const confirmDelete = async (category) => {
-  if (confirm(`Are you sure you want to delete category "${category.name}"?`)) {
+  if (
+    confirm(
+      t("Views.Admin.ManageCategories.DeleteConfirm", { name: category.name })
+    )
+  ) {
     const result = await categoryStore.deleteCategory(category.categoryID);
-    alert(result.message);
+    app?.proxy.$notify(result.message, result.success ? "success" : "error");
   }
 };
 </script>

@@ -2,10 +2,10 @@
   <div class="home">
     <div class="container">
       <section class="products-section">
-        <h2>{{ $t("Views.Client.Title") }}</h2>
+        <h2>{{ $t("Views.Client.Home.Title") }}</h2>
 
         <div v-if="loading" class="loading">
-          <p>{{ $t("Views.Client.Loading") }}</p>
+          <p>{{ $t("Views.Client.Home.Loading") }}</p>
         </div>
 
         <div v-else-if="productStore.error" class="error">
@@ -13,7 +13,7 @@
         </div>
 
         <div v-else-if="productStore.products.length === 0" class="no-products">
-          <p>{{ $t("Views.Client.NoProducts") }}</p>
+          <p>{{ $t("Views.Client.Home.NoProducts") }}</p>
         </div>
 
         <div v-else class="products-grid">
@@ -28,8 +28,8 @@
                 :src="`${APP_CONSTANTS.UPLOAD.UPLOAD_URL}${product.image}`"
                 :alt="product.name"
               />
-              <div 
-                v-if="product.discount" 
+              <div
+                v-if="product.discount"
                 class="discount-badge"
                 :class="getDiscountStatus(product)"
               >
@@ -39,8 +39,8 @@
 
             <div class="product-info">
               <h3>{{ product.name }}</h3>
-              <div 
-                v-if="product.discount" 
+              <div
+                v-if="product.discount"
                 class="discount-period"
                 :class="getDiscountStatus(product)"
               >
@@ -49,7 +49,9 @@
                   <template v-if="getDiscountStatus(product) === 'active'">
                     Sale ends {{ formatDiscountPeriod(product) }}
                   </template>
-                  <template v-else-if="getDiscountStatus(product) === 'upcoming'">
+                  <template
+                    v-else-if="getDiscountStatus(product) === 'upcoming'"
+                  >
                     Sale starts {{ formatStartDate(product) }}
                   </template>
                   <template v-else>
@@ -86,15 +88,16 @@ function navigateTo(path) {
 }
 
 function getDiscountStatus(product) {
-  if (!product.startDate || !product.endDate || !product.discount) return 'none';
-  
+  if (!product.startDate || !product.endDate || !product.discount)
+    return "none";
+
   const now = new Date();
   const startDate = parseISO(product.startDate);
   const endDate = parseISO(product.endDate);
-  
-  if (isBefore(now, startDate)) return 'upcoming';
-  if (isAfter(now, endDate)) return 'expired';
-  return 'active';
+
+  if (isBefore(now, startDate)) return "upcoming";
+  if (isAfter(now, endDate)) return "expired";
+  return "active";
 }
 
 function formatStartDate(product) {

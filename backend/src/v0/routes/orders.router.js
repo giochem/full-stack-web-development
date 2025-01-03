@@ -1,37 +1,44 @@
-const express = require("express");
-const router = express.Router();
+import express from "express";
+import { authorizeRoles } from "../middlewares/authen.middleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import {
+  validateGetOrders,
+  validateCreateOrder,
+  validateUpdateOrder
+} from "../validations/orders.validation.js";
+import {
+  handleGetOrders,
+  handleGetOwnerOrders,
+  handleCreateOrder,
+  handleUpdateOrder
+} from "../controllers/orders.controller.js";
 
-const { authorizeRoles } = require("../middlewares/authen.middleware");
-const { validate } = require("../middlewares/validate.middleware");
-const orderValidation = require("../validations/orders.validation");
-const orderController = require("../controllers/orders.controller");
+const router = express.Router();
 
 router.get(
   "/",
-  // authorizeRoles("admin", "client"),
-  orderValidation.getOrders,
-  validate,
-  orderController.getOrders
-);
-router.get(
-  "/owner",
   authorizeRoles("admin", "client"),
-  orderController.getOwnerOrders
+  validateGetOrders,
+  validate,
+  handleGetOrders
 );
+
+router.get("/owner", authorizeRoles("admin", "client"), handleGetOwnerOrders);
 
 router.post(
   "/",
   authorizeRoles("client", "admin"),
-  orderValidation.createOrder,
+  validateCreateOrder,
   validate,
-  orderController.createOrder
+  handleCreateOrder
 );
+
 router.put(
   "/:orderID",
   authorizeRoles("admin", "client"),
-  orderValidation.updateOrder,
+  validateUpdateOrder,
   validate,
-  orderController.updateOrder
+  handleUpdateOrder
 );
 
-module.exports = router;
+export default router;

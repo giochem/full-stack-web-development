@@ -7,9 +7,15 @@
             $t("Components.Layouts.HeaderDefault.Home")
           }}</RouterLink>
         </div>
-
+        <div class="nav-brand">
+          <RouterLink to="/category">{{
+            $t("Components.Layouts.HeaderDefault.Category")
+          }}</RouterLink>
+        </div>
         <div class="nav-logo">
-          <RouterLink to="/">.369</RouterLink>
+          <RouterLink to="/">{{
+            $t("Components.Layouts.HeaderDefault.NameStore")
+          }}</RouterLink>
         </div>
 
         <div class="nav-menu">
@@ -25,9 +31,17 @@
                 </span>
               </div>
             </RouterLink>
-            <button @click="handleLogout" class="action-button logout" :disabled="isLoggingOut">
+            <button
+              @click="handleLogout"
+              class="action-button logout"
+              :disabled="isLoggingOut"
+            >
               <i class="ri-logout-box-line"></i>
-              <span class="button-text">{{ isLoggingOut ? 'Logging out...' : 'Logout' }}</span>
+              <span class="button-text">{{
+                isLoggingOut
+                  ? $t("Components.Layouts.HeaderDefault.LoggingOut")
+                  : $t("Components.Layouts.HeaderDefault.Logout")
+              }}</span>
             </button>
           </template>
           <template v-else>
@@ -38,6 +52,10 @@
               </span>
             </RouterLink>
           </template>
+
+          <RouterLink to="/search" class="search-button">
+            <i class="ri-search-line"></i>
+          </RouterLink>
 
           <div class="lang-selector">
             <button
@@ -66,8 +84,7 @@ import { RouterLink, useRouter } from "vue-router";
 import { onMounted, watch, computed, ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useCartStore } from "@/stores/cart";
-import axios from "axios";
-
+import axios from "@/utils/axios";
 const router = useRouter();
 const cartStore = useCartStore();
 const { itemCount: cartItemCount } = storeToRefs(cartStore);
@@ -81,10 +98,10 @@ async function handleLogout() {
   try {
     isLoggingOut.value = true;
     await axios.post(
-      "http://localhost:5000/api/auth/logout",
+      "/auth/logout",
       {},
       {
-        withCredentials: true,
+        withCredentials: true
       }
     );
 
@@ -356,9 +373,20 @@ watch(isLoggedIn, async (newValue) => {
   .button-text {
     display: inline;
   }
-  
+
   .action-button {
     margin-left: 1rem;
   }
+}
+
+.search-button {
+  padding: 0.5rem;
+  color: var(--secondary-dark-color);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.search-button:hover {
+  color: var(--primary-color);
 }
 </style>

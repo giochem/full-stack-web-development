@@ -1,41 +1,59 @@
-const express = require("express");
+import express from "express";
+import { authorizeRoles } from "../middlewares/authen.middleware.js";
+import {
+  handleGetUsers,
+  handleGetUser,
+  handleCreateUser,
+  handleUpdateUser,
+  handleDeleteUser
+} from "../controllers/users.controller.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import {
+  validateGetUsers,
+  validateGetUser,
+  validateCreateUser,
+  validateUpdateUser,
+  validateDeleteUser,
+  validateSearchUsers
+} from "../validations/users.validation.js";
+
 const router = express.Router();
-
-const { authorizeRoles } = require("../middlewares/authen.middleware");
-
-const userController = require("../controllers/users.controller");
-
-const { validate } = require("../middlewares/validate.middleware");
-const userValidation = require("../validations/users.validation");
 
 router.get(
   "/",
   authorizeRoles("admin"),
-  userValidation.getUsers,
+  validateGetUsers,
   validate,
-  userController.getUsers
+  handleGetUsers
 );
 
 router.get(
   "/:userID",
   authorizeRoles("admin", "client"),
-  userValidation.getUser,
+  validateGetUser,
   validate,
-  userController.getUser
+  handleGetUser
 );
 router.post(
   "/",
   authorizeRoles("admin"),
-  userValidation.createUser,
+  validateCreateUser,
   validate,
-  userController.createUser
+  handleCreateUser
 );
 router.put(
   "/:userID",
   authorizeRoles("admin"),
-  userValidation.updateUser,
+  validateUpdateUser,
   validate,
-  userController.updateUser
+  handleUpdateUser
+);
+router.delete(
+  "/:userID",
+  authorizeRoles("admin"),
+  validateDeleteUser,
+  validate,
+  handleDeleteUser
 );
 
-module.exports = router;
+export default router;

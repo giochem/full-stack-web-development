@@ -3,7 +3,7 @@
     <header class="page-header">
       <div class="header-content">
         <div class="header-title">
-          <h1>Manage Products</h1>
+          <h1>{{ $t("Views.Admin.ManageProducts.Title") }}</h1>
         </div>
         <div class="header-actions">
           <div class="filter-group">
@@ -12,7 +12,9 @@
               <input
                 type="text"
                 v-model="searchQuery"
-                placeholder="Search products..."
+                :placeholder="
+                  $t('Views.Admin.ManageProducts.SearchPlaceholder')
+                "
                 @keyup.enter="handleSearch"
                 :disabled="productStore.loading"
               />
@@ -31,7 +33,9 @@
               class="filter-select"
               @change="handleFiltersChange"
             >
-              <option value="">All Categories</option>
+              <option value="">
+                {{ $t("Views.Admin.ManageProducts.Category") }}
+              </option>
               <option
                 v-for="category in productStore.categories"
                 :key="category.categoryID"
@@ -46,7 +50,9 @@
               class="filter-select"
               @change="handleFiltersChange"
             >
-              <option value="">All Promotions</option>
+              <option value="">
+                {{ $t("Views.Admin.ManageProducts.Promotion") }}
+              </option>
               <option
                 v-for="promotion in productStore.promotions"
                 :key="promotion.promotionID"
@@ -58,7 +64,8 @@
           </div>
 
           <RouterLink to="/admin/add-product" class="add-button">
-            <i class="ri-add-line"></i> Add Product
+            <i class="ri-add-line"></i>
+            {{ $t("Views.Admin.ManageProducts.AddProduct") }}
           </RouterLink>
         </div>
       </div>
@@ -66,14 +73,15 @@
 
     <div class="product-list">
       <div v-if="productStore.loading" class="loading-state">
-        <i class="ri-loader-4-line spinning"></i> Loading products...
+        <i class="ri-loader-4-line spinning"></i>
+        {{ $t("Views.Admin.ManageProducts.Loading") }}
       </div>
       <div v-else-if="productStore.error" class="error-state">
         <i class="ri-error-warning-line"></i> {{ productStore.error }}
       </div>
       <div v-else-if="products.length === 0" class="empty-state">
         <i class="ri-inbox-line"></i>
-        <p>No products found</p>
+        <p>{{ $t("Views.Admin.ManageProducts.NoProducts") }}</p>
       </div>
       <div v-else class="product-grid">
         <div
@@ -101,14 +109,14 @@
               <div class="stock-item">
                 <i class="ri-store-line"></i>
                 <span
-                  >In Stock:
+                  >{{ $t("Views.Admin.ManageProducts.Stock") }}:
                   {{ formatNumber(product.totalQuantityInStock) }}</span
                 >
               </div>
               <div class="stock-item">
                 <i class="ri-shopping-cart-line"></i>
                 <span
-                  >In Cart:
+                  >{{ $t("Views.Admin.ManageProducts.InCart") }}:
                   {{ formatNumber(product.totalQuantityInCart) }}</span
                 >
               </div>
@@ -136,14 +144,16 @@
               :to="'/admin/edit-product/' + product.productID"
               class="edit-btn"
             >
-              <i class="ri-edit-line"></i> Edit
+              <i class="ri-edit-line"></i>
+              {{ $t("Views.Admin.ManageProducts.Edit") }}
             </RouterLink>
             <button
               @click="handleDelete(product.productID)"
               class="delete-btn"
               :disabled="productStore.loading"
             >
-              <i class="ri-delete-bin-line"></i> Delete
+              <i class="ri-delete-bin-line"></i>
+              {{ $t("Views.Admin.ManageProducts.Delete") }}
             </button>
           </div>
         </div>
@@ -157,23 +167,26 @@
             :disabled="currentPage <= 0 || productStore.loading"
           >
             <i class="ri-arrow-left-s-line"></i>
-            Previous
+            {{ $t("Views.Admin.ManageProducts.Previous") }}
           </button>
 
-          <span class="page-info">Page {{ currentPage + 1 }}</span>
+          <span class="page-info"
+            >{{ $t("Views.Admin.ManageProducts.Page") }}
+            {{ currentPage + 1 }}</span
+          >
 
           <button
             class="page-btn next-btn"
             @click="handlePageChange(currentPage + 1)"
             :disabled="!productStore.hasNextPage || productStore.loading"
           >
-            Next
+            {{ $t("Views.Admin.ManageProducts.Next") }}
             <i class="ri-arrow-right-s-line"></i>
           </button>
         </div>
 
         <div class="page-size-selector">
-          <label>Show:</label>
+          <label>{{ $t("Views.Admin.ManageProducts.Show") }}:</label>
           <select
             v-model="itemsPerPage"
             @change="handlePageSizeChange"
@@ -184,7 +197,7 @@
             <option :value="48">48</option>
             <option :value="96">96</option>
           </select>
-          <span>entries</span>
+          <span>{{ $t("Views.Admin.ManageProducts.Entries") }}</span>
         </div>
       </div>
     </div>
@@ -252,7 +265,7 @@ async function loadProducts() {
       sortOrder: sortOrder.value,
       searchText: searchQuery.value,
       filterCategory: filterCategory.value,
-      filterPromotion: filterPromotion.value,
+      filterPromotion: filterPromotion.value
     }
   );
 
@@ -282,7 +295,7 @@ function formatDate(dateString) {
   return new Date(dateString).toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
-    day: "numeric",
+    day: "numeric"
   });
 }
 function formatNumber(num) {
@@ -322,7 +335,7 @@ function getPromotionStatusClass(product) {
   return {
     "status-expired": status === "Expired",
     "status-active": status === "Active",
-    "status-coming": status === "Coming Soon",
+    "status-coming": status === "Coming Soon"
   };
 }
 
@@ -383,7 +396,9 @@ onMounted(async () => {
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .product-card:hover {

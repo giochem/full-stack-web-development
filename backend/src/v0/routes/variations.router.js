@@ -1,26 +1,34 @@
-const express = require("express");
-const router = express.Router();
-const { authorizeRoles } = require("../middlewares/authen.middleware");
-const { validate } = require("../middlewares/validate.middleware");
-const variationValidation = require("../validations/variations.validation");
-const variationController = require("../controllers/variations.controller");
+import express from "express";
+import { authorizeRoles } from "../middlewares/authen.middleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
+import {
+  validateUpsertVariation,
+  validateDeleteVariation
+} from "../validations/variations.validation.js";
+import {
+  handleGetVariations,
+  handleUpsertVariation,
+  handleDeleteVariation
+} from "../controllers/variations.controller.js";
 
-router.get("/", variationController.getVariations);
+const router = express.Router();
+
+router.get("/", handleGetVariations);
 
 router.put(
   "/",
   authorizeRoles("admin"),
-  variationValidation.upsertVariation,
+  validateUpsertVariation,
   validate,
-  variationController.upsertVariation
+  handleUpsertVariation
 );
 
 router.delete(
   "/:variationID",
   authorizeRoles("admin"),
-  variationValidation.deleteVariation,
+  validateDeleteVariation,
   validate,
-  variationController.deleteVariation
+  handleDeleteVariation
 );
 
-module.exports = router;
+export default router;

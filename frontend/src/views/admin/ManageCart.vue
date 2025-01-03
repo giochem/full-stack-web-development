@@ -1,20 +1,27 @@
 <template>
   <div class="manage-cart">
     <div class="header">
-      <h2>{{ userID ? `Carts for User #${userID}` : "Manage Carts" }}</h2>
+      <h2>
+        {{
+          userID
+            ? $t("Views.Admin.ManageCarts.CartsForUser", { id: userID })
+            : $t("Views.Admin.ManageCarts.Title")
+        }}
+      </h2>
       <div class="search-box">
         <i class="ri-search-line"></i>
         <input
           type="text"
           v-model="searchText"
-          placeholder="Search carts..."
+          :placeholder="$t('Views.Admin.ManageCarts.SearchPlaceholder')"
           @input="handleSearch"
         />
       </div>
     </div>
 
     <div v-if="cartStore.loading" class="loading">
-      <i class="ri-loader-4-line spin"></i> Loading...
+      <i class="ri-loader-4-line spin"></i>
+      {{ $t("Views.Admin.ManageCarts.Loading") }}
     </div>
 
     <div v-else-if="cartStore.error" class="error">
@@ -97,7 +104,7 @@
       <div class="pagination">
         <div class="pagination-info">
           <div class="items-per-page">
-            <span>Show</span>
+            <span>{{ $t("Views.Admin.ManageCarts.ShowEntries") }}</span>
             <select v-model="pageSize" @change="handlePageSizeChange">
               <option
                 v-for="size in [20, 50, 100, 200]"
@@ -107,11 +114,13 @@
                 {{ size }}
               </option>
             </select>
-            <span>items</span>
+            <span>{{ $t("Views.Admin.ManageCarts.Items") }}</span>
           </div>
           <div class="items-info">
-            Showing {{ paginationInfo.from }}-{{ paginationInfo.to }} of
-            {{ cartStore.totalItems }} items
+            {{ $t("Views.Admin.ManageCarts.Showing") }}
+            {{ paginationInfo.from }}-{{ paginationInfo.to }}
+            {{ $t("Views.Admin.ManageCarts.Of") }} {{ cartStore.totalItems }}
+            {{ $t("Views.Admin.ManageCarts.Items") }}
           </div>
         </div>
         <div class="pagination-buttons">
@@ -120,7 +129,7 @@
             :disabled="currentPage === 0"
             @click="changePage(currentPage - 1)"
           >
-            Previous
+            {{ $t("Views.Admin.ManageCarts.Previous") }}
           </button>
 
           <div class="page-numbers">
@@ -139,7 +148,7 @@
             :disabled="currentPage >= cartStore.totalPages - 1"
             @click="changePage(currentPage + 1)"
           >
-            Next
+            {{ $t("Views.Admin.ManageCarts.Next") }}
           </button>
         </div>
       </div>
@@ -253,7 +262,7 @@ const fetchCarts = () => {
     searchText: searchText.value,
     sortBy: sortBy.value,
     sortOrder: sortOrder.value,
-    userID: userID.value,
+    userID: userID.value
   });
 };
 
@@ -262,7 +271,7 @@ const formatPrice = (price) => {
     style: "currency",
     currency: "VND",
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 0
   }).format(price);
 };
 

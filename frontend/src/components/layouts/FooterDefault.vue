@@ -13,9 +13,7 @@
             </li>
             <li>
               <strong>Email: </strong>
-              <a href="mailto:369boutique.vn@gmail.com"
-                >369boutique.vn@gmail.com</a
-              >
+              <a href="mailto:website.vn@gmail.com">website.vn@gmail.com</a>
             </li>
             <li>
               <strong
@@ -45,11 +43,7 @@
 
     <div class="copyright">
       <div class="container">
-        <p>
-          Copyright 2024 ©
-          {{ $t("Components.Layouts.FooterDefault.ShortCompanyName") }} - All
-          rights reserved.
-        </p>
+        <p>{{ $t("Components.Layouts.FooterDefault.Copyright") }}</p>
       </div>
     </div>
   </footer>

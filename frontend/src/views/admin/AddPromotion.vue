@@ -12,9 +12,9 @@
       <form class="admin-form" @submit.prevent="save">
         <div class="form-group">
           <label for="name">Name</label>
-          <input 
+          <input
             id="name"
-            v-model="promotion.name" 
+            v-model="promotion.name"
             type="text"
             placeholder="Enter promotion name"
           />
@@ -22,9 +22,9 @@
 
         <div class="form-group">
           <label for="reduce">Discount (%)</label>
-          <input 
+          <input
             id="reduce"
-            v-model="promotion.reduce" 
+            v-model="promotion.reduce"
             type="number"
             min="0"
             max="100"
@@ -35,18 +35,18 @@
         <div class="form-row">
           <div class="form-group">
             <label for="startTime">Start Time</label>
-            <input 
+            <input
               id="startTime"
-              v-model="promotion.startTime" 
+              v-model="promotion.startTime"
               type="datetime-local"
             />
           </div>
 
           <div class="form-group">
             <label for="endTime">End Time</label>
-            <input 
+            <input
               id="endTime"
-              v-model="promotion.endTime" 
+              v-model="promotion.endTime"
               type="datetime-local"
             />
           </div>
@@ -54,18 +54,16 @@
 
         <div class="form-group">
           <label for="productIDs">Product IDs</label>
-          <input 
+          <input
             id="productIDs"
-            v-model="promotion.productIDs" 
+            v-model="promotion.productIDs"
             type="text"
             placeholder="Enter product IDs (comma-separated)"
           />
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="primary-btn">
-            Add Promotion
-          </button>
+          <button type="submit" class="primary-btn">Add Promotion</button>
           <RouterLink to="/admin/manage-promotion" class="secondary-btn">
             Cancel
           </RouterLink>
@@ -78,7 +76,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import axios from "@/utils/axios";
 
 const router = useRouter();
 
@@ -87,29 +85,27 @@ const promotion = ref({
   reduce: 0,
   startTime: "",
   endTime: "",
-  productIDs: "",
+  productIDs: ""
 });
 
 async function save() {
   try {
     const productIDArray = promotion.value.productIDs
       .split(",")
-      .map(id => parseInt(id.trim()));
+      .map((id) => parseInt(id.trim()));
 
     const data = {
       ...promotion.value,
       productIDs: productIDArray,
       reduce: parseInt(promotion.value.reduce),
       startTime: promotion.value.startTime.replace("T", " "),
-      endTime: promotion.value.endTime.replace("T", " "),
+      endTime: promotion.value.endTime.replace("T", " ")
     };
 
-    await axios.post(
-      "http://localhost:5000/api/promotions",
-      data,
-      { withCredentials: true }
-    );
-    
+    await axios.post("/promotions", data, {
+      withCredentials: true
+    });
+
     router.push("/admin/manage-promotion");
   } catch (error) {
     console.error("Error adding promotion:", error);

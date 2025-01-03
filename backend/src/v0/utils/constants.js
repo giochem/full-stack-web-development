@@ -87,7 +87,7 @@ const Message = {
 
   // General errors
   ERROR_UNKNOWN: "An unknown error occurred",
-  ERROR_VALIDATION: "Validation error",
+  ERROR_VALIDATION: "Validation error"
 };
 
 const StatusCode = {
@@ -110,16 +110,11 @@ const StatusCode = {
   INTERNAL_SERVER_ERROR: 500,
   NOT_IMPLEMENTED: 501,
   BAD_GATEWAY: 502,
-  SERVICE_UNAVAILABLE: 503,
+  SERVICE_UNAVAILABLE: 503
 };
 
 const Path = {
-  UPLOAD_DIR: "./src/v0/uploads",
-  STATIC_DIR: "/v0/uploads",
+  UPLOAD_DIR: "./src/v0/uploads"
 };
 
-module.exports = {
-  Message,
-  StatusCode,
-  Path,
-};
+export { Message, StatusCode, Path };

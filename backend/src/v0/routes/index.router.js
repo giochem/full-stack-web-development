@@ -1,12 +1,12 @@
-const express = require("express");
-const authRouter = require("./auth.router");
-const userRouter = require("./users.router");
-const productRouter = require("./products.router");
-const promotionRouter = require("./promotions.router");
-const categoryRouter = require("./categories.router");
-const cartRouter = require("./carts.router");
-const orderRouter = require("./orders.router");
-const variationRouter = require("./variations.router");
+import express from "express";
+import authRouter from "./auth.router.js";
+import userRouter from "./users.router.js";
+import productRouter from "./products.router.js";
+import promotionRouter from "./promotions.router.js";
+import categoryRouter from "./categories.router.js";
+import cartRouter from "./carts.router.js";
+import orderRouter from "./orders.router.js";
+import variationRouter from "./variations.router.js";
 const apiRoute = express();
 
 apiRoute.get("", (req, res) => {
@@ -21,4 +21,4 @@ apiRoute.use("/promotions", promotionRouter);
 apiRoute.use("/categories", categoryRouter);
 apiRoute.use("/carts", cartRouter);
 apiRoute.use("/orders", orderRouter);
-module.exports = apiRoute;
+export default apiRoute;

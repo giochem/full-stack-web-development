@@ -3,38 +3,45 @@
     <header class="page-header">
       <div class="header-content">
         <div class="header-title">
-          <h1>Add Product</h1>
+          <h1>{{ $t("Views.Admin.AddProduct.Title") }}</h1>
         </div>
       </div>
     </header>
 
     <div class="form-container">
       <div v-if="loading" class="loading-state">
-        <i class="ri-loader-4-line spinning"></i> Loading...
+        <i class="ri-loader-4-line spinning"></i>
+        {{ $t("Views.Admin.AddProduct.Loading") }}
       </div>
       <form v-else class="admin-form" @submit.prevent="handleSave">
         <div class="form-row">
           <div class="form-group">
-            <label for="name">Product Name</label>
+            <label for="name">{{
+              $t("Views.Admin.AddProduct.LabelProductName")
+            }}</label>
             <input
               id="name"
               v-model="product.name"
               type="text"
-              placeholder="Enter product name"
+              :placeholder="$t('Views.Admin.AddProduct.PlaceholderProductName')"
               :disabled="productStore.loading"
               required
             />
           </div>
 
           <div class="form-group">
-            <label for="category">Category</label>
+            <label for="category">{{
+              $t("Views.Admin.AddProduct.LabelCategory")
+            }}</label>
             <select
               id="category"
               v-model="product.categoryID"
               required
               :disabled="productStore.loading"
             >
-              <option value="">Select Category</option>
+              <option value="">
+                {{ $t("Views.Admin.AddProduct.PlaceholderCategory") }}
+              </option>
               <option
                 v-for="category in categories"
                 :key="category.categoryID"
@@ -47,25 +54,31 @@
         </div>
 
         <div class="form-group">
-          <label for="description">Description</label>
+          <label for="description">{{
+            $t("Views.Admin.AddProduct.LabelDescription")
+          }}</label>
           <textarea
             id="description"
             v-model="product.description"
             rows="3"
-            placeholder="Enter product description"
+            :placeholder="$t('Views.Admin.AddProduct.PlaceholderDescription')"
             :disabled="productStore.loading"
             required
           ></textarea>
         </div>
 
         <div class="form-group">
-          <label for="promotion">Promotion (Optional)</label>
+          <label for="promotion">{{
+            $t("Views.Admin.AddProduct.LabelPromotion")
+          }}</label>
           <select
             id="promotion"
             v-model="product.promotionID"
             :disabled="productStore.loading"
           >
-            <option value="">No Promotion</option>
+            <option value="">
+              {{ $t("Views.Admin.AddProduct.PlaceholderPromotion") }}
+            </option>
             <option
               v-for="promotion in activePromotions"
               :key="promotion.promotionID"
@@ -75,13 +88,15 @@
             </option>
           </select>
           <small v-if="selectedPromotion" class="promotion-dates">
-            Valid from {{ formatDate(selectedPromotion.startDate) }} to
+            {{ $t("Views.Admin.AddProduct.PromotionValidFrom") }}
+            {{ formatDate(selectedPromotion.startDate) }}
+            {{ $t("Views.Admin.AddProduct.PromotionValidTo") }}
             {{ formatDate(selectedPromotion.endDate) }}
           </small>
         </div>
 
         <div class="form-group">
-          <label>Main Product Image</label>
+          <label>{{ $t("Views.Admin.AddProduct.LabelMainImage") }}</label>
           <div class="image-upload">
             <input
               type="file"
@@ -104,10 +119,12 @@
             class="primary-btn"
             :disabled="productStore.loading"
           >
-            <i class="ri-save-line"></i> Save Product
+            <i class="ri-save-line"></i>
+            {{ $t("Views.Admin.AddProduct.ButtonAddProduct") }}
           </button>
           <RouterLink to="/admin/manage-product" class="secondary-btn">
-            <i class="ri-arrow-left-line"></i> Cancel
+            <i class="ri-arrow-left-line"></i>
+            {{ $t("Views.Admin.AddProduct.ButtonCancel") }}
           </RouterLink>
         </div>
       </form>
@@ -134,7 +151,7 @@ const product = ref({
   name: "",
   description: "",
   categoryID: "",
-  promotionID: "",
+  promotionID: ""
 });
 
 const activePromotions = computed(() => {
@@ -163,7 +180,7 @@ function formatDate(dateString) {
   return new Date(dateString).toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
-    day: "numeric",
+    day: "numeric"
   });
 }
 
