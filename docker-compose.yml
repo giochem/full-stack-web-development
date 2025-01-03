@@ -13,9 +13,6 @@ services:
       - SQL_SERVER_DATABASE=clothes369
     depends_on:
       - db
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
     networks:
       - same_network
   frontend:
@@ -29,9 +26,6 @@ services:
       - VITE_API_UPLOAD_URL=http://backend:3000/api/upload
     depends_on:
       - backend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     networks:
       - same_network
   db:
@@ -40,12 +34,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "1435:1433"
-    volumes:
-      - sqlserver_data:/var/opt/mssql
     networks:
       - same_network
-volumes:
-  sqlserver_data:
+
 networks:
   same_network:
     driver: bridge
