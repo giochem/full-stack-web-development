@@ -281,14 +281,6 @@ We welcome contributions! Here's how you can help:
 4. Push to the branch
 5. Open a Pull Request
 
-## 📞 Support
-
-Need help? Here's how to get support:
-
-- Create an issue
-- Email: your.email@example.com
-- Documentation: [Link to docs]
-
 ## 📄 License
 
 MIT License - feel free to use and modify for your needs!
